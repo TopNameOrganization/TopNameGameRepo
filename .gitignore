@@ -1,6 +1,10 @@
-node_modules/
-.env
 .idea
 .vscode
+.DS_Store
+packages/.DS_Store
+
+node_modules/
 dist
 tmp
+.yarn
+lerna-debug.log
