@@ -6,5 +6,4 @@ packages/.DS_Store
 node_modules/
 dist
 tmp
-.yarn
 lerna-debug.log
