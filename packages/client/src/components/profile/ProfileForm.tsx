@@ -1,42 +1,13 @@
 import * as React from 'react';
 import {useFormik} from 'formik';
-import * as yup from 'yup';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
+import {validationProfile} from "./validation";
 
 interface IProfile {
     [key: string]: FormDataEntryValue | null
 }
-
-const validationSchema = yup.object({
-    firstName: yup
-        .string()
-        .min(3, 'First name should be of minimum 3 characters length')
-        .max(20, 'First name should be of maximum 20 characters length'),
-    secondName: yup
-        .string()
-        .min(3, 'Second name should be of minimum 3 characters length')
-        .max(20, 'First name should be of maximum 20 characters length'),
-    nickName: yup
-        .string()
-        .min(3, 'Password should be of minimum 3 characters length')
-        .max(20, 'First name should be of maximum 20 characters length')
-        .required('Nick name is required'),
-    email: yup
-        .string()
-        .email('Enter a valid email')
-        .required('Email is required'),
-    phone: yup
-        .string()
-        .min(12, 'Phone should be of minimum 12 characters length')
-        .max(12, 'Phone should be of maximum 12 characters length')
-        .required('Phone is required'),
-    password: yup
-        .string()
-        .min(8, 'Password should be of minimum 8 characters length')
-        .required('Password is required'),
-});
 
 export default function ProfileForm() {
     const [isDisabled, setIsDisabled] = React.useState<boolean>(false);
@@ -50,7 +21,7 @@ export default function ProfileForm() {
             email: '',
             password: '',
         },
-        validationSchema: validationSchema,
+        validationSchema: validationProfile,
         onSubmit: (profileData: IProfile) => {
             console.log('profileData: ', profileData)
             setIsDisabled(false);
@@ -152,27 +123,24 @@ export default function ProfileForm() {
                 helperText={formik.touched.password && formik.errors.password}
             />
             {
-                !isDisabled &&
-                <Button
-                    onClick={handleChangeIsDisabled}
-                    type="button"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 5, mb: 2 }}
-                >
-                    Edit Profile
-                </Button>
-            }
-            {
-                isDisabled &&
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 5, mb: 2 }}
-                >
-                    Save Profile
-                </Button>
+                isDisabled
+                    ? (<Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 5, mb: 2 }}
+                    >
+                        Save Profile
+                    </Button>)
+                    : (<Button
+                        onClick={handleChangeIsDisabled}
+                        type="button"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 5, mb: 2 }}
+                    >
+                        Edit Profile
+                    </Button>)
             }
         </Box>
     );
