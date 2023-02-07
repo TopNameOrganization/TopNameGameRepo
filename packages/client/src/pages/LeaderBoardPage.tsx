@@ -9,14 +9,14 @@ import {
   TableCell,
 } from '@mui/material'
 
-const LeaderBoardPage = () => {
-  // это должно быть из стора, а там из апи, но это неточно ))
-  const data = [
-    { name: 'aaa', level: 10, score: 1000 },
-    { name: 'bbb', level: 8, score: 500 },
-    { name: 'ccc', level: 2, score: 20 },
-  ]
+// это должно быть из стора, а там из апи, но это неточно ))
+const data = [
+  { name: 'aaa', level: 10, score: 1000 },
+  { name: 'bbb', level: 8, score: 500 },
+  { name: 'ccc', level: 2, score: 20 },
+]
 
+const LeaderBoardPage = () => {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -36,7 +36,7 @@ const LeaderBoardPage = () => {
         </TableHead>
         <TableBody>
           {data.map(({ name, level, score }, index) => (
-            <TableRow key={index}>
+            <TableRow key={`key${index}`}>
               <TableCell size="small" align="right">
                 {index}
               </TableCell>
