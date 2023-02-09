@@ -1,4 +1,3 @@
-import React from "react";
 import instance from "./axiosInstance";
 
 export type UserProfileData = {
@@ -15,9 +14,9 @@ export type UserPasswordData = {
     newPassword: string;
 }
 
-class UsersAPI extends React.Component {
+class UsersAPI {
 
-  static handleChangeUserProfile = async (data: UserProfileData) => {
+  static changeUserProfile = async (data: UserProfileData) => {
     try {
       const response = await instance.put(`/user/profile`, data);
       if (response.status === 200) {
@@ -28,7 +27,7 @@ class UsersAPI extends React.Component {
     }
   }
 
-  static handleChangeUserAvatar = async (data: FormData) => {
+  static changeUserAvatar = async (data: FormData) => {
     try {
       const response = await instance.put(`/user/profile/avatar`, data);
       if (response.status === 200) {
@@ -39,7 +38,7 @@ class UsersAPI extends React.Component {
     }
   }
 
-  static handleChangeUserPassword = async (data: UserPasswordData) => {
+  static changeUserPassword = async (data: UserPasswordData) => {
     try {
       const response = await instance.put(`/user/password`, data);
       if (response.status === 200) {
@@ -50,7 +49,7 @@ class UsersAPI extends React.Component {
     }
   }
 
-  static handleGetUserById = async (id: number) => {
+  static getUserById = async (id: number) => {
     try {
       const response = await instance.get(`/user/${id}`);
       if (response.status === 200) {
