@@ -1,18 +1,26 @@
-import { useEffect } from 'react'
+import React from 'react'
+import { RouterProvider } from 'react-router-dom'
+import { ThemeProvider, createTheme } from '@mui/material'
 import './App.css'
+import router from './router/router'
+
+
+const theme = createTheme()
+
+
+
+
 
 function App() {
-  useEffect(() => {
-    const fetchServerData = async () => {
-      const url = `http://localhost:${__SERVER_PORT__}`
-      const response = await fetch(url)
-      const data = await response.json()
-      console.log(data)
-    }
+  return (
+    <div className="App">
+      <ThemeProvider theme={theme}>
+        <RouterProvider router={router}></RouterProvider>
+      </ThemeProvider>
 
-    fetchServerData()
-  }, [])
-  return <div className="App">Вот тут будет жить ваше приложение:)</div>
+    </div>
+  )
+
 }
 
 export default App
