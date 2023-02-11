@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { TileSize } from '../constants'
+import { TileSize } from '../../../constants'
 
 export const Tile = styled.div<{ type: number }> `
   width: ${TileSize}px;

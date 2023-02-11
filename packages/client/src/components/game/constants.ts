@@ -7,10 +7,10 @@ export enum Tiles {
 }
 
 export enum Directions {
-  Up = 'up',
-  Right = 'right',
-  Down = 'down',
-  Left = 'left'
+  Left = 37,
+  Up = 38,
+  Right = 39,
+  Down = 40,
 }
 
 // TODO: это должно быть в ассетах, в апи или как-то ещё иначе
