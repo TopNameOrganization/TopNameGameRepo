@@ -1,25 +1,34 @@
 import { Directions, Tiles, TileSize } from "../constants";
 import Player from './Player';
 import { Player as PlayerType } from "./Player";
+import { EventBus } from "../utils/EventBus";
+import { LevelType, SizeType, PositionType, ModelEvents } from "./types";
 
-export class GameModel {
+export class GameModel extends EventBus {
   private _player: PlayerType;
-  private _level: Tiles[][];
+  private _level: LevelType;
 
   constructor() {
+    super();
     this._player = Player;
   }
 
-  public setLevel({ level, player }): void {
+  // TODO: подумать более лучше про тип и вообще, как и где это хранить
+  public setLevel({ level, player }: { level: LevelType, player: PositionType }): void {
     this._level = level;
     this._player.setPosition(player);
   }
 
-  public getLevelSize(): { width: number, height: number } {
+  public dispatchUpdate(): void {
+    // TODO: диспатчить ВСЕ изменения, а не только игрока
+    this.dispatch(ModelEvents.Update, this.getPlayerPosition());
+  }
+
+  public getLevelSize(): SizeType {
     return { width: this._level[0].length * TileSize, height: this._level.length * TileSize };
   }
 
-  public getLevel(): Tiles[][] {
+  public getLevel(): LevelType {
     return this._level;
   }
 
@@ -59,13 +68,19 @@ export class GameModel {
         this._player.setPosition({ x: x + dx, y });
         break;
     }
+
+    if (this.checkPlayerFall()) {
+      this.movePlayer(Directions.Down);
+    }
+
+    this.dispatchUpdate();
   }
 
   public checkPlayerFall(): boolean {
     return this.getTileAtPlayer(0, 1) === Tiles.Empty && this.getTileAtPlayer(0, 0) === Tiles.Empty;
   }
 
-  public getPlayerPosition(): { x: number, y: number } {
+  private getPlayerPosition(): { x: number, y: number } {
     const { x, y } = this._player;
     return { x, y };
   }
