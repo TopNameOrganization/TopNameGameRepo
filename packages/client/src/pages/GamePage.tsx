@@ -1,14 +1,13 @@
 import React from 'react'
 
 import { Level } from '../components/game/constants'
-import { LevelHolder } from '../components/game/level'
-import { AnimationHolder } from '../components/game/animation/AnimationHolder'
+
+import { GameView } from '../components/game/view/GameView'
+import GameModel from '../components/game/model/GameModel'
 
 export const GamePage = () => {
-  return (
-    <div>
-      <LevelHolder level={Level} />
-      <AnimationHolder player={{ x: 1, y: 1 }} level={Level} />
-    </div>
-  )
+  const model = GameModel
+  model.setLevel({ level: Level, player: { x: 1, y: 1 } })
+
+  return <GameView />
 }
