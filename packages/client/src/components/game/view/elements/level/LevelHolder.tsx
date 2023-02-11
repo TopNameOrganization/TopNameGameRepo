@@ -1,15 +1,17 @@
 import React from 'react'
-import { Tile } from './styled'
 
-export function LevelHolder({ level }) {
+import { LevelType } from '../../../model'
+import { Tile, FlexContainer } from './styled'
+
+export function LevelHolder({ level }: { level: LevelType }) {
   return (
     <div>
-      {level.map(item => (
-        <div style={{ display: 'flex' }}>
-          {item.map(type => (
-            <Tile type={type} />
+      {level.map((item, i) => (
+        <FlexContainer key={`row${i}`}>
+          {item.map((type, j) => (
+            <Tile key={`tile${j}${i}`} type={type} />
           ))}
-        </div>
+        </FlexContainer>
       ))}
     </div>
   )

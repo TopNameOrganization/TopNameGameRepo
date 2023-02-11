@@ -1,13 +1,14 @@
+import { PositionType } from "./types";
+
 export class Player {
   private _x: number;
   private _y: number;
 
-  constructor({ x, y }) {
+  constructor({ x, y }: PositionType) {
     this.setPosition({ x, y });
   }
 
-  // TODO: собрать типы в одном месте и назвать по-понятному
-  public setPosition({ x, y }: { x: number, y: number }): void {
+  public setPosition({ x, y }: PositionType): void {
     this._x = x;
     this._y = y;
   }
