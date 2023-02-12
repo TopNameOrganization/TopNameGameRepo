@@ -9,8 +9,7 @@ import { LevelHolder } from './elements/level'
 export const GameView = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const model = GameModel
-  const { width, height } = model.getLevelSize()
+  const { width, height } = GameModel.getLevelSize()
 
   const drawFrame = (playerPosition: PositionType) => {
     const ctx = canvasRef.current.getContext('2d')
@@ -29,19 +28,23 @@ export const GameView = () => {
     evt.preventDefault()
     const { keyCode } = evt
     if (keyCode >= Directions.Left && keyCode <= Directions.Down) {
-      model.movePlayer(keyCode)
+      GameModel.movePlayer(keyCode)
     }
   }
 
   useEffect(() => {
     document.addEventListener('keyup', onKey)
-    model.on(ModelEvents.Update, drawFrame)
-    model.dispatchUpdate()
+    GameModel.on(ModelEvents.Update, drawFrame)
+    GameModel.dispatchUpdate()
+    return () => {
+      document.removeEventListener('keyup', onKey)
+      GameModel.off(ModelEvents.Update, drawFrame)
+    }
   }, [])
 
   return (
     <div>
-      <LevelHolder level={model.getLevel()} />
+      <LevelHolder level={GameModel.getLevel()} />
       <canvas
         ref={canvasRef}
         width={width}
