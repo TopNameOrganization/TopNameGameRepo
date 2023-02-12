@@ -12,15 +12,18 @@ export const GameView = () => {
   const { width, height } = GameModel.getLevelSize()
 
   const drawFrame = (playerPosition: PositionType) => {
-    const ctx = canvasRef.current.getContext('2d')
-    // TODO: это должен делать спрайт, каждый сам за себя, а не весь canvas перерисовывать
-    ctx.clearRect(0, 0, width, height)
+    const ctx = canvasRef.current?.getContext('2d')
+    if (ctx) {
+      // TODO: это должен делать спрайт, каждый сам за себя, а не весь canvas перерисовывать
+      ctx.clearRect(0, 0, width, height)
 
-    // вроде не особо на что влияет, но лучше проверить
-    if (playerPosition) {
-      const { x, y } = playerPosition
-      ctx.fillStyle = 'grey'
-      ctx.fillRect(x * TileSize, y * TileSize, TileSize, TileSize)
+      // вроде не особо на что влияет, но лучше проверить
+      if (playerPosition) {
+        const { x, y } = playerPosition
+
+        ctx.fillStyle = 'grey'
+        ctx.fillRect(x * TileSize, y * TileSize, TileSize, TileSize)
+      }
     }
   }
 

@@ -5,32 +5,32 @@ export class EventBus<
   E extends Record<string, string> = Record<string, string>,
   Args extends Record<MapInterface<E>, any[]> = Record<string, any>,
   > {
-  private readonly _listeners: { [K in MapInterface<E>]?: Handler<Args[K]>[] } = {};
+  private readonly listeners: { [K in MapInterface<E>]?: Handler<Args[K]>[] } = {};
 
   constructor() {
-    this._listeners = {};
+    this.listeners = {};
   }
 
   public on<Event extends MapInterface<E>>(event: Event, callback: Handler<Args[Event]>) {
-    if (!this._listeners[event]) {
-      this._listeners[event] = [];
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
     }
-    this._listeners[event]?.push(callback);
+    this.listeners[event]?.push(callback);
   }
 
   public off<Event extends MapInterface<E>>(event: Event, callback: Handler<Args[Event]>) {
-    if (!this._listeners[event]) {
+    if (!this.listeners[event]) {
       // ну или как-то более иначе это обрабатывать
       throw (new Error(`NO such event!!1 ${event}`));
     }
-    this._listeners[event] = this._listeners[event].filter((listener) => listener !== callback);
+    this.listeners[event] = this.listeners[event]?.filter((listener) => listener !== callback);
   }
 
   public dispatch<Event extends MapInterface<E>>(event: Event, ...args: Args[Event]) {
-    if (!this._listeners[event]) {
+    if (!this.listeners[event]) {
       // ну или как-то более иначе это обрабатывать
       throw (new Error(`NO such event!!1 ${event}`));
     }
-    this._listeners[event].forEach((listener) => listener(...args));
+    this.listeners[event]?.forEach((listener) => listener(...args));
   }
 }

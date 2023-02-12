@@ -5,8 +5,8 @@ import { EventBus } from "../utils/EventBus";
 import { LevelType, SizeType, PositionType, ModelEvents } from "./types";
 
 export class GameModel extends EventBus {
-  private _player: RunnerType;
-  private _level: LevelType;
+  private player: RunnerType;
+  private level: LevelType;
 
   constructor() {
     super();
@@ -14,25 +14,25 @@ export class GameModel extends EventBus {
 
   // TODO: подумать более лучше про тип и вообще, как и где это хранить
   public setLevel({ level, player }: { level: LevelType, player: PositionType }): void {
-    this._level = level;
-    this._player = new Runner(player);
+    this.level = level;
+    this.player = new Runner(player);
   }
 
   // чтоб GameView могло узнать, какого размера canvas делать
   public getLevelSize(): SizeType {
-    return { width: this._level[0].length * TileSize, height: this._level.length * TileSize };
+    return { width: this.level[0].length * TileSize, height: this.level.length * TileSize };
   }
 
   // чтоб GameView могло узнать, какой уровень рисовать
   public getLevel(): LevelType {
-    return this._level;
+    return this.level;
   }
 
   // чтоб можно было снаружи снаружи задиспатчить обновление
   // TODO: скорее всего выпилить после того, как научить модель считать время
   public dispatchUpdate(): void {
     // TODO: диспатчить ВСЕ изменения, а не только игрока
-    const { x, y } = this._player;
+    const { x, y } = this.player;
     this.dispatch(ModelEvents.Update, { x, y });
   }
 
@@ -42,7 +42,7 @@ export class GameModel extends EventBus {
     const tile = this.getTileAtPlayer(0, 0);
     const tileUnder = this.getTileAtPlayer(0, 1);
 
-    const { x, y } = this._player;
+    const { x, y } = this.player;
     const dy = dir === Directions.Down ? 1 : -1;
     const dx = dir === Directions.Right ? 1 : -1;
 
@@ -51,19 +51,19 @@ export class GameModel extends EventBus {
     switch (dir) {
       case Directions.Up:
       case Directions.Down:
-        if (y + dy < 0 || y + dy >= this._level.length) {
+        if (y + dy < 0 || y + dy >= this.level.length) {
           // выходим за пределы уровня, а туда выходить нельзя
           break;
         }
         if (this.checkPlayerFall()) {
           // есть куда упасть, значит надо падать 
-          this._player.setPosition({ x, y: y + 1 });
+          this.player.setPosition({ x, y: y + 1 });
           break;
         }
         if (dir === Directions.Down && tile === Tiles.Rope
           && (tileUnder === Tiles.Empty || tileUnder === Tiles.Rope)) {
           // если висим на верёвке и жмём вниз, значит надо падать
-          this._player.setPosition({ x, y: y + 1 });
+          this.player.setPosition({ x, y: y + 1 });
           break;
         }
         if (tile === Tiles.Stair || tileUnder === Tiles.Stair) {
@@ -73,12 +73,12 @@ export class GameModel extends EventBus {
             // если наткнулись стену или идём вверх, но лестница уже закончилась, дальше идти нельзя
             break;
           }
-          this._player.setPosition({ x, y: y + dy });
+          this.player.setPosition({ x, y: y + dy });
         }
         break;
       case Directions.Right:
       case Directions.Left:
-        if (x + dx < 0 || x + dx >= this._level[0].length) {
+        if (x + dx < 0 || x + dx >= this.level[0].length) {
           // выходим за пределы уровня, а туда выходить нельзя
           break;
         }
@@ -86,7 +86,7 @@ export class GameModel extends EventBus {
           // наткнулись на стену, дальше идти нельзя
           break;
         }
-        this._player.setPosition({ x: x + dx, y });
+        this.player.setPosition({ x: x + dx, y });
         break;
     }
 
@@ -104,7 +104,7 @@ export class GameModel extends EventBus {
   }
 
   private getTileAtPlayer(x: number, y: number): Tiles {
-    return this._level[this._player.y + y][this._player.x + x]
+    return this.level[this.player.y + y][this.player.x + x]
   }
 }
 
