@@ -1,3 +1,3 @@
 export * from './GameModel';
-export * from './Player';
+export * from './Runner';
 export * from './types';

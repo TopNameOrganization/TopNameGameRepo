@@ -1,6 +1,6 @@
 import { PositionType } from "./types";
 
-export class Player {
+export class Runner {
   private _x: number;
   private _y: number;
 
@@ -22,4 +22,4 @@ export class Player {
   }
 }
 
-export default new Player({ x: 0, y: 0 });
+export default Runner;

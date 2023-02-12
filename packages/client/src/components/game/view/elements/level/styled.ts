@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { TileSize } from '../../../constants'
+import { TileSize, Tiles } from '../../../constants'
 
 export const FlexContainer = styled.div`
   display: flex;
@@ -10,10 +10,14 @@ export const Tile = styled.div<{ type: number }> `
   height: ${TileSize}px;
   background: ${({ type }) => {
     switch (type) {
-      case 1:
+      case Tiles.Brick:
         return 'red';
-      case 2:
+      case Tiles.Concrete:
+        return 'darkred';
+      case Tiles.Stair:
         return 'white';
+      case Tiles.Rope:
+        return 'lightgrey';
       default:
         return 'black';
     }
