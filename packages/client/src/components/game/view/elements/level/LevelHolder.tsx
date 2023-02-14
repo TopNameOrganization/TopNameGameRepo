@@ -9,7 +9,7 @@ export function LevelHolder({ level }: { level: LevelType }) {
       {level.map((item, i) => (
         <FlexContainer key={`row${i}`}>
           {item.map((type, j) => (
-            <Tile key={`tile${j}${i}`} type={type} />
+            <Tile key={`tile_${j}_${i}`} type={type} />
           ))}
         </FlexContainer>
       ))}
