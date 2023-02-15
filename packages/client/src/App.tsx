@@ -1,26 +1,25 @@
 import React from 'react'
-import { RouterProvider } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material'
-import './App.css'
-import router from './router/router'
-
+import { AuthProvider } from './context/AuthContext'
+import { Router } from './Router'
+import { QueryClientProvider, QueryClient } from 'react-query'
+import { HashRouter } from 'react-router-dom'
 
 const theme = createTheme()
-
-
-
-
+const queryClient = new QueryClient()
 
 function App() {
   return (
-    <div className="App">
+    <HashRouter>
       <ThemeProvider theme={theme}>
-        <RouterProvider router={router}></RouterProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <Router />
+          </AuthProvider>
+        </QueryClientProvider>
       </ThemeProvider>
-
-    </div>
+    </HashRouter>
   )
-
 }
 
 export default App

@@ -16,7 +16,7 @@ const data = [
   { name: 'ccc', level: 2, score: 20 },
 ]
 
-const LeaderBoardPage = () => {
+export const LeaderBoardPage = () => {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -50,5 +50,3 @@ const LeaderBoardPage = () => {
     </TableContainer>
   )
 }
-
-export default LeaderBoardPage
