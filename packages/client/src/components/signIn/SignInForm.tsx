@@ -1,26 +1,25 @@
 import React from 'react'
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import Link from '@mui/material/Link'
-import Grid from '@mui/material/Grid'
-import Box from '@mui/material/Box'
+import { Button, Box, TextField } from '@mui/material'
 import { useFormik } from 'formik'
 import { signInFormValidationSchema } from './validation'
+import { useAuth } from '../../context/AuthContext'
+import { FormServerError } from '../FormServerError'
 
 interface SignInFormData {
-  email: string
+  login: string
   password: string
 }
 
 export function SignInForm() {
+  const auth = useAuth()
   const formik = useFormik({
     initialValues: {
-      email: '',
+      login: '',
       password: '',
     },
     validationSchema: signInFormValidationSchema,
     onSubmit: (data: SignInFormData) => {
-      console.log('SignInFormData: ', data)
+      auth.signin(data)
     },
   })
 
@@ -28,38 +27,41 @@ export function SignInForm() {
     <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 1 }}>
       <TextField
         margin="normal"
-        required
         fullWidth
-        id="email"
+        id="login"
         label="Email Address"
-        name="email"
+        name="login"
         autoComplete="email"
         autoFocus
-        error={formik.touched.email && Boolean(formik.errors.email)}
-        helperText={formik.touched.email && formik.errors.email}
+        onChange={formik.handleChange}
+        value={formik.values.login}
+        error={formik.touched.login && Boolean(formik.errors.login)}
+        helperText={formik.touched.login && formik.errors.login}
       />
       <TextField
         margin="normal"
-        required
         fullWidth
         name="password"
         label="Password"
         type="password"
         id="password"
         autoComplete="current-password"
+        onChange={formik.handleChange}
+        value={formik.values.password}
         error={formik.touched.password && Boolean(formik.errors.password)}
         helperText={formik.touched.password && formik.errors.password}
       />
-      <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+      {!!auth.signinError && (
+        <FormServerError message={auth.signinError.response.data.reason} />
+      )}
+      <Button
+        type="submit"
+        disabled={auth.signinIsLoading}
+        fullWidth
+        variant="contained"
+        sx={{ mt: 3, mb: 2 }}>
         Sign In
       </Button>
-      <Grid container justifyContent="flex-end">
-        <Grid item>
-          <Link href="/signup" variant="body2">
-            {"Don't have an account? Sign Up"}
-          </Link>
-        </Grid>
-      </Grid>
     </Box>
   )
 }
