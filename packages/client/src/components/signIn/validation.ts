@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 
 export const signInFormValidationSchema = yup.object({
-  email: yup
+  login: yup
     .string()
     .email('Enter a valid email')
     .required('Email is required'),

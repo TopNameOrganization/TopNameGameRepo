@@ -1,11 +1,11 @@
 import React from 'react'
 import Button from '@mui/material/Button'
 import TextField, { TextFieldProps } from '@mui/material/TextField'
-import Link from '@mui/material/Link'
-import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
 import { useFormik } from 'formik'
 import { signUpFormValidationSchema } from './validation'
+import { useAuth } from '../../context/AuthContext'
+import { FormServerError } from '../FormServerError'
 
 interface SignUpFormData {
   email: string
@@ -18,11 +18,11 @@ interface SignUpFormData {
 
 const generalFieldParams: Partial<TextFieldProps> = {
   margin: 'normal',
-  required: true,
   fullWidth: true,
 }
 
 export function SignUpForm() {
+  const auth = useAuth()
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -35,7 +35,7 @@ export function SignUpForm() {
     },
     validationSchema: signUpFormValidationSchema,
     onSubmit: (data: SignUpFormData) => {
-      console.log('SignUpFormData: ', data)
+      auth.signup(data)
     },
   })
 
@@ -46,8 +46,11 @@ export function SignUpForm() {
         id="email"
         label="Email Address"
         name="email"
+        type="email"
         autoComplete="email"
         autoFocus
+        onChange={formik.handleChange}
+        value={formik.values.email}
         error={formik.touched.email && Boolean(formik.errors.email)}
         helperText={formik.touched.email && formik.errors.email}
       />
@@ -57,6 +60,8 @@ export function SignUpForm() {
         label="Login"
         name="login"
         autoComplete="login"
+        onChange={formik.handleChange}
+        value={formik.values.login}
         error={formik.touched.login && Boolean(formik.errors.login)}
         helperText={formik.touched.login && formik.errors.login}
       />
@@ -66,7 +71,9 @@ export function SignUpForm() {
         label="First name"
         name="first_name"
         autoComplete="first_name"
-        error={formik.touched.first_name && Boolean(formik.errors.first_name)}
+        onChange={formik.handleChange}
+        value={formik.values.first_name}
+        error={Boolean(formik.errors.first_name) && formik.touched.first_name}
         helperText={formik.touched.first_name && formik.errors.first_name}
       />
       <TextField
@@ -75,6 +82,8 @@ export function SignUpForm() {
         label="Second name"
         name="second_name"
         autoComplete="second_name"
+        onChange={formik.handleChange}
+        value={formik.values.second_name}
         error={formik.touched.second_name && Boolean(formik.errors.second_name)}
         helperText={formik.touched.second_name && formik.errors.second_name}
       />
@@ -83,7 +92,10 @@ export function SignUpForm() {
         id="phone"
         label="Phone number"
         name="phone"
+        type="tel"
         autoComplete="phone"
+        onChange={formik.handleChange}
+        value={formik.values.phone}
         error={formik.touched.phone && Boolean(formik.errors.phone)}
         helperText={formik.touched.phone && formik.errors.phone}
       />
@@ -93,6 +105,8 @@ export function SignUpForm() {
         label="Password"
         type="password"
         id="password"
+        onChange={formik.handleChange}
+        value={formik.values.password}
         error={formik.touched.password && Boolean(formik.errors.password)}
         helperText={formik.touched.password && formik.errors.password}
       />
@@ -102,6 +116,8 @@ export function SignUpForm() {
         label="Password confirm"
         type="password"
         id="password_confirm"
+        onChange={formik.handleChange}
+        value={formik.values.password_confirm}
         error={
           formik.touched.password_confirm &&
           Boolean(formik.errors.password_confirm)
@@ -110,21 +126,12 @@ export function SignUpForm() {
           formik.touched.password_confirm && formik.errors.password_confirm
         }
       />
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        disabled={!!formik.errors.password_confirm}
-        sx={{ mt: 3, mb: 2 }}>
+      {!!auth.signupError && (
+        <FormServerError message={auth.signupError.response.data.reason} />
+      )}
+      <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
         Sign Up
       </Button>
-      <Grid container justifyContent="flex-end">
-        <Grid item>
-          <Link href="/signin" variant="body2">
-            {'Already have an account? Sign in'}
-          </Link>
-        </Grid>
-      </Grid>
     </Box>
   )
 }
