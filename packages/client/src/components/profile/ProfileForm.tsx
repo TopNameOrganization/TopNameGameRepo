@@ -3,79 +3,100 @@ import {useFormik} from 'formik';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-import {validationProfile} from "./validation";
+import {validationUserProfile} from "./validation";
+import {useEffect} from "react";
+import {useTypedSelector} from "../../hooks/useTypedSelector";
+import {useActions} from "../../hooks/useActions";
+import {UserProfileData} from "../../api/types";
 
-interface IProfile {
-    [key: string]: FormDataEntryValue | null
-}
+export const ProfileForm = (props: any) => {
+    const { user } = useTypedSelector((state) => state.user);
+    const { fetchUser, changeUserProfile } = useActions()
 
-export default function ProfileForm() {
-    const [isDisabled, setIsDisabled] = React.useState<boolean>(false);
+    useEffect(() => {
+        fetchUser()
+    }, [])
 
     const formik = useFormik({
         initialValues: {
-            firstName: '',
-            secondName: '',
-            nickName: '',
-            phone: '',
-            email: '',
-            password: '',
+            first_name: user.first_name || '',
+            second_name: user.second_name || '',
+            display_name: user.display_name || '',
+            login: user.login || '',
+            phone: user.phone || '',
+            email: user.email || ''
         },
-        validationSchema: validationProfile,
-        onSubmit: (profileData: IProfile) => {
-            console.log('profileData: ', profileData)
-            setIsDisabled(false);
+        enableReinitialize: true,
+        validationSchema: validationUserProfile,
+        onSubmit: (profileData: UserProfileData) => {
+            changeUserProfile(profileData)
+            props.noUseForm()
         },
     });
 
-    const handleChangeIsDisabled = () => {
-        setIsDisabled(true);
-    };
-
     return (
-        <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box id="profileForm" component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
                 variant="standard"
                 margin="dense"
                 fullWidth
-                name="firstName"
+                name="first_name"
                 label="First name"
                 type="text"
-                id="firstName"
-                autoComplete="firstName"
-                disabled={!isDisabled}
+                id="first_name"
+                autoComplete="first_name"
+                disabled={!props.isDisabled}
+                value={formik.values.first_name}
                 onChange={formik.handleChange}
-                error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-                helperText={formik.touched.firstName && formik.errors.firstName}
+                error={formik.touched.first_name && Boolean(formik.errors.first_name)}
+                helperText={formik.touched.first_name && formik.errors.first_name}
             />
             <TextField
                 variant="standard"
                 margin="dense"
                 fullWidth
-                name="secondName"
+                name="second_name"
                 label="Second name"
                 type="text"
-                id="secondName"
-                autoComplete="secondName"
-                disabled={!isDisabled}
+                id="second_name"
+                autoComplete="second_name"
+                disabled={!props.isDisabled}
+                value={formik.values.second_name}
                 onChange={formik.handleChange}
-                error={formik.touched.secondName && Boolean(formik.errors.secondName)}
-                helperText={formik.touched.secondName && formik.errors.secondName}
+                error={formik.touched.second_name && Boolean(formik.errors.second_name)}
+                helperText={formik.touched.second_name && formik.errors.second_name}
             />
             <TextField
                 variant="standard"
                 margin="dense"
                 required
                 fullWidth
-                name="nickName"
+                name="display_name"
                 label="Nick name"
                 type="text"
-                id="nickName"
-                autoComplete="nickName"
-                disabled={!isDisabled}
+                id="display_name"
+                autoComplete="display_name"
+                disabled={!props.isDisabled}
+                value={formik.values.display_name}
                 onChange={formik.handleChange}
-                error={formik.touched.nickName && Boolean(formik.errors.nickName)}
-                helperText={formik.touched.nickName && formik.errors.nickName}
+                error={formik.touched.display_name && Boolean(formik.errors.display_name)}
+                helperText={formik.touched.display_name && formik.errors.display_name}
+            />
+            <TextField
+                variant="standard"
+                margin="dense"
+                required
+                fullWidth
+                name="login"
+                label="login"
+                type="text"
+                id="login"
+                autoComplete="login"
+                disabled={!props.isDisabled}
+                value={formik.values.login}
+                onChange={formik.handleChange}
+                error={formik.touched.login && Boolean(formik.errors.login)}
+                helperText={formik.touched.login && formik.errors.login}
             />
             <TextField
                 variant="standard"
@@ -86,7 +107,7 @@ export default function ProfileForm() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
-                disabled={!isDisabled}
+                disabled={!props.isDisabled}
                 value={formik.values.email}
                 onChange={formik.handleChange}
                 error={formik.touched.email && Boolean(formik.errors.email)}
@@ -101,46 +122,22 @@ export default function ProfileForm() {
                 type="tel"
                 id="phone"
                 autoComplete="phone"
-                disabled={!isDisabled}
+                disabled={!props.isDisabled}
+                value={formik.values.phone}
                 onChange={formik.handleChange}
                 error={formik.touched.phone && Boolean(formik.errors.phone)}
                 helperText={formik.touched.phone && formik.errors.phone}
             />
-            <TextField
-                variant="standard"
-                margin="dense"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                disabled={!isDisabled}
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                error={formik.touched.password && Boolean(formik.errors.password)}
-                helperText={formik.touched.password && formik.errors.password}
-            />
             {
-                isDisabled
-                    ? (<Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 5, mb: 2 }}
-                    >
-                        Save Profile
-                    </Button>)
-                    : (<Button
-                        onClick={handleChangeIsDisabled}
-                        type="button"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 5, mb: 2 }}
-                    >
-                        Edit Profile
-                    </Button>)
+                props.isDisabled &&
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 5, mb: 2 }}
+                >
+                    Save Profile
+                </Button>
             }
         </Box>
     );

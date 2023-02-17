@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
-import Profile from '../components/profile/Profile'
+import { Profile } from '../components/profile/Profile'
 
 export const ProfilePage = () => {
   return (

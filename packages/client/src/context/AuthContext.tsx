@@ -2,7 +2,8 @@ import { createContext, useContext, ReactNode } from 'react'
 import { AxiosResponse } from 'axios'
 import { useMutation, useQuery, UseMutateFunction } from 'react-query'
 import { useNavigate } from 'react-router-dom'
-import { AuthAPI, SigninData, SignupData, User } from '../api/AuthApi'
+import { AuthAPI } from '../api/AuthApi'
+import { SigninData, SignupData, User } from '../api/types'
 
 interface AuthData<T> {
   data: T
