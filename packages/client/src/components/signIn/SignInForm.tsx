@@ -31,7 +31,7 @@ export function SignInForm() {
         id="login"
         label="Email Address"
         name="login"
-        autoComplete="email"
+        // autoComplete="email"
         autoFocus
         onChange={formik.handleChange}
         value={formik.values.login}
