@@ -8,21 +8,19 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import DialogActions from "@mui/material/DialogActions";
 import Dialog from "@mui/material/Dialog";
-import { useActions } from "../../hooks/useActions";
+import UsersAPI from "../../api/UsersAPI";
 
 export default function ProfileAvatarDialog(props: any) {
     const [open, setOpen] = React.useState<boolean>(false);
     const fileInput = React.createRef<HTMLInputElement>();
-    const { changeUserAvatar } = useActions()
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const node: HTMLInputElement | null = fileInput.current
         if (node && node.files?.length) {
-            // console.log(`Selected file - ${node.files[0]}`)
             const userAvatarData = new FormData()
             userAvatarData.append('avatar', node.files[0]);
-            changeUserAvatar(userAvatarData)
+            UsersAPI.changeUserAvatar(userAvatarData)
             handleClose();
         }
     }
