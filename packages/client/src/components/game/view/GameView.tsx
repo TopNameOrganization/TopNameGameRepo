@@ -39,7 +39,6 @@ export const GameView = () => {
     ) {
       evt.stopImmediatePropagation()
       GameModel.setPlayerAction(RunnerActions.Stay)
-      // GameModel.movePlayer(keyCode)
     }
   }
 
