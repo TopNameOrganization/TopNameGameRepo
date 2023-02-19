@@ -1,10 +1,10 @@
 import {Dispatch} from "redux";
 import UsersAPI from "../../api/UsersAPI";
-import {ChangeUserProfileAction, ChangeUserProfileActionTypes} from "../types/changeUserProfileTypes";
+import {UserProfileAction, ChangeUserProfileActionTypes} from "../types/changeUserProfileTypes";
 import {UserProfileData} from "../../api/types";
 
 export const changeUserProfile = (userProfile: UserProfileData) => {
-  return async (dispatch: Dispatch<ChangeUserProfileAction>) => {
+  return async (dispatch: Dispatch<UserProfileAction>) => {
     try {
       dispatch({type: ChangeUserProfileActionTypes.CHANGE_USER_PROFILE})
       const response = await UsersAPI.changeUserProfile(userProfile)

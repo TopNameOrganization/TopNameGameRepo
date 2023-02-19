@@ -20,7 +20,7 @@ interface IChangeUserProfileErrorAction {
   payload: string
 }
 
-export type ChangeUserProfileAction =
+export type UserProfileAction =
   IChangeUserProfileAction |
   IChangeUserProfileSuccessAction |
   IChangeUserProfileErrorAction

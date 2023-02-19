@@ -1,7 +1,7 @@
 import * as UserAction from './userAction'
-import * as ChangeUserProfileAction from './changeUserProfileAction'
+import * as UserProfileAction from './changeUserProfileAction'
 
 export default {
   ...UserAction,
-  ...ChangeUserProfileAction
+  ...UserProfileAction
 }
