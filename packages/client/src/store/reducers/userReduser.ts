@@ -1,7 +1,7 @@
 import { User } from "../../api/types";
-import {IUserState, UserAction, UserActionTypes} from "../types/userTypes";
+import {UserState, UserAction, UserActionTypes} from "../types/userTypes";
 
-const initialState: IUserState = {
+const initialState: UserState = {
   user: {
     id: null,
     first_name: '',
@@ -16,7 +16,7 @@ const initialState: IUserState = {
   error: null
 }
 
-export const userReducer = (state: IUserState = initialState, action: UserAction): IUserState => {
+export const userReducer = (state: UserState = initialState, action: UserAction): UserState => {
   switch (action.type) {
     case UserActionTypes.FETCH_USER:
       return {loading: true, error: null, user: initialState.user}

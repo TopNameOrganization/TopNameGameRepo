@@ -1,8 +1,8 @@
 import { User } from "../../api/types";
-import { IUserState } from "../types/userTypes";
-import { ChangeUserProfileAction, ChangeUserProfileActionTypes } from "../types/changeUserProfileTypes";
+import { UserState } from "../types/userTypes";
+import { UserProfileAction, ChangeUserProfileActionTypes } from "../types/changeUserProfileTypes";
 
-const initialState: IUserState = {
+const initialState: UserState = {
   user: {
     id: null,
     first_name: '',
@@ -17,7 +17,7 @@ const initialState: IUserState = {
   error: null
 }
 
-export const changeUserProfileReducer = (state: IUserState = initialState, action: ChangeUserProfileAction): IUserState => {
+export const changeUserProfileReducer = (state: UserState = initialState, action: UserProfileAction): UserState => {
   switch (action.type) {
     case ChangeUserProfileActionTypes.CHANGE_USER_PROFILE:
       return {loading: true, error: null, user: initialState.user}
