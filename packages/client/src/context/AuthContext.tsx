@@ -1,65 +1,53 @@
-import {
-  createContext,
-  useState,
-  useEffect,
-  useContext,
-  ReactNode,
-} from 'react'
+import { createContext, useContext, ReactNode } from 'react'
 import { AxiosResponse } from 'axios'
 import { useMutation, useQuery, UseMutateFunction } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { AuthAPI, SigninData, SignupData, User } from '../api/AuthApi'
 
+interface AuthData<T> {
+  data: T
+  isLoading: boolean
+  error: any
+}
+
+interface AuthAction<T> {
+  action: UseMutateFunction<AxiosResponse<User, any>, unknown, T, unknown>
+  isLoading: boolean
+  error: any
+}
+
 interface Context {
-  user: User | null
-  signin: UseMutateFunction<
-    AxiosResponse<User, any>,
-    unknown,
-    SigninData,
-    unknown
-  >
-  signup: UseMutateFunction<
-    AxiosResponse<User, any>,
-    unknown,
-    SignupData,
-    unknown
-  >
-  logout: UseMutateFunction<AxiosResponse<any, any>, unknown, void, unknown>
-  signinIsLoading: boolean
-  signinError: any
-  signupIsLoading: boolean
-  signupError: any
-  logoutIsLoading: boolean
-  logoutError: any
+  user: AuthData<User | undefined>
+  signin: AuthAction<SigninData>
+  signup: AuthAction<SignupData>
+  logout: AuthAction<void>
 }
 
 const AuthContext = createContext<Context>({} as Context)
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate()
-  const [user, setUser] = useState<User | null>(null)
 
-  const { data, error, isFetching, refetch } = useQuery(
-    ['user'],
-    AuthAPI.read,
-    {
-      retry: 0,
-    }
-  )
-
-  useEffect(() => {
-    if (data?.data) {
-      setUser(data.data)
-    }
-  }, [data?.data])
+  const {
+    data,
+    error: userError,
+    isFetching: userIsFetching,
+    refetch,
+  } = useQuery(['user'], AuthAPI.read, {
+    refetchOnWindowFocus: false,
+    retry: 0,
+    onError: () => {
+      return
+    },
+  })
 
   const {
     mutate: signin,
     isLoading: signinIsLoading,
     error: signinError,
   } = useMutation(AuthAPI.signin, {
-    onSuccess: ({ data }) => {
-      setUser(data)
+    onSuccess: () => {
+      refetch()
       navigate('/')
     },
   })
@@ -81,22 +69,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     error: logoutError,
   } = useMutation(AuthAPI.logout, {
     onSuccess: () => {
-      setUser(null)
-      navigate('/login')
+      refetch()
     },
   })
 
   const value = {
-    user,
-    signin,
-    signinIsLoading,
-    signinError,
-    signup,
-    signupIsLoading,
-    signupError,
-    logout,
-    logoutIsLoading,
-    logoutError,
+    user: {
+      data: !userError ? data?.data : undefined,
+      isLoading: userIsFetching,
+      error: userError,
+    },
+    signin: {
+      action: signin,
+      isLoading: signinIsLoading,
+      error: signinError,
+    },
+    signup: { action: signup, isLoading: signupIsLoading, error: signupError },
+    logout: { action: logout, isLoading: logoutIsLoading, error: logoutError },
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
