@@ -1,5 +1,4 @@
 export const TileSize = 30;
-
 export enum Tiles {
   Empty = 0,
   Brick = 1,
@@ -8,11 +7,14 @@ export enum Tiles {
   Rope = 4,
 }
 
-export enum Directions {
-  Left = 37,
-  Up = 38,
-  Right = 39,
-  Down = 40,
+export const VELOCITY = 200;
+export enum RunnerActions {
+  Stay = 0,
+  Fall = 1000,
+  MoveLeft = 37,
+  MoveUp = 38,
+  MoveRight = 39,
+  MoveDown = 40,
 }
 
 // TODO: это должно быть в ассетах, в апи или как-то ещё иначе
