@@ -35,7 +35,7 @@ export function SignUpForm() {
     },
     validationSchema: signUpFormValidationSchema,
     onSubmit: (data: SignUpFormData) => {
-      auth.signup(data)
+      auth.signup.action(data)
     },
   })
 
@@ -126,8 +126,8 @@ export function SignUpForm() {
           formik.touched.password_confirm && formik.errors.password_confirm
         }
       />
-      {!!auth.signupError && (
-        <FormServerError message={auth.signupError.response.data.reason} />
+      {!!auth.signup.error && (
+        <FormServerError message={auth.signup.error.response.data.reason} />
       )}
       <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
         Sign Up

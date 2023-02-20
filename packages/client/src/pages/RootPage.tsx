@@ -5,10 +5,10 @@ import { ROUTES } from '../constants'
 
 export function RootPage() {
   const auth = useAuth()
-  const content = auth.user ? (
+  const content = auth.user.data ? (
     <button
       onClick={() => {
-        auth.logout()
+        auth.logout.action()
       }}>
       logout
     </button>
@@ -21,7 +21,7 @@ export function RootPage() {
   return (
     <>
       <Typography component="h1" variant="h5">
-        Profile page
+        Root page
       </Typography>
       {content}
     </>

@@ -19,7 +19,7 @@ export function SignInForm() {
     },
     validationSchema: signInFormValidationSchema,
     onSubmit: (data: SignInFormData) => {
-      auth.signin(data)
+      auth.signin.action(data)
     },
   })
 
@@ -51,12 +51,12 @@ export function SignInForm() {
         error={formik.touched.password && Boolean(formik.errors.password)}
         helperText={formik.touched.password && formik.errors.password}
       />
-      {!!auth.signinError && (
-        <FormServerError message={auth.signinError.response.data.reason} />
+      {!!auth.signin.error && (
+        <FormServerError message={auth.signin.error.response.data.reason} />
       )}
       <Button
         type="submit"
-        disabled={auth.signinIsLoading}
+        disabled={auth.signin.isLoading}
         fullWidth
         variant="contained"
         sx={{ mt: 3, mb: 2 }}>
