@@ -1,36 +1,32 @@
-import { TileSize } from "../../../constants";
-import { AnimationPhases } from "../../../model";
+import { TileSize, AnimationPhases } from "../../../constants";
+import { PhasesType, SpriteConfigType } from './types'
 
 export class Sprite {
   private time = 0;
   private frame = 0;
-  private curentPhaseFrames = 4;
-  private fps = 15;
+  
+  private img: HTMLImageElement;
+  private fps: number;
+  private phases: PhasesType;
 
-  private phases: Record<AnimationPhases, number> = {
-    [AnimationPhases.Run]: 0,
-    [AnimationPhases.Climb]: 4,
-    [AnimationPhases.Hang]: 8,
-    [AnimationPhases.Fall]: 12,
-    [AnimationPhases.Stay]: 16,
+  constructor({ img, fps, phases, }: SpriteConfigType) {
+    this.img = img;
+    this.fps = fps;
+    this.phases = phases;
   }
 
-  constructor(cfg: unknown) {
-    // TODO: тут должны быть настройки спрайта, но пока так, что б ошибка не выпадала
-    console.log(cfg);
-  }
-
-  public getPhase(dt: number, phase: AnimationPhases = 0, direction: number): { x: number, y: number, w: number, h: number } {
+  public getPhase(dt: number, phase: AnimationPhases = 0, direction: number): { x: number, y: number, img: HTMLImageElement } {
     this.time += dt;
-    const frameOffset = this.phases[phase];
+    const frameOffset = this.phases[phase].start;
     if (this.time >= 1 / this.fps) {
-      if (phase === AnimationPhases.Stay) {
-        this.frame = 0;
-      } else {
-        this.frame = (this.frame + 1) % this.curentPhaseFrames;
-      }
+      this.frame = (this.frame + 1) % this.phases[phase].length;
       this.time = 0;
     }
-    return { x: (this.frame + frameOffset) * TileSize, y: direction * TileSize, w: TileSize, h: TileSize };
+    let x = (this.frame + frameOffset) * TileSize;
+    let y = direction * TileSize;
+    x = x >= this.img.width ? this.img.width - TileSize : x;
+    y = y >= this.img.height ? this.img.height - TileSize : y;
+
+    return { x, y, img: this.img };
   }
 }

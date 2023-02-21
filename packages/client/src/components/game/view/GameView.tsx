@@ -1,27 +1,20 @@
 import React, { useRef, useEffect } from 'react'
 
-import { RunnerAction, TileSize } from '../constants'
+import { RunnerAction, TileSize, AnimationPhases } from '../constants'
 import GameModel from '../model/GameModel'
 import { ModelEvents, PlayerInfoType } from '../model'
 
 import { LevelHolder } from './elements/level'
 import { Sprite } from './elements/sprite'
-
-import runnerImg from '../../../assets/game/player.png'
+import { playerCfg } from './spriteConfigs'
 
 export const GameView = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const sprite = new Sprite()
-  const img = new Image()
-  img.src = runnerImg
+  const sprite = new Sprite(playerCfg)
 
   const { width, height } = GameModel.getLevelSize()
 
-  const drawFrame = (data: {
-    dTime: number
-    player: PlayerInfoType
-    rDeb: { x: number; y: number; w: number; h: number }
-  }) => {
+  const drawFrame = (data: { dTime: number; player: PlayerInfoType }) => {
     const ctx = canvasRef.current?.getContext('2d')
     if (ctx) {
       ctx.clearRect(0, 0, width, height)
@@ -32,7 +25,7 @@ export const GameView = () => {
 
         const src = sprite.getPhase(dTime, phase, direction)
         ctx.drawImage(
-          img,
+          src.img,
           src.x,
           src.y,
           TileSize,
@@ -62,10 +55,7 @@ export const GameView = () => {
 
   const onKeyDown = (evt: KeyboardEvent): void => {
     const { keyCode } = evt
-    if (
-      keyCode >= RunnerAction.MoveLeft &&
-      keyCode <= RunnerAction.MoveDown
-    ) {
+    if (keyCode >= RunnerAction.MoveLeft && keyCode <= RunnerAction.MoveDown) {
       evt.preventDefault()
       evt.stopImmediatePropagation()
       GameModel.setPlayerAction(keyCode)

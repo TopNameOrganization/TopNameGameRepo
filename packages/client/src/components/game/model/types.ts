@@ -1,4 +1,4 @@
-import { Tiles } from "../constants"
+import { Tiles, AnimationPhases } from "../constants"
 
 export type PositionType = {
   x: number,
@@ -13,14 +13,6 @@ export type SizeType = {
 export type PlayerInfoType = PositionType & {
   phase: AnimationPhases,
   direction: number,
-}
-
-export enum AnimationPhases {
-  Stay = 0,
-  Run = 1,
-  Climb = 2,
-  Hang = 3,
-  Fall = 4,
 }
 
 export type LevelType = Tiles[][];

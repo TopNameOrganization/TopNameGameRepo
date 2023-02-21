@@ -21,6 +21,14 @@ export enum RunnerAction {
   MoveDown = 40,
 }
 
+export enum AnimationPhases {
+  Stay = 0,
+  Run = 1,
+  Climb = 2,
+  Hang = 3,
+  Fall = 4,
+}
+
 // TODO: это должно быть в ассетах, в апи или как-то ещё иначе
 export const Level = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
