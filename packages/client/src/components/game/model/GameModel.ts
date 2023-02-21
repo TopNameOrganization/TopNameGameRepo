@@ -1,8 +1,8 @@
-import { RunnerAction, Tiles, TileSize } from "../constants";
+import { RunnerAction, Tiles, TileSize, AnimationPhases } from "../constants";
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
 import { EventBus } from "../utils/EventBus";
-import { LevelType, SizeType, PositionType, ModelEvents, AnimationPhases } from "./types";
+import { LevelType, SizeType, PositionType, ModelEvents } from "./types";
 
 export class GameModel extends EventBus {
   private time: number;
