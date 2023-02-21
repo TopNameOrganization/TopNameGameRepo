@@ -6,4 +6,5 @@ export const ROUTES = {
   signup: '/signup',
   profile: '/profile',
   leaderBoard: '/leader-board',
+  endGame: '/end-game',
 }
