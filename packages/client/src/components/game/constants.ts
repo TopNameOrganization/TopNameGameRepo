@@ -1,4 +1,4 @@
-export const TileSize = 30;
+export const TileSize = 32;
 export enum Tiles {
   Empty = 0,
   Brick = 1,
@@ -8,7 +8,11 @@ export enum Tiles {
 }
 
 export const VELOCITY = 200;
-export enum RunnerActions {
+export enum Orientation {
+  Left = 0,
+  Right = 1,
+}
+export enum RunnerAction {
   Stay = 0,
   Fall = 1000,
   MoveLeft = 37,
