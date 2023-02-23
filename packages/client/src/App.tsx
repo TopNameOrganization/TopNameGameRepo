@@ -21,17 +21,17 @@ function App() {
 
   return (
     <Provider store={store}>
-        <HashRouter>
-          <ThemeProvider theme={theme}>
-            <QueryClientProvider client={queryClient}>
-              <ErrorBoundary msg={<DefaultStub />}>
-                <AuthProvider>
-                  <Router />
-                </AuthProvider>
-              </ErrorBoundary>
-            </QueryClientProvider>
-          </ThemeProvider>
-        </HashRouter>
+      <HashRouter>
+        <ThemeProvider theme={theme}>
+          <QueryClientProvider client={queryClient}>
+            <ErrorBoundary msg={<DefaultStub />}>
+              <AuthProvider>
+                <Router />
+              </AuthProvider>
+            </ErrorBoundary>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </HashRouter>
     </Provider>
   )
 }
