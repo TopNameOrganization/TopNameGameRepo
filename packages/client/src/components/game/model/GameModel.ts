@@ -1,4 +1,4 @@
-import { RunnerActions, Tiles, TileSize, VELOCITY } from "../constants";
+import { RunnerActions, Tiles, TileSize } from "../constants";
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
 import { EventBus } from "../utils/EventBus";
@@ -11,6 +11,39 @@ export class GameModel extends EventBus {
 
   constructor() {
     super();
+
+    // TODO: унести это отсюда куда-то
+    const reader = new FileReader();
+    reader.addEventListener('loadend', () => {
+      const data = new Int8Array(reader.result);
+      const dataLength = data.length;
+      let i = 0;
+      const level: number[][] = [];
+      const player = { x: 0, y: 0 }
+      while (i < dataLength) {
+        const x = i % 32;
+        const y = Math.floor(i / 32);
+        if (data[i] === 7) {
+          player.x = x * TileSize;
+          player.y = y * TileSize;
+        }
+        if (!level[y]) {
+          level[y] = [];
+        }
+        level[y][x] = data[i];
+        i++;
+      }
+      this.setLevel({ level, player });
+    });
+
+    const req = new XMLHttpRequest();
+    req.open("GET", "/game/level.bin", true);
+    req.responseType = "blob";
+    req.onload = () => {
+      const blob = req.response;
+      reader.readAsArrayBuffer(blob);
+    };
+    req.send();
   }
 
   // TODO: подумать более лучше про тип и вообще, как и где это хранить
