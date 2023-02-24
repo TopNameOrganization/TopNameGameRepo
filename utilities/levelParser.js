@@ -65,29 +65,31 @@ loadImage(__dirname + '/levels.png').then(img => {
   const levelMap = []
 
   const yc = 0
-  for (var i = 0; i < 15; i++) {
-    ctx.drawImage(
-      img,
-      offsetX + levelStepX * i,
-      offsetY + levelStepY * yc,
-      canvasWidth,
-      canvasHeight,
-      0,
-      0,
-      canvasWidth,
-      canvasHeight
-    )
+  for (var j = 0; j < 10; j++) {
+    for (var i = 0; i < 15; i++) {
+      ctx.drawImage(
+        img,
+        offsetX + levelStepX * i,
+        offsetY + levelStepY * j,
+        canvasWidth,
+        canvasHeight,
+        0,
+        0,
+        canvasWidth,
+        canvasHeight
+      )
 
-    for (var y = 0; y < height; y++) {
-      for (var x = 0; x < width; x++) {
-        levelMap.push(getTileAt(x, y))
+      for (var y = 0; y < height; y++) {
+        for (var x = 0; x < width; x++) {
+          levelMap.push(getTileAt(x, y))
+        }
       }
+      console.log(`${j} ${i} done`)
     }
-    console.log(`${i} done`)
   }
   const data = new Uint8Array(Buffer.from(levelMap))
   fs.writeFile(
-    __dirname + `/levels${yc * 15 + 1}_${yc * 15 + 15}.bin`,
+    __dirname + `/levels150.set`,
     data,
     err => {
       console.log(err)
