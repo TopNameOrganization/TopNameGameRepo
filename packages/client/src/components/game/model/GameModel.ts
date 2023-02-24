@@ -6,8 +6,9 @@ import { LevelType, SizeType, PositionType, ModelEvents } from "./types";
 
 export class GameModel extends EventBus {
   private time: number;
-  private player: RunnerType;
+  private player: RunnerType = new Runner();
   private level: LevelType;
+  private bonuses = 0;
 
   private _lastPressed: number; // TODO: подумать где и как это xранить более лучше
 
@@ -16,9 +17,17 @@ export class GameModel extends EventBus {
   }
 
   // TODO: подумать более лучше про тип и вообще, как и где это хранить
-  public setLevel({ level, player }: { level: LevelType, player: PositionType }): void {
+  public setLevel({ level }: { level: LevelType }): void {
+    // TODO: сделать норм, ща просто чтоб было
+    this.bonuses = level.reduce((last, row, y) =>
+      last + row.reduce((prev, curr, x) => {
+        if (curr === Tile.Player) {
+          this.player.update({ x: x * TileSize, y: y * TileSize });
+        }
+        return curr === Tile.Bonus ? prev + 1 : prev
+      }, 0), 0)
+    // ---
     this.level = level;
-    this.player = new Runner(player);
   }
 
   // чтоб GameView могло узнать, какого размера canvas делать
@@ -106,7 +115,7 @@ export class GameModel extends EventBus {
           }
         }
 
-        if (tile === Tile.Brick || tile === Tile.Concrete) {
+        if (tile === Tile.Brick || tile === Tile.Concrete || tile === Tile.Out) {
           // туда нельзя, ровнять координаты по движению
           switch (action) {
             case RunnerAction.MoveLeft:
@@ -123,6 +132,15 @@ export class GameModel extends EventBus {
                 this.player.resetAction();
               }
               break;
+          }
+        }
+
+        if (playerTile === Tile.Bonus) {
+          this.dispatch(ModelEvents.UpdateWorld, { burn: this.playerAtMap() });
+          this.level[this.playerAtMap().y][this.playerAtMap().x] = Tile.Empty;
+          this.bonuses--;
+          if (this.bonuses === 0) {
+            console.log('THAT`S ALL!!1');
           }
         }
 
@@ -160,6 +178,9 @@ export class GameModel extends EventBus {
   }
 
   private getTileAt({ x, y }: PositionType): Tile {
+    if (x < 0 || y < 0 || x >= this.level[0].length || y >= this.level.length) {
+      return Tile.Out;
+    }
     return this.level[y][x];
   }
 
