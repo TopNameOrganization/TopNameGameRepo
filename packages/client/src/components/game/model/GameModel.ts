@@ -14,24 +14,50 @@ export class GameModel extends EventBus {
 
   constructor() {
     super();
+
+    // TODO: унести это отсюда куда-то
+    const reader = new FileReader();
+    reader.addEventListener('loadend', () => {
+      const data = new Int8Array(reader.result);
+      const level: LevelType = [];
+      const player = { x: 0, y: 0 };
+      const bonuses = data.reduce((prev, curr, i) => {
+        const x = i % 32;
+        const y = Math.floor(i / 32);
+        if (!level[y]) {
+          level[y] = [];
+        }
+        level[y][x] = curr;
+        if (curr === Tile.Player) {
+          player.x = x * TileSize;
+          player.y = y * TileSize;
+        }
+        return curr === Tile.Bonus ? prev + 1 : prev;
+      }, 0);
+      this.setLevel({ level, player, bonuses });
+    });
+
+    const req = new XMLHttpRequest();
+    req.open("GET", "/game/level.bin", true);
+    req.responseType = "blob";
+    req.onload = () => {
+      const blob = req.response;
+      reader.readAsArrayBuffer(blob.slice(704, 704 * 2));
+    };
+    req.send();
   }
 
   // TODO: подумать более лучше про тип и вообще, как и где это хранить
-  public setLevel({ level }: { level: LevelType }): void {
-    // TODO: сделать норм, ща просто чтоб было
-    this.bonuses = level.reduce((last, row, y) =>
-      last + row.reduce((prev, curr, x) => {
-        if (curr === Tile.Player) {
-          this.player.update({ x: x * TileSize, y: y * TileSize });
-        }
-        return curr === Tile.Bonus ? prev + 1 : prev
-      }, 0), 0)
-    // ---
+  public setLevel({ level, player, bonuses }: { level: LevelType, player: PositionType, bonuses: number }): void {
     this.level = level;
+    this.player.update(player);
+    this.bonuses = bonuses;
   }
 
   // чтоб GameView могло узнать, какого размера canvas делать
   public getLevelSize(): SizeType {
+    console.log('getLevelSize');
+    console.log(this.level);
     return { width: this.level[0].length * TileSize, height: this.level.length * TileSize };
   }
 
@@ -140,7 +166,8 @@ export class GameModel extends EventBus {
           this.level[this.playerAtMap().y][this.playerAtMap().x] = Tile.Empty;
           this.bonuses--;
           if (this.bonuses === 0) {
-            console.log('THAT`S ALL!!1');
+            this.dispatch(ModelEvents.LevelUp);
+            return;
           }
         }
 
