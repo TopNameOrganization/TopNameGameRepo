@@ -5,20 +5,32 @@ import { EventBus } from "../utils/EventBus";
 import { LevelType, SizeType, PositionType, ModelEvents } from "./types";
 
 export class GameModel extends EventBus {
+  private reader: FileReader;
   private time: number;
-  private player: RunnerType = new Runner();
+  private inited = false;
+  private player: RunnerType;
+  private levelNum = 0;
   private level: LevelType;
+  private levels: Blob;
   private bonuses = 0;
 
   private _lastPressed: number; // TODO: подумать где и как это xранить более лучше
 
   constructor() {
     super();
+    this.player = new Runner();
 
-    // TODO: унести это отсюда куда-то
-    const reader = new FileReader();
-    reader.addEventListener('loadend', () => {
-      const data = new Int8Array(reader.result);
+    const req = new XMLHttpRequest();
+    req.open("GET", "/game/levels150.set", true);
+    req.responseType = "blob";
+    req.onload = () => {
+      this.levels = req.response;
+      this.getLevel(this.levelNum);
+    };
+
+    this.reader = new FileReader();
+    this.reader.addEventListener('loadend', (evt: ProgressEvent<FileReader>) => {
+      const data = new Int8Array(evt.currentTarget.result);
       const level: LevelType = [];
       const player = { x: 0, y: 0 };
       const bonuses = data.reduce((prev, curr, i) => {
@@ -27,7 +39,7 @@ export class GameModel extends EventBus {
         if (!level[y]) {
           level[y] = [];
         }
-        level[y][x] = curr;
+        level[y][x] = (curr === Tile.Enemy || curr === Tile.Player) ? Tile.Empty : curr;
         if (curr === Tile.Player) {
           player.x = x * TileSize;
           player.y = y * TileSize;
@@ -37,33 +49,34 @@ export class GameModel extends EventBus {
       this.setLevel({ level, player, bonuses });
     });
 
-    const req = new XMLHttpRequest();
-    req.open("GET", "/game/level.bin", true);
-    req.responseType = "blob";
-    req.onload = () => {
-      const blob = req.response;
-      reader.readAsArrayBuffer(blob.slice(704, 704 * 2));
-    };
     req.send();
   }
 
-  // TODO: подумать более лучше про тип и вообще, как и где это хранить
   public setLevel({ level, player, bonuses }: { level: LevelType, player: PositionType, bonuses: number }): void {
     this.level = level;
     this.player.update(player);
     this.bonuses = bonuses;
+    if (this.inited) {
+      this.dispatchUpdate();
+    }
   }
 
-  // чтоб GameView могло узнать, какого размера canvas делать
-  public getLevelSize(): SizeType {
-    console.log('getLevelSize');
-    console.log(this.level);
-    return { width: this.level[0].length * TileSize, height: this.level.length * TileSize };
+  private getLevel(n: number) {
+    const start = n * 704;
+    const end = start + 704;
+    if (start >= this.levels.size || end > this.levels.size) {
+      this.levelNum = 0;
+      this.getLevel(this.levelNum);
+    } else {
+      this.reader.readAsArrayBuffer(this.levels.slice(start, end));
+    }
   }
 
-  // чтоб GameView могло узнать, какой уровень рисовать
-  public getLevel(): LevelType {
-    return this.level;
+  public init() {
+    if (this.level) {
+      this.dispatchUpdate();
+    }
+    this.inited = true;
   }
 
   public dispatchUpdate(): void {
@@ -126,7 +139,7 @@ export class GameModel extends EventBus {
 
         if (action === RunnerAction.MoveUp) {
           if (playerTile === Tile.Stair
-            && (tile === Tile.Stair || tile === Tile.Rope || tile === Tile.Empty)
+            && (tile === Tile.Stair || tile === Tile.Rope || tile === Tile.Empty || tile === Tile.Bonus)
           ) {
             x = playerTilePos.x;
           } else {
@@ -166,7 +179,9 @@ export class GameModel extends EventBus {
           this.level[this.playerAtMap().y][this.playerAtMap().x] = Tile.Empty;
           this.bonuses--;
           if (this.bonuses === 0) {
-            this.dispatch(ModelEvents.LevelUp);
+            this.levelNum++;
+            this.getLevel(this.levelNum);
+            // this.dispatch(ModelEvents.LevelUp);
             return;
           }
         }
@@ -201,7 +216,9 @@ export class GameModel extends EventBus {
     const mid: PositionType = this.worldToMap({ x: this.player.x + .5 * TileSize, y: this.player.y + .5 * TileSize });
     const bottom: PositionType = this.worldToMap({ x: this.player.x + .5 * TileSize, y: this.player.y + TileSize });
     return this.getTileAt(mid) === Tile.Empty
-      && (this.getTileAt(bottom) === Tile.Empty || this.getTileAt(bottom) === Tile.Rope);
+      && (this.getTileAt(bottom) === Tile.Empty
+        || this.getTileAt(bottom) === Tile.Rope
+        || this.getTileAt(bottom) === Tile.Bonus);
   }
 
   private getTileAt({ x, y }: PositionType): Tile {
