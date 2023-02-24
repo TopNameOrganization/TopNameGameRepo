@@ -9,7 +9,7 @@ export class Runner {
 
   private readonly magic: number = 2;
 
-  constructor({ x, y }: PositionType) {
+  constructor({ x, y }: PositionType = { x: 0, y: 0 }) {
     this.update({ x, y });
   }
 

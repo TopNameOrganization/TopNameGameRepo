@@ -1,4 +1,4 @@
-import { TileSize, AnimationPhase } from "../../constants";
+import { TileSize } from "../../constants";
 import { PhasesType, SpriteConfigType } from './types'
 
 export class Sprite {

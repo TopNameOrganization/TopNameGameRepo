@@ -28,7 +28,7 @@ export const GameView = () => {
     if (ctx) {
       level?.map((item, y) => {
         item.map((tile, x) => {
-          if (tile !== Tile.Empty) {
+          if (tile !== Tile.Empty && tile !== Tile.Player) {
             const src = tileSpr.getPhase(0, tile)
             ctx.drawImage(
               src.img,
