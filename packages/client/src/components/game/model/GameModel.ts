@@ -1,4 +1,4 @@
-import { RunnerActions, Tiles, TileSize, VELOCITY } from "../constants";
+import { RunnerAction, Tile, TileSize, AnimationPhase } from "../constants";
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
 import { EventBus } from "../utils/EventBus";
@@ -8,6 +8,8 @@ export class GameModel extends EventBus {
   private time: number;
   private player: RunnerType;
   private level: LevelType;
+
+  private _lastPressed: number; // TODO: подумать где и как это xранить более лучше
 
   constructor() {
     super();
@@ -30,18 +32,33 @@ export class GameModel extends EventBus {
   }
 
   public dispatchUpdate(): void {
+    this.dispatch(ModelEvents.UpdateWorld, { level: this.level });
     this.update();
   }
 
-  public setPlayerAction(action: RunnerActions) {
+  public setPlayerAction(action: RunnerAction) {
     this.player.setAction(action);
+  }
+
+  public burn() {
+    const { orientation } = this.player;
+    const dx = orientation === 0 ? -1 : 1;
+    let { x, y } = this.playerAtMap();
+    x += dx;
+    y++;
+    if (this.getTileAt({ x, y }) === Tile.Brick) {
+      this.player.setAction(RunnerAction.Stay);
+      this.level[y][x] = Tile.Empty;
+      this.dispatch(ModelEvents.UpdateWorld, { burn: { x, y } })
+    }
   }
 
   public update() {
     const currentTime = new Date().getTime();
-
+    let dTime = 0;
+    let phase: AnimationPhase = AnimationPhase.Stay;
     if (this.time) {
-      const dTime = (currentTime - this.time) / 1000;
+      dTime = (currentTime - this.time) / 1000;
 
       const { action } = this.player;
       const { x: xNew, y: yNew } = this.player.getNextPos(dTime);
@@ -53,28 +70,28 @@ export class GameModel extends EventBus {
       const playerTile = this.getTileAtPlayer(0, 0);
       const playerTilePos = this.mapToWorld(this.playerAtMap());
 
-      if (action !== RunnerActions.Fall) {
+      if (action !== RunnerAction.Fall) {
         if (this.checkFall()) {
-          this.player.setAction(RunnerActions.Fall);
+          this.player.setAction(RunnerAction.Fall);
           this.update();
           return;
         };
       }
-      if (action !== RunnerActions.Stay) {
-        if (action === RunnerActions.Fall) {
-          if (playerTile === Tiles.Rope) {
+      if (action !== RunnerAction.Stay) {
+        if (action === RunnerAction.Fall) {
+          if (playerTile === Tile.Rope) {
             y = playerTilePos.y;
             this.player.resetAction();
           }
-          if (tile === Tiles.Stair) {
+          if (tile === Tile.Stair) {
             y = playerTilePos.y;
             this.player.resetAction();
           }
         }
 
-        if (action === RunnerActions.MoveUp) {
-          if (playerTile === Tiles.Stair
-            && (tile === Tiles.Stair || tile === Tiles.Rope || tile === Tiles.Empty)
+        if (action === RunnerAction.MoveUp) {
+          if (playerTile === Tile.Stair
+            && (tile === Tile.Stair || tile === Tile.Rope || tile === Tile.Empty)
           ) {
             x = playerTilePos.x;
           } else {
@@ -82,27 +99,27 @@ export class GameModel extends EventBus {
           }
         }
 
-        if (action === RunnerActions.MoveDown) {
-          if (playerTile === Tiles.Empty
-            || playerTile === Tiles.Stair) {
+        if (action === RunnerAction.MoveDown) {
+          if (playerTile === Tile.Empty
+            || playerTile === Tile.Stair) {
             x = playerTilePos.x;
           }
         }
 
-        if (tile === Tiles.Brick || tile === Tiles.Concrete) {
+        if (tile === Tile.Brick || tile === Tile.Concrete) {
           // туда нельзя, ровнять координаты по движению
           switch (action) {
-            case RunnerActions.MoveLeft:
-            case RunnerActions.MoveRight:
+            case RunnerAction.MoveLeft:
+            case RunnerAction.MoveRight:
               x = playerTilePos.x;
               y = this.player.y;
               break;
-            case RunnerActions.MoveUp:
-            case RunnerActions.MoveDown:
-            case RunnerActions.Fall:
+            case RunnerAction.MoveUp:
+            case RunnerAction.MoveDown:
+            case RunnerAction.Fall:
               x = this.player.x;
               y = playerTilePos.y;
-              if (action === RunnerActions.Fall) {
+              if (action === RunnerAction.Fall) {
                 this.player.resetAction();
               }
               break;
@@ -110,22 +127,39 @@ export class GameModel extends EventBus {
         }
 
         this.player.update({ x, y });
+
+        switch (action) {
+          case RunnerAction.MoveLeft:
+          case RunnerAction.MoveRight:
+            phase = playerTile === Tile.Rope ? AnimationPhase.Hang : AnimationPhase.Run;
+            break;
+          case RunnerAction.MoveDown:
+          case RunnerAction.MoveUp:
+            phase = AnimationPhase.Climb;
+            break;
+          case RunnerAction.Fall:
+            phase = AnimationPhase.Fall;
+            break;
+          default:
+        }
       }
-    }
+    };
+
     this.time = currentTime;
-    const { x, y } = this.player;
-    this.dispatch(ModelEvents.Update, { player: { x, y }, rDeb: { x: 0, y: 0, w: 100, h: 100 } });
+    const { x, y, orientation: direction } = this.player;
+
+    this.dispatch(ModelEvents.Update, { dTime, player: { x, y, phase, direction } });
     requestAnimationFrame(this.update.bind(this));
   }
 
   private checkFall(): boolean {
     const mid: PositionType = this.worldToMap({ x: this.player.x + .5 * TileSize, y: this.player.y + .5 * TileSize });
     const bottom: PositionType = this.worldToMap({ x: this.player.x + .5 * TileSize, y: this.player.y + TileSize });
-    return this.getTileAt(mid) === Tiles.Empty
-      && (this.getTileAt(bottom) === Tiles.Empty || this.getTileAt(bottom) === Tiles.Rope);
+    return this.getTileAt(mid) === Tile.Empty
+      && (this.getTileAt(bottom) === Tile.Empty || this.getTileAt(bottom) === Tile.Rope);
   }
 
-  private getTileAt({ x, y }: PositionType): Tiles {
+  private getTileAt({ x, y }: PositionType): Tile {
     return this.level[y][x];
   }
 
@@ -147,13 +181,22 @@ export class GameModel extends EventBus {
     };
   }
 
-  private getTileAtPlayer(x: number, y: number, offset: PositionType = { x: .5, y: .5 }): Tiles {
+  private getTileAtPlayer(x: number, y: number, offset: PositionType = { x: .5, y: .5 }): Tile {
     const xOffset: number = offset.x * TileSize;
     const yOffset: number = offset.y * TileSize;
     const xTile = Math.floor((this.player.x + xOffset) / TileSize);
     const yTile = Math.floor((this.player.y + yOffset) / TileSize);
     return this.level[yTile + y][xTile + x];
   }
+
+  // ---
+  public setLastPressed(val: number) {
+    this._lastPressed = val;
+  }
+  get lastPressed(): number {
+    return this._lastPressed;
+  }
+  // ---
 }
 
 export default new GameModel();

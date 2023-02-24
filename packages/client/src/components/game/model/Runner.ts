@@ -1,10 +1,11 @@
 import { PositionType } from "./types";
-import { RunnerActions, VELOCITY, Tiles, TileSize } from "../constants";
+import { RunnerAction, VELOCITY, TileSize, Orientation } from "../constants";
 
 export class Runner {
   private _x: number;
   private _y: number;
-  private _action: RunnerActions = RunnerActions.Fall;
+  private _action: RunnerAction = RunnerAction.Fall;
+  private _orientation: Orientation = Orientation.Right;
 
   private readonly magic: number = 2;
 
@@ -17,14 +18,20 @@ export class Runner {
     this._y = y;
   }
 
-  public setAction(action: RunnerActions) {
-    if (this._action !== RunnerActions.Fall) {
+  public setAction(action: RunnerAction) {
+    if (this._action !== RunnerAction.Fall) {
       this._action = action;
+      if (this._action === RunnerAction.MoveLeft) {
+        this._orientation = 0;
+      }
+      if (this._action === RunnerAction.MoveRight) {
+        this._orientation = 1;
+      }
     }
   }
 
   public resetAction() {
-    this._action = RunnerActions.Stay;
+    this._action = RunnerAction.Stay;
   }
 
   public getNextPos(dTime: number): PositionType {
@@ -33,17 +40,17 @@ export class Runner {
     let x: number = this._x;
     let y: number = this._y;
     switch (this.action) {
-      case RunnerActions.MoveLeft:
+      case RunnerAction.MoveLeft:
         x = this._x - dx;
         break;
-      case RunnerActions.MoveRight:
+      case RunnerAction.MoveRight:
         x = this._x + dx;
         break;
-      case RunnerActions.MoveUp:
+      case RunnerAction.MoveUp:
         y = this._y - dy;
         break;
-      case RunnerActions.MoveDown:
-      case RunnerActions.Fall:
+      case RunnerAction.MoveDown:
+      case RunnerAction.Fall:
         y = this._y + dy;
         break;
       default:
@@ -53,14 +60,14 @@ export class Runner {
 
   public getCheckCollisionPoint({ x, y }: PositionType): PositionType {
     switch (this._action) {
-      case RunnerActions.MoveLeft:
+      case RunnerAction.MoveLeft:
         return { x, y: y + .5 * TileSize };
-      case RunnerActions.MoveUp:
+      case RunnerAction.MoveUp:
         return { x: x + .5 * TileSize, y };
-      case RunnerActions.MoveRight:
+      case RunnerAction.MoveRight:
         return { x: x + TileSize - this.magic, y: y + .5 * TileSize };
-      case RunnerActions.MoveDown:
-      case RunnerActions.Fall:
+      case RunnerAction.MoveDown:
+      case RunnerAction.Fall:
         return { x: x + .5 * TileSize, y: y + TileSize - this.magic };
       default:
         return { x: 0, y: 0 };
@@ -69,14 +76,14 @@ export class Runner {
 
   public getCheckPoints({ x, y }: PositionType): PositionType[] {
     switch (this._action) {
-      case RunnerActions.MoveLeft:
+      case RunnerAction.MoveLeft:
         return [{ x, y }, { x, y: y + TileSize }];
-      case RunnerActions.MoveUp:
+      case RunnerAction.MoveUp:
         return [{ x, y }, { x: x + TileSize, y }];
-      case RunnerActions.MoveRight:
+      case RunnerAction.MoveRight:
         return [{ x: x + TileSize, y }, { x: x + TileSize, y: y + TileSize }];
-      case RunnerActions.MoveDown:
-      case RunnerActions.Fall:
+      case RunnerAction.MoveDown:
+      case RunnerAction.Fall:
         return [{ x, y: y + TileSize }, { x: x + TileSize, y: y + TileSize }];
     }
     return [];
@@ -90,8 +97,12 @@ export class Runner {
     return this._y;
   }
 
-  get action(): RunnerActions {
+  get action(): RunnerAction {
     return this._action;
+  }
+
+  get orientation(): number {
+    return this._orientation;
   }
 }
 

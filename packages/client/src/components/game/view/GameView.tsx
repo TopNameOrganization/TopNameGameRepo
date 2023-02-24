@@ -1,76 +1,137 @@
 import React, { useRef, useEffect } from 'react'
 
-import { RunnerActions, TileSize } from '../constants'
+import { RunnerAction, TileSize, Tile } from '../constants'
 import GameModel from '../model/GameModel'
-import { ModelEvents, PositionType } from '../model'
+import { ModelEvents, PlayerInfoType, LevelType, PositionType } from '../model'
 
-import { LevelHolder } from './elements/level'
+import { Sprite } from './sprite'
+import { tileCfg } from './spriteConfigs'
+import { playerCfg } from './spriteConfigs'
 
 export const GameView = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const worldRef = useRef<HTMLCanvasElement>(null)
+  const actorsRef = useRef<HTMLCanvasElement>(null)
+
+  const tileSpr = new Sprite(tileCfg)
+  const playerSpr = new Sprite(playerCfg)
 
   const { width, height } = GameModel.getLevelSize()
 
-  const drawFrame = (data: {
-    player: PositionType
-    rDeb: { x: number; y: number; w: number; h: number }
+  const updateWorld = ({
+    level,
+    burn,
+  }: {
+    level?: LevelType
+    burn?: PositionType
   }) => {
-    const ctx = canvasRef.current?.getContext('2d')
+    const ctx = worldRef.current?.getContext('2d')
     if (ctx) {
-      // TODO: это должен делать спрайт, каждый сам за себя, а не весь canvas перерисовывать
+      level?.map((item, y) => {
+        item.map((tile, x) => {
+          if (tile !== Tile.Empty) {
+            const src = tileSpr.getPhase(0, tile)
+            ctx.drawImage(
+              src.img,
+              src.x,
+              src.y,
+              TileSize,
+              TileSize,
+              x * TileSize,
+              y * TileSize,
+              TileSize,
+              TileSize
+            )
+          }
+        })
+      })
+      if (burn) {
+        const { x, y } = burn
+        ctx.fillStyle = 'black'
+        ctx.fillRect(x * TileSize, y * TileSize, TileSize, TileSize)
+      }
+    }
+  }
+
+  const drawFrame = (data: { dTime: number; player: PlayerInfoType }) => {
+    const ctx = actorsRef.current?.getContext('2d')
+    if (ctx) {
       ctx.clearRect(0, 0, width, height)
-      const { player, rDeb } = data
+      const { player, dTime } = data
       // вроде не особо на что влияет, но лучше проверить
       if (player) {
-        const { x, y } = player
+        const { x, y, phase, direction } = player
 
-        ctx.fillStyle = 'grey'
-        ctx.fillRect(x, y, TileSize, TileSize)
+        const src = playerSpr.getPhase(dTime, phase, direction)
+        ctx.drawImage(
+          src.img,
+          src.x,
+          src.y,
+          TileSize,
+          TileSize,
+          x,
+          y,
+          TileSize,
+          TileSize
+        )
       }
     }
   }
 
   const onKeyUp = (evt: KeyboardEvent): void => {
-    evt.preventDefault()
     const { keyCode } = evt
-    if (
-      keyCode >= RunnerActions.MoveLeft &&
-      keyCode <= RunnerActions.MoveDown
-    ) {
-      evt.stopImmediatePropagation()
-      GameModel.setPlayerAction(RunnerActions.Stay)
+    if (GameModel.lastPressed === keyCode) {
+      if (
+        keyCode >= RunnerAction.MoveLeft &&
+        keyCode <= RunnerAction.MoveDown
+      ) {
+        evt.preventDefault()
+        evt.stopImmediatePropagation()
+        GameModel.setPlayerAction(RunnerAction.Stay)
+      }
     }
   }
 
   const onKeyDown = (evt: KeyboardEvent): void => {
-    evt.preventDefault()
     const { keyCode } = evt
-    if (
-      keyCode >= RunnerActions.MoveLeft &&
-      keyCode <= RunnerActions.MoveDown
-    ) {
+    if (keyCode >= RunnerAction.MoveLeft && keyCode <= RunnerAction.MoveDown) {
+      evt.preventDefault()
       evt.stopImmediatePropagation()
       GameModel.setPlayerAction(keyCode)
+      GameModel.setLastPressed(keyCode)
+    }
+    if (keyCode === 32) {
+      evt.preventDefault()
+      evt.stopImmediatePropagation()
+      GameModel.burn()
     }
   }
 
   useEffect(() => {
+    const ctx = worldRef.current?.getContext('2d')
+    if (ctx) {
+      ctx.fillStyle = '#000000'
+      ctx.fillRect(0, 0, width, height)
+    }
+
     document.addEventListener('keydown', onKeyDown)
     document.addEventListener('keyup', onKeyUp)
+
+    GameModel.on(ModelEvents.UpdateWorld, updateWorld)
     GameModel.on(ModelEvents.Update, drawFrame)
     GameModel.dispatchUpdate()
     return () => {
       document.removeEventListener('keydown', onKeyDown)
       document.removeEventListener('keyup', onKeyUp)
+      GameModel.off(ModelEvents.UpdateWorld, updateWorld)
       GameModel.off(ModelEvents.Update, drawFrame)
     }
   }, [])
 
   return (
     <div>
-      <LevelHolder level={GameModel.getLevel()} />
+      <canvas ref={worldRef} width={width} height={height} />
       <canvas
-        ref={canvasRef}
+        ref={actorsRef}
         width={width}
         height={height}
         style={{
