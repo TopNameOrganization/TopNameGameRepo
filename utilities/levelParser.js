@@ -64,11 +64,12 @@ loadImage(__dirname + '/levels.png').then(img => {
   const ctx = canvas.getContext('2d')
   const levelMap = []
 
-  for (var i = 0; i < 2; i++) {
+  const yc = 0
+  for (var i = 0; i < 15; i++) {
     ctx.drawImage(
       img,
       offsetX + levelStepX * i,
-      offsetY,
+      offsetY + levelStepY * yc,
       canvasWidth,
       canvasHeight,
       0,
@@ -82,9 +83,14 @@ loadImage(__dirname + '/levels.png').then(img => {
         levelMap.push(getTileAt(x, y))
       }
     }
+    console.log(`${i} done`)
   }
   const data = new Uint8Array(Buffer.from(levelMap))
-  fs.writeFile(__dirname + '/level.bin', data, err => {
-    console.log(err)
-  })
+  fs.writeFile(
+    __dirname + `/levels${yc * 15 + 1}_${yc * 15 + 15}.bin`,
+    data,
+    err => {
+      console.log(err)
+    }
+  )
 })
