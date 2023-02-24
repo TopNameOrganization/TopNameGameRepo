@@ -62,38 +62,29 @@ loadImage(__dirname + '/levels.png').then(img => {
   const canvasHeight = height * tileSize
   const canvas = createCanvas(canvasWidth, canvasHeight)
   const ctx = canvas.getContext('2d')
-
-  ctx.drawImage(
-    img,
-    offsetX + levelStepX,
-    offsetY,
-    canvasWidth,
-    canvasHeight,
-    0,
-    0,
-    canvasWidth,
-    canvasHeight
-  )
-
   const levelMap = []
-  for (var y = 0; y < height; y++) {
-    for (var x = 0; x < width; x++) {
-      if (!levelMap[y]) {
-        levelMap[y] = []
+
+  for (var i = 0; i < 2; i++) {
+    ctx.drawImage(
+      img,
+      offsetX + levelStepX * i,
+      offsetY,
+      canvasWidth,
+      canvasHeight,
+      0,
+      0,
+      canvasWidth,
+      canvasHeight
+    )
+
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        levelMap.push(getTileAt(x, y))
       }
-      levelMap[y].push(getTileAt(x, y))
     }
   }
-  console.log(levelMap)
-
-  // const levelMap = []
-  // for (var y = 0; y < height; y++) {
-  //   for (var x = 0; x < width; x++) {
-  //     levelMap.push(getTileAt(x, y))
-  //   }
-  // }
-  // const data = new Uint8Array(Buffer.from(levelMap))
-  // fs.writeFile(__dirname + '/level.bin', data, err => {
-  //   console.log(err)
-  // })
+  const data = new Uint8Array(Buffer.from(levelMap))
+  fs.writeFile(__dirname + '/level.bin', data, err => {
+    console.log(err)
+  })
 })
