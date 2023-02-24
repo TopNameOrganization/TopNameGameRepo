@@ -123,14 +123,14 @@ export const GameView = () => {
 
     GameModel.on(ModelEvents.UpdateWorld, updateWorld)
     GameModel.on(ModelEvents.Update, drawFrame)
-    GameModel.dispatchUpdate()
+    GameModel.init()
     return () => {
       document.removeEventListener('keydown', onKeyDown)
       document.removeEventListener('keyup', onKeyUp)
       GameModel.off(ModelEvents.UpdateWorld, updateWorld)
       GameModel.off(ModelEvents.Update, drawFrame)
     }
-  }, [GameModel.getLevel()])
+  }, [])
 
   return (
     <div>
