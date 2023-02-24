@@ -1,7 +1,8 @@
+import { EventBus } from "../utils/EventBus";
+import { GameAPI } from '../../../api/GameApi';
 import { RunnerAction, Tile, TileSize, AnimationPhase } from "../constants";
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
-import { EventBus } from "../utils/EventBus";
 import { LevelType, SizeType, PositionType, ModelEvents } from "./types";
 
 export class GameModel extends EventBus {
@@ -20,13 +21,10 @@ export class GameModel extends EventBus {
     super();
     this.player = new Runner();
 
-    const req = new XMLHttpRequest();
-    req.open("GET", "/game/levels150.set", true);
-    req.responseType = "blob";
-    req.onload = () => {
-      this.levels = req.response;
+    GameAPI.read('levels150.set').then(({ data }) => {
+      this.levels = data;
       this.getLevel(this.levelNum);
-    };
+    })
 
     this.reader = new FileReader();
     this.reader.addEventListener('loadend', (evt: ProgressEvent<FileReader>) => {
@@ -48,8 +46,6 @@ export class GameModel extends EventBus {
       }, 0);
       this.setLevel({ level, player, bonuses });
     });
-
-    req.send();
   }
 
   public setLevel({ level, player, bonuses }: { level: LevelType, player: PositionType, bonuses: number }): void {
