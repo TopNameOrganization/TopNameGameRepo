@@ -65,8 +65,8 @@ loadImage(__dirname + '/levels.png').then(img => {
 
   ctx.drawImage(
     img,
-    offsetX + levelStepX * 3,
-    offsetY + levelStepY * 5,
+    offsetX + levelStepX,
+    offsetY,
     canvasWidth,
     canvasHeight,
     0,
@@ -78,11 +78,22 @@ loadImage(__dirname + '/levels.png').then(img => {
   const levelMap = []
   for (var y = 0; y < height; y++) {
     for (var x = 0; x < width; x++) {
-      levelMap.push(getTileAt(x, y))
+      if (!levelMap[y]) {
+        levelMap[y] = []
+      }
+      levelMap[y].push(getTileAt(x, y))
     }
   }
-  const data = new Uint8Array(Buffer.from(levelMap))
-  fs.writeFile(__dirname + '/level.bin', data, err => {
-    console.log(err)
-  })
+  console.log(levelMap)
+
+  // const levelMap = []
+  // for (var y = 0; y < height; y++) {
+  //   for (var x = 0; x < width; x++) {
+  //     levelMap.push(getTileAt(x, y))
+  //   }
+  // }
+  // const data = new Uint8Array(Buffer.from(levelMap))
+  // fs.writeFile(__dirname + '/level.bin', data, err => {
+  //   console.log(err)
+  // })
 })
