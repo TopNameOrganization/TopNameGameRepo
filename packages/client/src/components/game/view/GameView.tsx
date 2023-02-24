@@ -8,6 +8,9 @@ import { Sprite } from './sprite'
 import { tileCfg } from './spriteConfigs'
 import { playerCfg } from './spriteConfigs'
 
+const width = 32 * TileSize
+const height = 22 * TileSize
+
 export const GameView = () => {
   const worldRef = useRef<HTMLCanvasElement>(null)
   const actorsRef = useRef<HTMLCanvasElement>(null)
@@ -15,7 +18,7 @@ export const GameView = () => {
   const tileSpr = new Sprite(tileCfg)
   const playerSpr = new Sprite(playerCfg)
 
-  const { width, height } = GameModel.getLevelSize()
+  // const { width, height } = GameModel.getLevelSize()
 
   const updateWorld = ({
     level,
@@ -26,9 +29,17 @@ export const GameView = () => {
   }) => {
     const ctx = worldRef.current?.getContext('2d')
     if (ctx) {
+      if (level) {
+        ctx.fillStyle = '#000000'
+        ctx.fillRect(0, 0, width, height)
+      }
       level?.map((item, y) => {
         item.map((tile, x) => {
-          if (tile !== Tile.Empty && tile !== Tile.Player) {
+          if (
+            tile !== Tile.Empty &&
+            tile !== Tile.Player &&
+            tile !== Tile.Enemy
+          ) {
             const src = tileSpr.getPhase(0, tile)
             ctx.drawImage(
               src.img,
@@ -107,12 +118,6 @@ export const GameView = () => {
   }
 
   useEffect(() => {
-    const ctx = worldRef.current?.getContext('2d')
-    if (ctx) {
-      ctx.fillStyle = '#000000'
-      ctx.fillRect(0, 0, width, height)
-    }
-
     document.addEventListener('keydown', onKeyDown)
     document.addEventListener('keyup', onKeyUp)
 
@@ -125,7 +130,7 @@ export const GameView = () => {
       GameModel.off(ModelEvents.UpdateWorld, updateWorld)
       GameModel.off(ModelEvents.Update, drawFrame)
     }
-  }, [])
+  }, [GameModel.getLevel()])
 
   return (
     <div>
