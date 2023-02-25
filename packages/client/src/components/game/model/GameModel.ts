@@ -137,7 +137,7 @@ export class GameModel extends EventBus {
 
         if (action === RunnerAction.MoveUp) {
           if (playerTile === Tile.Stair
-            && (tile === Tile.Stair || tile === Tile.Rope || tile === Tile.Empty || tile === Tile.Bonus)
+            && ([Tile.Stair, Tile.Rope, Tile.Empty, Tile.Bonus].includes(tile))
           ) {
             x = playerTilePos.x;
           } else {
@@ -152,7 +152,7 @@ export class GameModel extends EventBus {
           }
         }
 
-        if (tile === Tile.Brick || tile === Tile.Concrete || tile === Tile.Out) {
+        if ([Tile.Brick, Tile.Concrete, Tile.Out].includes(tile)) {
           // туда нельзя, ровнять координаты по движению
           switch (action) {
             case RunnerAction.MoveLeft:
@@ -215,9 +215,7 @@ export class GameModel extends EventBus {
     const mid: PositionType = this.worldToMap({ x: this.player.x + .5 * TileSize, y: this.player.y + .5 * TileSize });
     const bottom: PositionType = this.worldToMap({ x: this.player.x + .5 * TileSize, y: this.player.y + TileSize });
     return this.getTileAt(mid) === Tile.Empty
-      && (this.getTileAt(bottom) === Tile.Empty
-        || this.getTileAt(bottom) === Tile.Rope
-        || this.getTileAt(bottom) === Tile.Bonus);
+      && ([Tile.Empty, Tile.Rope, Tile.Bonus].includes(this.getTileAt(bottom)));
   }
 
   private getTileAt({ x, y }: PositionType): Tile {

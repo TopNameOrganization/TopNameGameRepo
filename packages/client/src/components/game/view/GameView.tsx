@@ -33,11 +33,7 @@ export const GameView = () => {
       }
       level?.map((item, y) => {
         item.map((tile, x) => {
-          if (
-            tile !== Tile.Empty &&
-            tile !== Tile.Player &&
-            tile !== Tile.Enemy
-          ) {
+          if (![Tile.Empty, Tile.Player, Tile.Enemy].includes(tile)) {
             const src = tileSpr.getPhase(0, tile)
             ctx.drawImage(tileSpr.getPhase(0, tile), x * TileSize, y * TileSize)
           }
