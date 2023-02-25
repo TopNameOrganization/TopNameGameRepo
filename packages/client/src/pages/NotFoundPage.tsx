@@ -1,3 +1,7 @@
+import { DefaultStub } from '../components/DefaultStub'
+
 export function NotFoundPage() {
-  return <div>Not found ;-(</div>
+  return (
+    <DefaultStub title="404" subTitle="Sorry, we couldn't find that page" />
+  )
 }
