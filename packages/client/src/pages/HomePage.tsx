@@ -5,33 +5,37 @@ import play from '../assets/appLayout/play.png'
 export const HomePage = () => {
   return (
     <AppLayout>
-        <Stack
-          direction="row"
-          spacing={0}
-          alignItems="center"
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '562px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          transform: 'translateY(-50%)',
+          left: 0,
+          right:0
+        }}>
+        <Button
+          disableRipple={true}
           sx={{
-            height: 0,
-            width: '1000px',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            transform: 'translateY(-61vh)',
-          }}>
-          <Button
-            sx={{
-              backgroundImage: `url(${play})`,
-              backgroundSize: 'contain',
-              backgroundRepeat: 'no-repeat',
-              height: '400px',
-              width: '400px',
-              transform: 'translateX(10%)'
-            }}></Button>
+            backgroundImage: `url(${play})`,
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat',
+            height: '400px',
+            width: '400px',
+            transform: 'translateX(10%)',
+            ":hover": {
+              backgroundColor: 'transparent'
+            },
+          }}></Button>
 
-          <Typography variant="h1">
-            CLICK
-            <br />
-            FOR PLAY!
-          </Typography>
-        </Stack>
+        <Typography variant="h1">
+          CLICK
+          <br />
+          FOR PLAY!
+        </Typography>
+      </Box>
     </AppLayout>
   )
 }

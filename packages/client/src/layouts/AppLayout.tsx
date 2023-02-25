@@ -110,12 +110,10 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
             xs={6}
             md={6}
             sx={{
-              marginTop: '70px',
               opacity: 0.2,
-              transform: 'rotate(-45deg)',
               zIndex: '0'
             }}>
-              <img src={game_controller} style={{objectFit: 'cover'}}/>
+              <img src={game_controller} style={{objectFit: 'cover', width: '100%'}}/>
             </Grid>
           <Grid
             item
@@ -125,7 +123,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
               marginTop: '20px',
               opacity: 0.2,
             }}>
-              <img src={cassette} style={{objectFit: 'cover'}}/>
+              <img src={cassette} style={{objectFit: 'cover', width: '100%'}}/>
             </Grid>
         </Grid>
       </Box>
