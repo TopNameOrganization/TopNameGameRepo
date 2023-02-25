@@ -3,7 +3,7 @@ import * as yup from 'yup'
 export const signInFormValidationSchema = yup.object({
   login: yup
     .string()
-    .email('Enter a valid email')
+    // .email('Enter a valid email')
     .required('Email is required'),
   password: yup
     .string()

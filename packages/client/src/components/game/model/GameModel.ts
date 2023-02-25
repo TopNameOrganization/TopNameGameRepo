@@ -1,10 +1,11 @@
-import { Directions, Tiles, TileSize } from "../constants";
+import { RunnerActions, Tiles, TileSize, VELOCITY } from "../constants";
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
 import { EventBus } from "../utils/EventBus";
 import { LevelType, SizeType, PositionType, ModelEvents } from "./types";
 
 export class GameModel extends EventBus {
+  private time: number;
   private player: RunnerType;
   private level: LevelType;
 
@@ -28,83 +29,130 @@ export class GameModel extends EventBus {
     return this.level;
   }
 
-  // чтоб можно было снаружи снаружи задиспатчить обновление
-  // TODO: скорее всего выпилить после того, как научить модель считать время
   public dispatchUpdate(): void {
-    // TODO: диспатчить ВСЕ изменения, а не только игрока
-    const { x, y } = this.player;
-    this.dispatch(ModelEvents.Update, { x, y });
+    this.update();
   }
 
-  // для управления игроком снаружи
-  // TODO: перепилить, наверно, на состояние
-  public movePlayer(dir: Directions): void {
-    const tile = this.getTileAtPlayer(0, 0);
-    const tileUnder = this.getTileAtPlayer(0, 1);
+  public setPlayerAction(action: RunnerActions) {
+    this.player.setAction(action);
+  }
 
-    const { x, y } = this.player;
-    const dy = dir === Directions.Down ? 1 : -1;
-    const dx = dir === Directions.Right ? 1 : -1;
+  public update() {
+    const currentTime = new Date().getTime();
 
-    // обработчик столкновений
-    // TODO: вынести всё это в отдельный фаел, а то и вовсе класс
-    switch (dir) {
-      case Directions.Up:
-      case Directions.Down:
-        if (y + dy < 0 || y + dy >= this.level.length) {
-          // выходим за пределы уровня, а туда выходить нельзя
-          break;
-        }
-        if (this.checkPlayerFall()) {
-          // есть куда упасть, значит надо падать 
-          this.player.setPosition({ x, y: y + 1 });
-          break;
-        }
-        if (dir === Directions.Down && tile === Tiles.Rope
-          && (tileUnder === Tiles.Empty || tileUnder === Tiles.Rope)) {
-          // если висим на верёвке и жмём вниз, значит надо падать
-          this.player.setPosition({ x, y: y + 1 });
-          break;
-        }
-        if (tile === Tiles.Stair || tileUnder === Tiles.Stair) {
-          // вот мы на лестнице, смотрим какие есть варианты
-          if ((this.getTileAtPlayer(0, dy) === Tiles.Brick || this.getTileAtPlayer(0, dy) === Tiles.Concrete)
-            || (dir === Directions.Up && tile !== Tiles.Stair)) {
-            // если наткнулись стену или идём вверх, но лестница уже закончилась, дальше идти нельзя
-            break;
+    if (this.time) {
+      const dTime = (currentTime - this.time) / 1000;
+
+      const { action } = this.player;
+      const { x: xNew, y: yNew } = this.player.getNextPos(dTime);
+      let x: number = xNew;
+      let y: number = yNew;
+
+      const collision = this.worldToMap(this.player.getCheckCollisionPoint({ x: xNew, y: yNew }));
+      const tile = this.getTileAt(collision);
+      const playerTile = this.getTileAtPlayer(0, 0);
+      const playerTilePos = this.mapToWorld(this.playerAtMap());
+
+      if (action !== RunnerActions.Fall) {
+        if (this.checkFall()) {
+          this.player.setAction(RunnerActions.Fall);
+          this.update();
+          return;
+        };
+      }
+      if (action !== RunnerActions.Stay) {
+        if (action === RunnerActions.Fall) {
+          if (playerTile === Tiles.Rope) {
+            y = playerTilePos.y;
+            this.player.resetAction();
           }
-          this.player.setPosition({ x, y: y + dy });
+          if (tile === Tiles.Stair) {
+            y = playerTilePos.y;
+            this.player.resetAction();
+          }
         }
-        break;
-      case Directions.Right:
-      case Directions.Left:
-        if (x + dx < 0 || x + dx >= this.level[0].length) {
-          // выходим за пределы уровня, а туда выходить нельзя
-          break;
-        }
-        if (this.getTileAtPlayer(dx, 0) === Tiles.Brick || this.getTileAtPlayer(dx, 0) === Tiles.Concrete) {
-          // наткнулись на стену, дальше идти нельзя
-          break;
-        }
-        this.player.setPosition({ x: x + dx, y });
-        break;
-    }
 
-    // проверяем
-    if (this.checkPlayerFall()) {
-      this.movePlayer(Directions.Down);
-    }
+        if (action === RunnerActions.MoveUp) {
+          if (playerTile === Tiles.Stair
+            && (tile === Tiles.Stair || tile === Tiles.Rope || tile === Tiles.Empty)
+          ) {
+            x = playerTilePos.x;
+          } else {
+            y = playerTilePos.y;
+          }
+        }
 
-    this.dispatchUpdate();
+        if (action === RunnerActions.MoveDown) {
+          if (playerTile === Tiles.Empty
+            || playerTile === Tiles.Stair) {
+            x = playerTilePos.x;
+          }
+        }
+
+        if (tile === Tiles.Brick || tile === Tiles.Concrete) {
+          // туда нельзя, ровнять координаты по движению
+          switch (action) {
+            case RunnerActions.MoveLeft:
+            case RunnerActions.MoveRight:
+              x = playerTilePos.x;
+              y = this.player.y;
+              break;
+            case RunnerActions.MoveUp:
+            case RunnerActions.MoveDown:
+            case RunnerActions.Fall:
+              x = this.player.x;
+              y = playerTilePos.y;
+              if (action === RunnerActions.Fall) {
+                this.player.resetAction();
+              }
+              break;
+          }
+        }
+
+        this.player.update({ x, y });
+      }
+    }
+    this.time = currentTime;
+    const { x, y } = this.player;
+    this.dispatch(ModelEvents.Update, { player: { x, y }, rDeb: { x: 0, y: 0, w: 100, h: 100 } });
+    requestAnimationFrame(this.update.bind(this));
   }
 
-  private checkPlayerFall(): boolean {
-    return (this.getTileAtPlayer(0, 1) === Tiles.Empty || this.getTileAtPlayer(0, 1) === Tiles.Rope)
-      && this.getTileAtPlayer(0, 0) === Tiles.Empty;
+  private checkFall(): boolean {
+    const mid: PositionType = this.worldToMap({ x: this.player.x + .5 * TileSize, y: this.player.y + .5 * TileSize });
+    const bottom: PositionType = this.worldToMap({ x: this.player.x + .5 * TileSize, y: this.player.y + TileSize });
+    return this.getTileAt(mid) === Tiles.Empty
+      && (this.getTileAt(bottom) === Tiles.Empty || this.getTileAt(bottom) === Tiles.Rope);
   }
 
-  private getTileAtPlayer(x: number, y: number): Tiles {
-    return this.level[this.player.y + y][this.player.x + x]
+  private getTileAt({ x, y }: PositionType): Tiles {
+    return this.level[y][x];
+  }
+
+  // координаты мира -> координаты карты
+  private worldToMap({ x, y }: PositionType): PositionType {
+    return { x: Math.floor(x / TileSize), y: Math.floor(y / TileSize) };
+  }
+
+  // координаты карты -> координаты мира
+  private mapToWorld({ x, y }: PositionType): PositionType {
+    return { x: x * TileSize, y: y * TileSize };
+  }
+
+  private playerAtMap(offset: PositionType = { x: .5, y: .5 }): PositionType {
+    const { x, y } = this.player;
+    return {
+      x: Math.floor((x + offset.x * TileSize) / TileSize),
+      y: Math.floor((y + offset.y * TileSize) / TileSize)
+    };
+  }
+
+  private getTileAtPlayer(x: number, y: number, offset: PositionType = { x: .5, y: .5 }): Tiles {
+    const xOffset: number = offset.x * TileSize;
+    const yOffset: number = offset.y * TileSize;
+    const xTile = Math.floor((this.player.x + xOffset) / TileSize);
+    const yTile = Math.floor((this.player.y + yOffset) / TileSize);
+    return this.level[yTile + y][xTile + x];
   }
 }
 
