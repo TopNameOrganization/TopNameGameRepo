@@ -21,14 +21,15 @@ export class GameModel extends EventBus {
     super();
     this.player = new Runner();
 
+    // TODO: убрать это отсюда куда-нить
     GameAPI.read('levels150.set').then(({ data }) => {
       this.levels = data;
       this.getLevel(this.levelNum);
     })
 
     this.reader = new FileReader();
-    this.reader.addEventListener('loadend', (evt: ProgressEvent<FileReader>) => {
-      const data = new Int8Array(evt.currentTarget.result);
+    this.reader.addEventListener('loadend', () => {
+      const data = new Int8Array(this.reader.result as ArrayBuffer);
       const level: LevelType = [];
       const player = { x: 0, y: 0 };
       const bonuses = data.reduce((prev, curr, i) => {
@@ -46,6 +47,7 @@ export class GameModel extends EventBus {
       }, 0);
       this.setLevel({ level, player, bonuses });
     });
+    // ---
   }
 
   public setLevel({ level, player, bonuses }: { level: LevelType, player: PositionType, bonuses: number }): void {
@@ -177,7 +179,8 @@ export class GameModel extends EventBus {
           if (this.bonuses === 0) {
             this.levelNum++;
             this.getLevel(this.levelNum);
-            // this.dispatch(ModelEvents.LevelUp);
+            // TODO:
+            // this.dispatch(ModelEvents.LevelUp, this.levelNum);
             return;
           }
         }

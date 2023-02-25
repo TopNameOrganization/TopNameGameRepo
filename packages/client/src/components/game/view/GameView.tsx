@@ -18,8 +18,6 @@ export const GameView = () => {
   const tileSpr = new Sprite(tileCfg)
   const playerSpr = new Sprite(playerCfg)
 
-  // const { width, height } = GameModel.getLevelSize()
-
   const updateWorld = ({
     level,
     burn,
@@ -41,17 +39,7 @@ export const GameView = () => {
             tile !== Tile.Enemy
           ) {
             const src = tileSpr.getPhase(0, tile)
-            ctx.drawImage(
-              src.img,
-              src.x,
-              src.y,
-              TileSize,
-              TileSize,
-              x * TileSize,
-              y * TileSize,
-              TileSize,
-              TileSize
-            )
+            ctx.drawImage(tileSpr.getPhase(0, tile), x * TileSize, y * TileSize)
           }
         })
       })
@@ -71,19 +59,7 @@ export const GameView = () => {
       // вроде не особо на что влияет, но лучше проверить
       if (player) {
         const { x, y, phase, direction } = player
-
-        const src = playerSpr.getPhase(dTime, phase, direction)
-        ctx.drawImage(
-          src.img,
-          src.x,
-          src.y,
-          TileSize,
-          TileSize,
-          x,
-          y,
-          TileSize,
-          TileSize
-        )
+        ctx.drawImage(playerSpr.getPhase(dTime, phase, direction), x, y)
       }
     }
   }
