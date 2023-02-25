@@ -5,26 +5,25 @@ import play from '../assets/appLayout/play.png'
 export const HomePage = () => {
   return (
     <AppLayout>
-      <Box component="main">
         <Stack
           direction="row"
           spacing={0}
           alignItems="center"
           sx={{
-            height: '400px',
+            height: 0,
             width: '1000px',
             marginLeft: 'auto',
             marginRight: 'auto',
-            transform: 'translateY(-50%)',
+            transform: 'translateY(-61vh)',
           }}>
           <Button
             sx={{
               backgroundImage: `url(${play})`,
               backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
               height: '400px',
               width: '400px',
-              padding: 0,
-              transform: 'translateX(10%)',
+              transform: 'translateX(10%)'
             }}></Button>
 
           <Typography variant="h1">
@@ -33,7 +32,6 @@ export const HomePage = () => {
             FOR PLAY!
           </Typography>
         </Stack>
-      </Box>
     </AppLayout>
   )
 }

@@ -9,7 +9,7 @@ export const EndGameScreen = () => {
 
   return (
     <AppLayout>
-      {/* <Box component="main" className="game-over">
+      <Box component="main" className="game-over">
         <Container>
           <Paper
             elevation={24}
@@ -17,7 +17,7 @@ export const EndGameScreen = () => {
               backgroundColor: 'black',
               height: '300px',
               width: 'auto',
-              transform: 'translateY(-60%)',
+              transform: 'translateY(-260%)',
               marginLeft: 'auto',
               marginRight: 'auto',
             }}>
@@ -57,7 +57,7 @@ export const EndGameScreen = () => {
             </Stack>
           </Paper>
         </Container>
-      </Box> */}
+      </Box>
     </AppLayout>
   )
 }
