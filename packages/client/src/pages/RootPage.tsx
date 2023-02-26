@@ -1,29 +1,12 @@
-import { Typography, Link } from '@mui/material'
-import { Link as RouterLink } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { ROUTES } from '../constants'
+import { Typography } from '@mui/material'
+import { GeneralLayout } from '../layouts'
 
-export function RootPage() {
-  const auth = useAuth()
-  const content = auth.user.data ? (
-    <button
-      onClick={() => {
-        auth.logout.action()
-      }}>
-      logout
-    </button>
-  ) : (
-    <Link component={RouterLink} to={ROUTES.login} variant="body2">
-      {'Sign In'}
-    </Link>
-  )
-
+export const RootPage = () => {
   return (
-    <>
+    <GeneralLayout>
       <Typography component="h1" variant="h5">
         Root page
       </Typography>
-      {content}
-    </>
+    </GeneralLayout>
   )
 }
