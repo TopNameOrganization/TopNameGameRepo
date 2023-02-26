@@ -8,6 +8,7 @@ import {
   TableRow,
   TableCell,
 } from '@mui/material'
+import { GeneralLayout } from '../layouts'
 
 // это должно быть из стора, а там из апи, но это неточно ))
 const data = [
@@ -18,35 +19,37 @@ const data = [
 
 export const LeaderBoardPage = () => {
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ width: '50px' }} align="center">
-              No.
-            </TableCell>
-            <TableCell sx={{ width: '200px' }} align="center">
-              Имя
-            </TableCell>
-            <TableCell sx={{ width: '200px' }} align="center">
-              Уровень
-            </TableCell>
-            <TableCell align="center">Счёт</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map(({ name, level, score }, index) => (
-            <TableRow key={`key${index}`}>
-              <TableCell size="small" align="right">
-                {index}
+    <GeneralLayout>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ width: '50px' }} align="center">
+                No.
               </TableCell>
-              <TableCell align="center">{name}</TableCell>
-              <TableCell align="center">{level}</TableCell>
-              <TableCell align="center">{score}</TableCell>
+              <TableCell sx={{ width: '200px' }} align="center">
+                Имя
+              </TableCell>
+              <TableCell sx={{ width: '200px' }} align="center">
+                Уровень
+              </TableCell>
+              <TableCell align="center">Счёт</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {data.map(({ name, level, score }, index) => (
+              <TableRow key={`key${index}`}>
+                <TableCell size="small" align="right">
+                  {index}
+                </TableCell>
+                <TableCell align="center">{name}</TableCell>
+                <TableCell align="center">{level}</TableCell>
+                <TableCell align="center">{score}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </GeneralLayout>
   )
 }
