@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { ThemeProvider, createTheme } from '@mui/material'
 import { AuthProvider } from './context/AuthContext'
 import { Router } from './Router'
@@ -8,25 +8,30 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { DefaultStub } from './components/DefaultStub'
 import { Provider } from 'react-redux'
 import { setupStore } from "./store";
+import { serviceWorkersRegistration } from './serviceWorkersRegistration'
 
 const theme = createTheme()
 const queryClient = new QueryClient()
 const store = setupStore()
 
 function App() {
+  useEffect(() => {
+    serviceWorkersRegistration()
+  }, [])
+
   return (
     <Provider store={store}>
-        <HashRouter>
-          <ThemeProvider theme={theme}>
-            <QueryClientProvider client={queryClient}>
-              <ErrorBoundary msg={<DefaultStub />}>
-                <AuthProvider>
-                  <Router />
-                </AuthProvider>
-              </ErrorBoundary>
-            </QueryClientProvider>
-          </ThemeProvider>
-        </HashRouter>
+      <HashRouter>
+        <ThemeProvider theme={theme}>
+          <QueryClientProvider client={queryClient}>
+            <ErrorBoundary msg={<DefaultStub />}>
+              <AuthProvider>
+                <Router />
+              </AuthProvider>
+            </ErrorBoundary>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </HashRouter>
     </Provider>
   )
 }

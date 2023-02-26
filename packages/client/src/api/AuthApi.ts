@@ -1,6 +1,6 @@
 import { api } from './api'
 import { AxiosResponse } from 'axios'
-import {SigninData, SignupData, User} from "./types";
+import { SigninData, SignupData, User } from "./types";
 
 export class AuthAPI {
   static signin = (data: SigninData) =>

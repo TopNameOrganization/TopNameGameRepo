@@ -1,4 +1,4 @@
-import { Tiles } from "../constants"
+import { Tile, AnimationPhase } from "../constants"
 
 export type PositionType = {
   x: number,
@@ -10,11 +10,17 @@ export type SizeType = {
   height: number,
 }
 
-export type LevelType = Tiles[][];
+export type PlayerInfoType = PositionType & {
+  phase: AnimationPhase,
+  direction: number,
+}
+
+export type LevelType = Tile[][];
 
 // TODO: всё кроме Update - это неточно
 export enum ModelEvents {
   Update = 'update',
+  UpdateWorld = 'updateWorld',
   GameStart = 'start',
   LevelUp = 'levelUp',
   GameOver = 'over'
