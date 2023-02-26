@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { ThemeProvider, createTheme } from '@mui/material'
 import { AuthProvider } from './context/AuthContext'
 import { Router } from './Router'
