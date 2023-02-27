@@ -13,12 +13,12 @@ import {
 import { Person, Logout } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
 import { ROUTES, resourcesUrl } from '../constants'
-import { useTypedSelector } from '../hooks/useTypedSelector'
+import { useAppSelector } from '../hooks/redux'
 import { useAuth } from '../context/AuthContext'
 
 export const UserDropdown = () => {
   const auth = useAuth()
-  const { avatar, display_name } = useTypedSelector(state => state.user.user)
+  const { avatar, display_name } = useAppSelector(state => state.userReducer.user)
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   )
