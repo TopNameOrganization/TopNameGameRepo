@@ -36,3 +36,10 @@ export interface UserPasswordData {
   oldPassword: string
   newPassword: string
 }
+
+export interface LeaderData {
+  id: number,
+  name: string,
+  score: number,
+  level: number,
+}

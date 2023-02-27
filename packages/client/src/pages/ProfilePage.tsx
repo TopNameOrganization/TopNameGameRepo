@@ -1,15 +1,21 @@
 import * as React from 'react'
-import Typography from '@mui/material/Typography'
-import Container from '@mui/material/Container'
+import { Container } from '@mui/material'
 import { Profile } from '../components/profile/Profile'
+import { GeneralLayout } from '../layouts'
 
 export const ProfilePage = () => {
   return (
-    <Container component="main" maxWidth="xs">
-      <Typography component="h1" variant="h5">
-        Profile page
-      </Typography>
-      <Profile />
-    </Container>
+    <GeneralLayout>
+      <Container
+        maxWidth="xs"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Profile />
+      </Container>
+    </GeneralLayout>
   )
 }
