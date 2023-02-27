@@ -5,17 +5,16 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import {validationUserProfile} from "./validation";
 import {useEffect} from "react";
-import {useTypedSelector} from "../../hooks/useTypedSelector";
-import {useActions} from "../../hooks/useActions";
+import {useAppSelector, useAppActions} from "../../hooks/redux";
 import {UserProfileData} from "../../api/types";
 
 export const ProfileForm = (props: any) => {
-    const { user } = useTypedSelector((state) => state.user);
-    const { fetchUser, changeUserProfile } = useActions()
+    const { user } = useAppSelector((state) => state.userReducer);
+    const { fetchUser, changeUserProfile } = useAppActions()
 
     useEffect(() => {
         fetchUser()
-    }, [])
+    },[])
 
     const formik = useFormik({
         initialValues: {
