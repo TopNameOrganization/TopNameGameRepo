@@ -1,26 +1,27 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getLeaders } from '../actions/leaderboardAction'
+import { leaderboardInitialState } from "../constants";
 
 export const leaderboardSlice = createSlice({
   name: 'leaderboard',
-  initialState: { leaders: [], error: null, loading: false },
+  initialState: leaderboardInitialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(getLeaders.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.leaders = [];
+        state.leaders = leaderboardInitialState.leaders;
       })
       .addCase(getLeaders.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.leaders = action.payload.map(({ data }) => data)
+        state.leaders = action.payload.map((item) => item.data)
       })
       .addCase(getLeaders.rejected, (state, action) => {
         state.loading = false;
-        state.error = null;
-        state.leaders = [];
+        state.error = action.payload;
+        state.leaders = leaderboardInitialState.leaders;
       })
   }
 })

@@ -1,6 +1,6 @@
-import {UserState} from "./types";
+import { UserState, LeaderboardState } from "./types";
 
-export const initialState: UserState = {
+export const userInitialState: UserState = {
   user: {
     id: null,
     first_name: '',
@@ -13,4 +13,10 @@ export const initialState: UserState = {
   },
   loading: false,
   error: null
+}
+
+export const leaderboardInitialState: LeaderboardState = {
+  leaders: [],
+  loading: false,
+  error: null,
 }
