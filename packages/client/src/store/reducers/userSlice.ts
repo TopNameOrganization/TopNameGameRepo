@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {fetchUser} from "../actions/userAction";
-import {initialState} from "../constants";
+import { fetchUser } from "../actions/userAction";
+import { initialState } from "../constants";
 
 export const userSlice = createSlice({
   name: 'user',

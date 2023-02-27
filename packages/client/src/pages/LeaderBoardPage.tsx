@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Paper,
   TableContainer,
@@ -9,15 +9,16 @@ import {
   TableCell,
 } from '@mui/material'
 import { GeneralLayout } from '../layouts'
-
-// это должно быть из стора, а там из апи, но это неточно ))
-const data = [
-  { name: 'aaa', level: 10, score: 1000 },
-  { name: 'bbb', level: 8, score: 500 },
-  { name: 'ccc', level: 2, score: 20 },
-]
+import { useAppActions, useAppSelector } from '../hooks/redux'
 
 export const LeaderBoardPage = () => {
+  const { getLeaders } = useAppActions()
+  const { leaders: data } = useAppSelector(state => state.leaderboardReducer)
+
+  useEffect(() => {
+    getLeaders('score')
+  }, [])
+
   return (
     <GeneralLayout>
       <TableContainer component={Paper}>
@@ -28,19 +29,30 @@ export const LeaderBoardPage = () => {
                 No.
               </TableCell>
               <TableCell sx={{ width: '200px' }} align="center">
-                Имя
+                Name
               </TableCell>
-              <TableCell sx={{ width: '200px' }} align="center">
-                Уровень
+              <TableCell
+                sx={{ width: '200px' }}
+                align="center"
+                onClick={() => {
+                  getLeaders('level')
+                }}>
+                Level
               </TableCell>
-              <TableCell align="center">Счёт</TableCell>
+              <TableCell
+                align="center"
+                onClick={() => {
+                  getLeaders('score')
+                }}>
+                Score
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {data.map(({ name, level, score }, index) => (
               <TableRow key={`key${index}`}>
-                <TableCell size="small" align="right">
-                  {index}
+                <TableCell size="small" align="center">
+                  {index + 1}
                 </TableCell>
                 <TableCell align="center">{name}</TableCell>
                 <TableCell align="center">{level}</TableCell>
