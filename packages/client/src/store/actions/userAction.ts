@@ -1,16 +1,15 @@
-import {AuthAPI} from "../../api/AuthApi";
-import {UserAction, UserActionTypes} from "../types/userTypes";
-import {Dispatch} from "redux";
+import { AuthAPI } from "../../api/AuthApi";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import {User} from "../../api/types";
 
-export const fetchUser = () => {
-  return async (dispatch: Dispatch<UserAction>) => {
+export const fetchUser = createAsyncThunk<User, void, { rejectValue: string }>(
+  'user/fetchUser',
+  async (_, thunkAPI) => {
     try {
-      dispatch({type: UserActionTypes.FETCH_USER})
       const response = await AuthAPI.read()
-      dispatch({type: UserActionTypes.FETCH_USER_SUCCESS, payload: response.data})
+      return response.data
     } catch (error) {
-      dispatch({type: UserActionTypes.FETCH_USER_ERROR, payload: 'Server Error!'})
-      console.log(error)
+      return thunkAPI.rejectWithValue('Server Error!')
     }
   }
-}
+)
