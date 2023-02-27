@@ -6,7 +6,7 @@ const URL = '/leaderboard';
 const MAX = 10;
 
 export class LeaderBoardAPI {
-  static TEAM = 'fantasy';//_run_test';
+  static TEAM = 'fantasy_run_test';
 
   static addLeader = (data: LeaderData) =>
     api.post<string, AxiosResponse>(URL, {
