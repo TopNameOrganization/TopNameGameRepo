@@ -1,5 +1,6 @@
 import { Paper, Typography, Stack, Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '../../constants/routes'
 
 export default function EndGameScreen() {
   const navigate = useNavigate()
@@ -35,13 +36,13 @@ export default function EndGameScreen() {
           try again
         </Button>
         <Button
-          onClick={() => navigate('/leaderboard')}
+          onClick={() => navigate(ROUTES.leaderBoard)}
           variant="contained"
           color="error">
           leaderboard
         </Button>
         <Button
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(ROUTES.home)}
           variant="contained"
           color="error">
           quit
