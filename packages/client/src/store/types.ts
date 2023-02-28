@@ -7,7 +7,7 @@ export interface UserState {
 }
 
 export interface LeaderboardState {
-  leaders: [] | LeaderData[],
+  leaders: LeaderData[],
   loading: boolean,
   error?: string,
 }
