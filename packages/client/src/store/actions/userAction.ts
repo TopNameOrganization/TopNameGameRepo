@@ -1,7 +1,8 @@
-import { AuthAPI } from "../../api/AuthApi";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { User } from "../../api/types";
+import { AuthAPI } from "../../api/AuthApi";
 
-export const fetchUser = createAsyncThunk(
+export const fetchUser = createAsyncThunk<User, void, { rejectValue: string }>(
   'user/fetchUser',
   async (_, thunkAPI) => {
     try {

@@ -10,12 +10,12 @@ export const leaderboardSlice = createSlice({
     builder
       .addCase(getLeaders.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
         state.leaders = leaderboardInitialState.leaders;
       })
       .addCase(getLeaders.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = null;
+        state.error = undefined;
         state.leaders = action.payload.map((item) => item.data)
       })
       .addCase(getLeaders.rejected, (state, action) => {
