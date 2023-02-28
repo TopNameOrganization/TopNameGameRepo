@@ -1,17 +1,15 @@
-import {Dispatch} from "redux";
 import UsersAPI from "../../api/UsersAPI";
-import {UserProfileAction, ChangeUserProfileActionTypes} from "../types/changeUserProfileTypes";
-import {UserProfileData} from "../../api/types";
+import { UserProfileData } from "../../api/types";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const changeUserProfile = (userProfile: UserProfileData) => {
-  return async (dispatch: Dispatch<UserProfileAction>) => {
+export const changeUserProfile = createAsyncThunk<any, UserProfileData, { rejectValue: string }>(
+  'userProfile/changeUserProfile',
+  async (userProfile, thunkAPI) => {
     try {
-      dispatch({type: ChangeUserProfileActionTypes.CHANGE_USER_PROFILE})
       const response = await UsersAPI.changeUserProfile(userProfile)
-      dispatch({type: ChangeUserProfileActionTypes.CHANGE_USER_PROFILE_SUCCESS, payload: response.data})
+      return response.data
     } catch (error) {
-      dispatch({type: ChangeUserProfileActionTypes.CHANGE_USER_PROFILE_ERROR, payload: 'Server Error!'})
-      console.log(error)
+      return thunkAPI.rejectWithValue('Server Error!')
     }
   }
-}
+)

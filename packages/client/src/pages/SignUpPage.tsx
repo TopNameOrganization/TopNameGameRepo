@@ -2,7 +2,7 @@ import React from 'react'
 import { Typography, Grid, Link } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { SignUpForm } from '../components/signUp'
-import { LoginLayout } from '../layouts/LoginLayout'
+import { LoginLayout } from '../layouts'
 import { ROUTES } from '../constants'
 
 export function SignUpPage() {
