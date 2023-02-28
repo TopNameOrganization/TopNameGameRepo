@@ -1,5 +1,4 @@
 import { Box, Button, Container, Grid, Paper, Stack, Typography } from '@mui/material'
-import { AppLayout } from '../layouts/AppLayout'
 import play from '../assets/appLayout/play.png'
 import { GeneralLayout } from '../layouts'
 import brick from '../assets/appLayout/brick2.png'

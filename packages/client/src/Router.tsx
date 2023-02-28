@@ -16,7 +16,6 @@ export const Router = () => {
         <Route path={ROUTES.game} element={<Pages.GamePage />} />
         <Route path={ROUTES.profile} element={<Pages.ProfilePage />} />
         <Route path={ROUTES.leaderBoard} element={<Pages.LeaderBoardPage />} />
-        <Route path={ROUTES.endGame} element={<Pages.EndGamePage />} />
       </Route>
       <Route path="*" element={<Pages.NotFoundPage />} />
     </Routes>
