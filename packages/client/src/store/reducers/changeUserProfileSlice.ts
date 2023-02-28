@@ -10,12 +10,12 @@ export const changeUserProfileSlice = createSlice({
     builder
       .addCase(changeUserProfile.pending, (state) => {
         state.loading = true
-        state.error = null
+        state.error = undefined
         state.user = userInitialState.user
       })
       .addCase(changeUserProfile.fulfilled, (state, action) => {
         state.loading = false
-        state.error = null
+        state.error = undefined
         state.user = action.payload
       })
       .addCase(changeUserProfile.rejected, (state, action) => {

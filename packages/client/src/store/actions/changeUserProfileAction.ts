@@ -1,10 +1,10 @@
 import UsersAPI from "../../api/UsersAPI";
-import {UserProfileData} from "../../api/types";
-import {createAsyncThunk} from "@reduxjs/toolkit";
+import { UserProfileData } from "../../api/types";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const changeUserProfile = createAsyncThunk(
+export const changeUserProfile = createAsyncThunk<any, UserProfileData, { rejectValue: string }>(
   'userProfile/changeUserProfile',
-  async (userProfile: UserProfileData, thunkAPI) => {
+  async (userProfile, thunkAPI) => {
     try {
       const response = await UsersAPI.changeUserProfile(userProfile)
       return response.data

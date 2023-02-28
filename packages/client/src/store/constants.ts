@@ -12,11 +12,9 @@ export const userInitialState: UserState = {
     avatar: ''
   },
   loading: false,
-  error: null
 }
 
 export const leaderboardInitialState: LeaderboardState = {
   leaders: [],
   loading: false,
-  error: null,
 }
