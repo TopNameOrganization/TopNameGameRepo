@@ -1,14 +1,79 @@
-import { Box, Button, Stack, Typography } from '@mui/material'
+import { Box, Button, Container, Grid, Paper, Stack, Typography } from '@mui/material'
 import { AppLayout } from '../layouts/AppLayout'
 import play from '../assets/appLayout/play.png'
+import { GeneralLayout } from '../layouts'
+import brick from '../assets/appLayout/brick2.png'
+import cassette from '../assets/appLayout/cassette.png'
+import game_controller from '../assets/appLayout/game_controller.png'
 
 export const HomePage = () => {
   return (
-    <AppLayout>
+    <GeneralLayout>
+      <Paper
+          elevation={24}
+          sx={{
+            backgroundImage: `url(${brick})`,
+            backgroundSize: 'cover',
+            backgroungPosition: 'center',
+            height: '500px',
+            width: '100%'
+          }}>
+          <Container fixed>
+            <Grid container>
+              <Grid item md={6}>
+                <div>
+                  <Typography
+                    component="h1"
+                    variant="h3"
+                    color="inherit"
+                    gutterBottom
+                    sx={{ marginTop: '30px', color: '#fff' }}>
+                    Top name game
+                  </Typography>
+                  <Typography
+                    component="h5"
+                    color="#fff"
+                    paragraph
+                    maxWidth="70%">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Similique perferendis repudiandae nemo quod eum esse minus
+                    qui quaerat? Repudiandae inventore voluptatem amet ex hic
+                    harum accusamus sapiente quia fugit sed.
+                  </Typography>
+                  <Button variant="contained" color="secondary">
+                    forum
+                  </Button>
+                </div>
+              </Grid>
+            </Grid>
+          </Container>
+        </Paper>
+        <Grid container>
+          <Grid
+            item
+            xs={6}
+            md={6}
+            sx={{
+              opacity: 0.2,
+              zIndex: '0'
+            }}>
+              <img src={game_controller} style={{objectFit: 'cover', width: '100%'}}/>
+            </Grid>
+          <Grid
+            item
+            xs={6}
+            md={6}
+            sx={{
+              marginTop: '20px',
+              opacity: 0.2,
+            }}>
+              <img src={cassette} style={{objectFit: 'cover', width: '100%'}}/>
+            </Grid>
+        </Grid>
       <Box
         sx={{
           position: 'absolute',
-          top: '562px',
+          top: '546px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -36,6 +101,6 @@ export const HomePage = () => {
           FOR PLAY!
         </Typography>
       </Box>
-    </AppLayout>
+    </GeneralLayout>
   )
 }
