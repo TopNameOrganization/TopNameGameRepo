@@ -9,7 +9,7 @@ export class LeaderBoardAPI {
   static TEAM = 'fantasy_run_test';
 
   static addLeader = (data: LeaderData) =>
-    api.post<string, AxiosResponse>(URL, {
+    api.post<string, AxiosResponse<string>>(URL, {
       temaName: LeaderBoardAPI.TEAM,
       ratingFieldName: 'score',
       data
