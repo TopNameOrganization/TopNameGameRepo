@@ -22,6 +22,9 @@ export enum ModelEvents {
   Update = 'update',
   UpdateWorld = 'updateWorld',
   GameStart = 'start',
+  Pause = 'pause',
   LevelUp = 'levelUp',
+  UpdateScore = 'updateScore',
+  UpdateRest = 'updateRest',
   GameOver = 'over'
 }

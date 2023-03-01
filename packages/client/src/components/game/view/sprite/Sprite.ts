@@ -1,4 +1,4 @@
-import { TileSize } from "../../constants";
+import { TileSize, AnimationPhase } from "../../constants";
 import { PhasesType, SpriteConfigType } from './types'
 
 export class Sprite {
@@ -19,6 +19,9 @@ export class Sprite {
 
   public getPhase(dt: number, phase = 0, direction = 0): OffscreenCanvas {
     this.time += dt;
+    if (phase === AnimationPhase.Freeze) {
+      return this.canvas;
+    }
     let x = 0;
     let y = 0;
     if (this.phases[phase]) {
