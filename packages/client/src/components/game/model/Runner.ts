@@ -1,5 +1,5 @@
 import { PositionType } from "./types";
-import { RunnerAction, VELOCITY, TileSize, Orientation } from "../constants";
+import { RunnerAction, VELOCITY, TileSize, Orientation, AnimationPhase, Tile } from "../constants";
 
 export class Runner {
   private _x: number;
@@ -74,19 +74,29 @@ export class Runner {
     }
   }
 
-  public getCheckPoints({ x, y }: PositionType): PositionType[] {
-    switch (this._action) {
+  public getAnimationPhase(tile: Tile, onFloor: boolean): AnimationPhase {
+    let phase: AnimationPhase = AnimationPhase.Freeze;
+    switch (this.action) {
       case RunnerAction.MoveLeft:
-        return [{ x, y }, { x, y: y + TileSize }];
-      case RunnerAction.MoveUp:
-        return [{ x, y }, { x: x + TileSize, y }];
       case RunnerAction.MoveRight:
-        return [{ x: x + TileSize, y }, { x: x + TileSize, y: y + TileSize }];
+        phase = tile === Tile.Rope ? AnimationPhase.Hang : AnimationPhase.Run;
+        if (onFloor) {
+          phase = AnimationPhase.Run;
+        }
+        break;
       case RunnerAction.MoveDown:
+      case RunnerAction.MoveUp:
+        phase = tile === Tile.Stair ? AnimationPhase.Climb : phase;
+        break;
       case RunnerAction.Fall:
-        return [{ x, y: y + TileSize }, { x: x + TileSize, y: y + TileSize }];
+        phase = AnimationPhase.Fall;
+        break;
+      case RunnerAction.Stay:
+        phase = onFloor ? AnimationPhase.Stay : phase;
+        break;
+      default:
     }
-    return [];
+    return phase;
   }
 
   get x(): number {

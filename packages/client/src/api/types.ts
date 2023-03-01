@@ -38,7 +38,7 @@ export interface UserPasswordData {
 }
 
 export interface LeaderData {
-  id: number,
+  id: number | null,
   name: string,
   score: number,
   level: number,

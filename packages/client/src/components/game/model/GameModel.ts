@@ -3,14 +3,22 @@ import { GameAPI } from '../../../api/GameApi';
 import { RunnerAction, Tile, TileSize, AnimationPhase } from "../constants";
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
-import { LevelType, SizeType, PositionType, ModelEvents } from "./types";
+import { LevelType, PositionType, ModelEvents } from "./types";
+
+const OBSTACLE: Tile[] = [Tile.Brick, Tile.Concrete, Tile.Out];
 
 export class GameModel extends EventBus {
   private reader: FileReader;
   private time: number;
+
   private inited = false;
-  private player: RunnerType;
+  private paused = false;
+
   private levelNum = 0;
+  private score = 0;
+  private rest = 5;
+
+  private player: RunnerType;
   private level: LevelType;
   private levels: Blob;
   private bonuses = 0;
@@ -74,7 +82,48 @@ export class GameModel extends EventBus {
     if (this.level) {
       this.dispatchUpdate();
     }
+    this.dispatch(ModelEvents.UpdateRest, this.rest);
     this.inited = true;
+  }
+
+  public togglePause() {
+    this.paused = !this.paused;
+    this.dispatch(ModelEvents.Pause, this.paused);
+    if (!this.paused) {
+      this.time = new Date().getTime();
+      this.update();
+    }
+  }
+
+  public replay() {
+    this.rest--;
+    if (this.rest < 0) {
+      console.log('OVER!!1');
+    } else {
+      this.dispatch(ModelEvents.UpdateRest, this.rest);
+      this.getLevel(this.levelNum);
+      this.paused = false;
+      this.dispatch(ModelEvents.Pause, this.paused);
+    }
+  }
+
+  public levelUp() {
+    this.rest--;
+    if (this.rest < 0) {
+      console.log('OVER!!1');
+    } else {
+      this.dispatch(ModelEvents.UpdateRest, this.rest);
+      this.levelNum++;
+      this.getLevel(this.levelNum);
+      this.dispatch(ModelEvents.LevelUp, this.levelNum);
+
+      this.paused = false;
+      this.dispatch(ModelEvents.Pause, this.paused);
+    }
+  }
+
+  public gameOver() {
+    this.dispatch(ModelEvents.GameOver, { score: this.score, level: this.levelNum + 1 })
   }
 
   public dispatchUpdate(): void {
@@ -87,22 +136,24 @@ export class GameModel extends EventBus {
   }
 
   public burn() {
-    const { orientation } = this.player;
-    const dx = orientation === 0 ? -1 : 1;
-    let { x, y } = this.playerAtMap();
-    x += dx;
-    y++;
-    if (this.getTileAt({ x, y }) === Tile.Brick) {
-      this.player.setAction(RunnerAction.Stay);
-      this.level[y][x] = Tile.Empty;
-      this.dispatch(ModelEvents.UpdateWorld, { burn: { x, y } })
+    if (!this.paused) {
+      const { orientation } = this.player;
+      const dx = orientation === 0 ? -1 : 1;
+      let { x, y } = this.playerAtMap();
+      x += dx;
+      y++;
+      if (this.getTileAt({ x, y }) === Tile.Brick) {
+        this.player.setAction(RunnerAction.Stay);
+        this.level[y][x] = Tile.Empty;
+        this.dispatch(ModelEvents.UpdateWorld, { burn: { x, y } })
+      }
     }
   }
 
   public update() {
     const currentTime = new Date().getTime();
     let dTime = 0;
-    let phase: AnimationPhase = AnimationPhase.Stay;
+    let phase: AnimationPhase = AnimationPhase.Freeze;
     if (this.time) {
       dTime = (currentTime - this.time) / 1000;
 
@@ -152,7 +203,7 @@ export class GameModel extends EventBus {
           }
         }
 
-        if ([Tile.Brick, Tile.Concrete, Tile.Out].includes(tile)) {
+        if (OBSTACLE.includes(tile)) {
           // туда нельзя, ровнять координаты по движению
           switch (action) {
             case RunnerAction.MoveLeft:
@@ -172,43 +223,56 @@ export class GameModel extends EventBus {
           }
         }
 
+        let tile1: Tile;
+        let tile2: Tile;
+        switch (action) {
+          case RunnerAction.MoveLeft:
+          case RunnerAction.MoveRight:
+            tile1 = this.getTileAtPlayer(0, 0, { x: .5, y: 0 });
+            tile2 = this.getTileAtPlayer(0, 0, { x: .5, y: 1 });
+            if (OBSTACLE.includes(tile1) || OBSTACLE.includes(tile2)) {
+              y = playerTilePos.y;
+            }
+            break;
+          case RunnerAction.MoveDown:
+          case RunnerAction.MoveUp:
+          case RunnerAction.Fall:
+            tile1 = this.getTileAtPlayer(0, 0, { x: 0, y: .5 });
+            tile2 = this.getTileAtPlayer(0, 0, { x: 1, y: .5 });
+            if (OBSTACLE.includes(tile1) || OBSTACLE.includes(tile2)) {
+              x = playerTilePos.x;
+            }
+            break;
+          default:
+        }
+
         if (playerTile === Tile.Bonus) {
           this.dispatch(ModelEvents.UpdateWorld, { burn: this.playerAtMap() });
           this.level[this.playerAtMap().y][this.playerAtMap().x] = Tile.Empty;
           this.bonuses--;
+          this.score += 100;
+          this.dispatch(ModelEvents.UpdateScore, this.score);
           if (this.bonuses === 0) {
             this.levelNum++;
             this.getLevel(this.levelNum);
-            // TODO:
-            // this.dispatch(ModelEvents.LevelUp, this.levelNum);
+
+            this.dispatch(ModelEvents.LevelUp, this.levelNum);
             return;
           }
         }
 
         this.player.update({ x, y });
-
-        switch (action) {
-          case RunnerAction.MoveLeft:
-          case RunnerAction.MoveRight:
-            phase = playerTile === Tile.Rope ? AnimationPhase.Hang : AnimationPhase.Run;
-            break;
-          case RunnerAction.MoveDown:
-          case RunnerAction.MoveUp:
-            phase = AnimationPhase.Climb;
-            break;
-          case RunnerAction.Fall:
-            phase = AnimationPhase.Fall;
-            break;
-          default:
-        }
       }
+      phase = this.player.getAnimationPhase(playerTile, OBSTACLE.includes(this.getTileAtPlayer(0, 1)));
     };
 
     this.time = currentTime;
     const { x, y, orientation: direction } = this.player;
 
     this.dispatch(ModelEvents.Update, { dTime, player: { x, y, phase, direction } });
-    requestAnimationFrame(this.update.bind(this));
+    if (!this.paused) {
+      requestAnimationFrame(this.update.bind(this));
+    }
   }
 
   private checkFall(): boolean {

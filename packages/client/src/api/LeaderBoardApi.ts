@@ -10,7 +10,7 @@ export class LeaderBoardAPI {
 
   static addLeader = (data: LeaderData) =>
     api.post<string, AxiosResponse<string>>(URL, {
-      temaName: LeaderBoardAPI.TEAM,
+      teamName: LeaderBoardAPI.TEAM,
       ratingFieldName: 'score',
       data
     });

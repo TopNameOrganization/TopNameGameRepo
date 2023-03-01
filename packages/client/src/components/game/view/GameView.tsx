@@ -1,9 +1,12 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
+import { Box, Paper, Grid, Typography } from '@mui/material'
 
 import { RunnerAction, TileSize, Tile } from '../constants'
 import GameModel from '../model/GameModel'
 import { ModelEvents, PlayerInfoType, LevelType, PositionType } from '../model'
 
+import { Result } from './result'
+import { PauseScreen } from './pauseScreen'
 import { Sprite } from './sprite'
 import { tileCfg } from './spriteConfigs'
 import { playerCfg } from './spriteConfigs'
@@ -12,6 +15,11 @@ const width = 32 * TileSize
 const height = 22 * TileSize
 
 export const GameView = () => {
+  const [level, setLevel] = useState<number>(1)
+  const [score, setScore] = useState<number>(0)
+  const [rest, setRest] = useState<number>(0)
+  const [isPaused, setIsPaused] = useState<boolean>(false)
+
   const worldRef = useRef<HTMLCanvasElement>(null)
   const actorsRef = useRef<HTMLCanvasElement>(null)
 
@@ -60,6 +68,30 @@ export const GameView = () => {
     }
   }
 
+  const updateLevel = (n: number) => {
+    setLevel(n + 1)
+  }
+
+  const updateScore = (n: number) => {
+    setScore(n)
+  }
+
+  const updateRest = (n: number) => {
+    setRest(n)
+  }
+
+  const onPause = (val: boolean) => {
+    setIsPaused(val)
+  }
+
+  const onReplay = () => {
+    GameModel.replay()
+  }
+
+  const onLevelUp = () => {
+    GameModel.levelUp()
+  }
+
   const onKeyUp = (evt: KeyboardEvent): void => {
     const { keyCode } = evt
     if (GameModel.lastPressed === keyCode) {
@@ -71,6 +103,12 @@ export const GameView = () => {
         evt.stopImmediatePropagation()
         GameModel.setPlayerAction(RunnerAction.Stay)
       }
+    }
+
+    if ([27, 80].includes(keyCode)) {
+      evt.preventDefault()
+      evt.stopImmediatePropagation()
+      GameModel.togglePause()
     }
   }
 
@@ -95,27 +133,70 @@ export const GameView = () => {
 
     GameModel.on(ModelEvents.UpdateWorld, updateWorld)
     GameModel.on(ModelEvents.Update, drawFrame)
+    GameModel.on(ModelEvents.LevelUp, updateLevel)
+    GameModel.on(ModelEvents.UpdateScore, updateScore)
+    GameModel.on(ModelEvents.UpdateRest, updateRest)
+    GameModel.on(ModelEvents.Pause, onPause)
     GameModel.init()
     return () => {
       document.removeEventListener('keydown', onKeyDown)
       document.removeEventListener('keyup', onKeyUp)
       GameModel.off(ModelEvents.UpdateWorld, updateWorld)
       GameModel.off(ModelEvents.Update, drawFrame)
+      GameModel.off(ModelEvents.LevelUp, updateLevel)
+      GameModel.off(ModelEvents.UpdateScore, updateScore)
+      GameModel.off(ModelEvents.UpdateRest, updateRest)
+      GameModel.off(ModelEvents.Pause, onPause)
     }
   }, [])
 
   return (
-    <div>
-      <canvas ref={worldRef} width={width} height={height} />
-      <canvas
-        ref={actorsRef}
-        width={width}
-        height={height}
-        style={{
-          position: 'relative',
-          top: `${-height}px`,
-        }}
-      />
-    </div>
+    <Box
+      component={Paper}
+      pt={2}
+      pb={4}
+      mt={4}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}>
+      {isPaused && (
+        <PauseScreen
+          noRest={rest === 0}
+          onReplay={onReplay}
+          onLevelUp={onLevelUp}
+          onOver={() => GameModel.gameOver()}
+        />
+      )}
+      <Box
+        sx={{
+          width,
+          height,
+          border: '4px solid black',
+        }}>
+        <canvas ref={worldRef} width={width} height={height} />
+        <canvas
+          ref={actorsRef}
+          width={width}
+          height={height}
+          style={{
+            position: 'relative',
+            top: `${-height - 2}px`,
+          }}
+        />
+      </Box>
+      <Grid container spacing={10} sx={{ width }}>
+        <Grid item xs={4}>
+          <Result label="score">{score}</Result>
+        </Grid>
+        <Grid item xs={4}>
+          <Result label="level">{level}</Result>
+        </Grid>
+        <Grid item xs={4}>
+          <Result label="rest">{rest}</Result>
+        </Grid>
+      </Grid>
+    </Box>
   )
 }

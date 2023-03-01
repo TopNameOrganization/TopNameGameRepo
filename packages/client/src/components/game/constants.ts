@@ -31,4 +31,5 @@ export enum AnimationPhase {
   Climb = 2,
   Hang = 3,
   Fall = 4,
+  Freeze = 100,
 }
