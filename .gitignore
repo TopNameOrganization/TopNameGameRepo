@@ -9,5 +9,3 @@ tmp
 lerna-debug.log
 .yarn
 .yarnrc.yml
-coverage
-mocks
