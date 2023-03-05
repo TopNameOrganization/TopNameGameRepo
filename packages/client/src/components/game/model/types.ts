@@ -1,30 +1,42 @@
-import { Tile, AnimationPhase } from "../constants"
+import { Tile, AnimationPhase } from "../constants";
 
 export type PositionType = {
   x: number,
   y: number,
-}
+};
 
 export type SizeType = {
   width: number,
   height: number,
-}
+};
 
 export type PlayerInfoType = PositionType & {
   phase: AnimationPhase,
   direction: number,
-}
+};
 
 export type LevelType = Tile[][];
 
-// TODO: всё кроме Update - это неточно
 export enum ModelEvents {
   Update = 'update',
   UpdateWorld = 'updateWorld',
   GameStart = 'start',
-  Pause = 'pause',
+  Message = 'message',
   LevelUp = 'levelUp',
   UpdateScore = 'updateScore',
   UpdateRest = 'updateRest',
-  GameOver = 'over'
-}
+  GameOver = 'over',
+};
+
+export enum MessageType {
+  Hide = 'hide',
+  Pause = 'pause',
+  Message = 'message',
+};
+
+export type ModelMessageType = {
+  type: MessageType,
+  noRest?: boolean,
+  title?: string,
+  message?: string,
+};

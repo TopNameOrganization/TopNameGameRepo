@@ -3,7 +3,7 @@ import { GameAPI } from '../../../api/GameApi';
 import { RunnerAction, Tile, TileSize, AnimationPhase } from "../constants";
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
-import { LevelType, PositionType, ModelEvents } from "./types";
+import { LevelType, PositionType, ModelEvents, MessageType } from "./types";
 
 const OBSTACLE: Tile[] = [Tile.Brick, Tile.Concrete, Tile.Out];
 
@@ -88,10 +88,21 @@ export class GameModel extends EventBus {
 
   public togglePause() {
     this.paused = !this.paused;
-    this.dispatch(ModelEvents.Pause, this.paused);
+    this.dispatch(ModelEvents.Message, {
+      type: this.paused ? MessageType.Pause : MessageType.Hide,
+      title: 'PAUSE',
+      message: 'select action',
+      noRest: this.rest === 0
+    });
     if (!this.paused) {
       this.time = new Date().getTime();
       this.update();
+    }
+  }
+
+  public resetPause() {
+    if (this.paused) {
+      this.togglePause();
     }
   }
 
@@ -103,7 +114,7 @@ export class GameModel extends EventBus {
       this.dispatch(ModelEvents.UpdateRest, this.rest);
       this.getLevel(this.levelNum);
       this.paused = false;
-      this.dispatch(ModelEvents.Pause, this.paused);
+      this.dispatch(ModelEvents.Message, { type: MessageType.Hide });
     }
   }
 
@@ -118,7 +129,7 @@ export class GameModel extends EventBus {
       this.dispatch(ModelEvents.LevelUp, this.levelNum);
 
       this.paused = false;
-      this.dispatch(ModelEvents.Pause, this.paused);
+      this.dispatch(ModelEvents.Message, { type: MessageType.Hide });
     }
   }
 
@@ -127,7 +138,9 @@ export class GameModel extends EventBus {
   }
 
   public dispatchUpdate(): void {
+    this.paused = true;
     this.dispatch(ModelEvents.UpdateWorld, { level: this.level });
+    this.dispatch(ModelEvents.Message, { type: MessageType.Message, title: `LEVEL ${this.levelNum + 1}` })
     this.update();
   }
 
