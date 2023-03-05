@@ -1,15 +1,21 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { Box, Paper, Grid, Typography } from '@mui/material'
+import { Box, Paper, Grid } from '@mui/material'
 
 import { RunnerAction, TileSize, Tile } from '../constants'
 import GameModel from '../model/GameModel'
-import { ModelEvents, PlayerInfoType, LevelType, PositionType } from '../model'
+import {
+  ModelEvents,
+  RunnerInfoType,
+  PositionType,
+  LevelMapType,
+} from '../model'
 
 import { Result } from './result'
 import { PauseScreen } from './pauseScreen'
 import { Sprite } from './sprite'
 import { tileCfg } from './spriteConfigs'
 import { playerCfg } from './spriteConfigs'
+import { enemyCfg } from './spriteConfigs'
 
 const width = 32 * TileSize
 const height = 22 * TileSize
@@ -25,12 +31,13 @@ export const GameView = () => {
 
   const tileSpr = new Sprite(tileCfg)
   const playerSpr = new Sprite(playerCfg)
+  const enemySpr = new Sprite(enemyCfg)
 
   const updateWorld = ({
     level,
     burn,
   }: {
-    level?: LevelType
+    level?: LevelMapType
     burn?: PositionType
   }) => {
     const ctx = worldRef.current?.getContext('2d')
@@ -55,15 +62,23 @@ export const GameView = () => {
     }
   }
 
-  const drawFrame = (data: { dTime: number; player: PlayerInfoType }) => {
+  const drawFrame = (data: {
+    dTime: number
+    player: RunnerInfoType
+    enemy: RunnerInfoType
+  }) => {
     const ctx = actorsRef.current?.getContext('2d')
     if (ctx) {
       ctx.clearRect(0, 0, width, height)
-      const { player, dTime } = data
+      const { player, enemy, dTime } = data
       // вроде не особо на что влияет, но лучше проверить
       if (player) {
         const { x, y, phase, direction } = player
         ctx.drawImage(playerSpr.getPhase(dTime, phase, direction), x, y)
+      }
+      if (enemy) {
+        const { x, y, phase, direction } = enemy
+        ctx.drawImage(enemySpr.getPhase(dTime, phase, direction), x, y)
       }
     }
   }

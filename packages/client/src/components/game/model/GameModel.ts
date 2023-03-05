@@ -1,11 +1,12 @@
 import { EventBus } from "../utils/EventBus";
 import { GameAPI } from '../../../api/GameApi';
-import { RunnerAction, Tile, TileSize } from "../constants";
-import { worldToMap, getTileAt } from '../utils'
+import { RunnerAction, Tile, TileSize, AnimationPhase } from "../constants";
+import { worldToMap, getTileAt, mapToWorld } from '../utils'
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
-import { LevelType, PositionType, ModelEvents } from "./types";
-import { checkCollision } from './checkCollision'
+import { LevelMapType, LevelType, ModelEvents } from "./types";
+import { checkCollision } from './checkCollision';
+import { agent } from './agent';
 
 export class GameModel extends EventBus {
   private reader: FileReader;
@@ -18,16 +19,18 @@ export class GameModel extends EventBus {
   private score = 0;
   private rest = 5;
 
-  private player: RunnerType;
-  private level: LevelType;
   private levels: Blob;
+  private levelMap: LevelMapType;
+  private player: RunnerType;
   private bonuses = 0;
+  private enemy: RunnerType;
 
   private _lastPressed: number; // TODO: подумать где и как это xранить более лучше
 
   constructor() {
     super();
     this.player = new Runner();
+    this.enemy = new Runner();
 
     // TODO: убрать это отсюда куда-нить
     GameAPI.read('levels150.set').then(({ data }) => {
@@ -38,8 +41,9 @@ export class GameModel extends EventBus {
     this.reader = new FileReader();
     this.reader.addEventListener('loadend', () => {
       const data = new Int8Array(this.reader.result as ArrayBuffer);
-      const level: LevelType = [];
-      const player = { x: 0, y: 0 };
+      const level: LevelMapType = [];
+      let player = { x: 0, y: 0 };
+      let enemy = { x: 0, y: 0 };
       const bonuses = data.reduce((prev, curr, i) => {
         const x = i % 32;
         const y = Math.floor(i / 32);
@@ -48,19 +52,22 @@ export class GameModel extends EventBus {
         }
         level[y][x] = (curr === Tile.Enemy || curr === Tile.Player) ? Tile.Empty : curr;
         if (curr === Tile.Player) {
-          player.x = x * TileSize;
-          player.y = y * TileSize;
+          player = mapToWorld({ x, y });
+        }
+        if (curr === Tile.Enemy) {
+          enemy = mapToWorld({ x, y });
         }
         return curr === Tile.Bonus ? prev + 1 : prev;
       }, 0);
-      this.setLevel({ level, player, bonuses });
+      this.setLevel({ level, player, bonuses, enemy });
     });
     // ---
   }
 
-  public setLevel({ level, player, bonuses }: { level: LevelType, player: PositionType, bonuses: number }): void {
-    this.level = level;
+  public setLevel({ level, player, bonuses, enemy }: LevelType): void {
+    this.levelMap = level;
     this.player.update(player);
+    this.enemy.update(enemy);
     this.bonuses = bonuses;
     if (this.inited) {
       this.dispatchUpdate();
@@ -78,12 +85,12 @@ export class GameModel extends EventBus {
     }
   }
 
-  public getLevelMap(): LevelType {
-    return this.level;
+  public getLevelMap(): LevelMapType {
+    return this.levelMap;
   }
 
   public init() {
-    if (this.level) {
+    if (this.levelMap) {
       this.dispatchUpdate();
     }
     this.dispatch(ModelEvents.UpdateRest, this.rest);
@@ -131,7 +138,8 @@ export class GameModel extends EventBus {
   }
 
   public dispatchUpdate(): void {
-    this.dispatch(ModelEvents.UpdateWorld, { level: this.level });
+    this.dispatch(ModelEvents.UpdateWorld, { level: this.levelMap });
+    this.enemy.setAction(RunnerAction.MoveLeft);
     this.update();
   }
 
@@ -148,7 +156,7 @@ export class GameModel extends EventBus {
       y++;
       if (getTileAt({ x, y }) === Tile.Brick) {
         this.player.setAction(RunnerAction.Stay);
-        this.level[y][x] = Tile.Empty;
+        this.levelMap[y][x] = Tile.Empty;
         this.dispatch(ModelEvents.UpdateWorld, { burn: { x, y } })
       }
     }
@@ -161,14 +169,16 @@ export class GameModel extends EventBus {
       dTime = (currentTime - this.time) / 1000;
     };
 
-    const collision = checkCollision(dTime, this.player);
-    const { position, phase } = collision;
-    this.player.update(position);
+    const newPlayerState = checkCollision(dTime, this.player);
+    this.player.update(newPlayerState.position);
 
-    const playerAtMap = worldToMap({ x: this.player.x, y: this.player.y });
+    const newEnemyState = agent(dTime, this.enemy);
+    this.enemy.update(newEnemyState.position)
+
+    const playerAtMap = worldToMap({ x: this.player.x + TileSize / 2, y: this.player.y + TileSize / 2 });
     if (getTileAt(playerAtMap) === Tile.Bonus) {
       this.dispatch(ModelEvents.UpdateWorld, { burn: playerAtMap });
-      this.level[playerAtMap.y][playerAtMap.x] = Tile.Empty;
+      this.levelMap[playerAtMap.y][playerAtMap.x] = Tile.Empty;
       this.bonuses--;
       this.score += 100;
       this.dispatch(ModelEvents.UpdateScore, this.score);
@@ -182,9 +192,20 @@ export class GameModel extends EventBus {
     }
 
     this.time = currentTime;
-    const { x, y, orientation: direction } = this.player;
+    const player = {
+      x: this.player.x,
+      y: this.player.y,
+      phase: newPlayerState.phase,
+      direction: this.player.orientation,
+    }
+    const enemy = {
+      x: this.enemy.x,
+      y: this.enemy.y,
+      phase: newEnemyState.phase,
+      direction: this.enemy.orientation,
+    }
 
-    this.dispatch(ModelEvents.Update, { dTime, player: { x, y, phase, direction } });
+    this.dispatch(ModelEvents.Update, { dTime, player, enemy });
     if (!this.paused) {
       requestAnimationFrame(this.update.bind(this));
     }

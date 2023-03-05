@@ -1,15 +1,14 @@
-import { Tile, RunnerAction, AnimationPhase, TileSize } from '../constants'
+import { Tile, RunnerAction, AnimationPhase, TileSize, OBSTACLE } from '../constants'
 import { CheckCollisionType } from './types';
 import { Runner as RunnerType } from './Runner'
 import { worldToMap, mapToWorld, getTileAt, checkFall } from '../utils';
-
-const OBSTACLE: Tile[] = [Tile.Brick, Tile.Concrete, Tile.Out];
 
 export const checkCollision = (dTime: number, player: RunnerType): CheckCollisionType => {
   const { action } = player;
   const { x: xNew, y: yNew } = player.getNextPos(dTime);
   let x: number = xNew;
   let y: number = yNew;
+  let isEnd = false;
 
   const collision = worldToMap(player.getCheckCollisionPoint({ x: xNew, y: yNew }));
   const tile = getTileAt(collision);
@@ -23,7 +22,7 @@ export const checkCollision = (dTime: number, player: RunnerType): CheckCollisio
   if (action !== RunnerAction.Fall) {
     if (checkFall({ x: player.x, y: player.y })) {
       player.setAction(RunnerAction.Fall);
-      return { position: { x, y }, phase: AnimationPhase.Fall };
+      return { position: { x, y }, phase: AnimationPhase.Fall, isEnd: false };
     };
   }
 
@@ -58,6 +57,7 @@ export const checkCollision = (dTime: number, player: RunnerType): CheckCollisio
 
     if (OBSTACLE.includes(tile)) {
       // туда нельзя, ровнять координаты по движению
+      isEnd = true;
       switch (action) {
         case RunnerAction.MoveLeft:
         case RunnerAction.MoveRight:
@@ -100,5 +100,5 @@ export const checkCollision = (dTime: number, player: RunnerType): CheckCollisio
     }
   }
 
-  return { position: { x, y }, phase };
+  return { position: { x, y }, phase, isEnd };
 }
