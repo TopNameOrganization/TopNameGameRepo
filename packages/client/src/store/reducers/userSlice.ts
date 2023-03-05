@@ -10,12 +10,12 @@ export const userSlice = createSlice({
     builder
       .addCase(fetchUser.pending, (state) => {
         state.loading = true
-        state.error = null
+        state.error = undefined
         state.user = initialState.user
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.loading = false
-        state.error = null
+        state.error = undefined
         state.user = action.payload
       })
       .addCase(fetchUser.rejected, (state, action) => {

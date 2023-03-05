@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Profile should renders profile correctly 1`] = `
+<div
+  className="MuiBox-root css-1142v5w"
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
+>
+  <div
+    className="MuiAvatar-root MuiAvatar-circular css-ghc07c-MuiAvatar-root"
+  >
+    <img
+      alt="Nick name"
+      className="MuiAvatar-img css-1pqm26d-MuiAvatar-img"
+      src="https://ya-praktikum.tech/api/v2/resourcesundefined"
+    />
+  </div>
+</div>
+`;

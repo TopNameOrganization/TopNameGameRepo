@@ -12,5 +12,5 @@ export const initialState: UserState = {
     avatar: ''
   },
   loading: false,
-  error: null
+  error: undefined
 }
