@@ -5,9 +5,10 @@ export type PositionType = {
   y: number,
 }
 
-export type SizeType = {
-  width: number,
-  height: number,
+export type CheckCollisionType = {
+  position: PositionType,
+  phase: AnimationPhase,
+  event?: string,
 }
 
 export type PlayerInfoType = PositionType & {
