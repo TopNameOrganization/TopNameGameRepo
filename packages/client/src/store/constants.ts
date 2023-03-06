@@ -12,6 +12,7 @@ export const userInitialState: UserState = {
     avatar: ''
   },
   loading: false,
+  error: undefined
 }
 
 export const leaderboardInitialState: LeaderboardState = {
