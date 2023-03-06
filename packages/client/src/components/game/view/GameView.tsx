@@ -8,10 +8,13 @@ import {
   RunnerInfoType,
   PositionType,
   LevelMapType,
+  MessageType,
+  ModelMessageType,
 } from '../model'
 
 import { Result } from './result'
-import { PauseScreen } from './pauseScreen'
+import { MessageScreen, MessageScreenProps } from './messageScreen'
+import { PauseActions } from './pauseActions'
 import { Sprite } from './sprite'
 import { tileCfg } from './spriteConfigs'
 import { playerCfg } from './spriteConfigs'
@@ -24,7 +27,7 @@ export const GameView = () => {
   const [level, setLevel] = useState<number>(1)
   const [score, setScore] = useState<number>(0)
   const [rest, setRest] = useState<number>(0)
-  const [isPaused, setIsPaused] = useState<boolean>(false)
+  const [message, setMessage] = useState<MessageScreenProps | null>(null)
 
   const worldRef = useRef<HTMLCanvasElement>(null)
   const actorsRef = useRef<HTMLCanvasElement>(null)
@@ -70,7 +73,6 @@ export const GameView = () => {
     if (ctx) {
       ctx.clearRect(0, 0, width, height)
       const { player, enemies, dTime } = data
-      // вроде не особо на что влияет, но лучше проверить
       if (player) {
         const { x, y, phase, direction } = player
         ctx.drawImage(playerSpr.getPhase(dTime, phase, direction), x, y)
@@ -96,16 +98,35 @@ export const GameView = () => {
     setRest(n)
   }
 
-  const onPause = (val: boolean) => {
-    setIsPaused(val)
-  }
-
-  const onReplay = () => {
-    GameModel.replay()
-  }
-
-  const onLevelUp = () => {
-    GameModel.levelUp()
+  const onMessage = ({
+    type,
+    noRest = true,
+    title,
+    message,
+  }: ModelMessageType) => {
+    switch (type) {
+      case MessageType.Hide:
+        setMessage(null)
+        break
+      case MessageType.Message:
+        setMessage({ title, message })
+        break
+      case MessageType.Pause:
+        setMessage({
+          title,
+          message,
+          children: (
+            <PauseActions
+              onReplay={() => GameModel.replay()}
+              onLevelUp={() => GameModel.levelUp()}
+              onOver={() => GameModel.gameOver()}
+              noRest={noRest}
+            />
+          ),
+        })
+        break
+      default:
+    }
   }
 
   const onKeyUp = (evt: KeyboardEvent): void => {
@@ -129,7 +150,10 @@ export const GameView = () => {
   }
 
   const onKeyDown = (evt: KeyboardEvent): void => {
-    const { keyCode } = evt
+    const { keyCode, repeat } = evt
+    if (!repeat && ![27, 80].includes(keyCode)) {
+      GameModel.resetPause()
+    }
     if (keyCode >= RunnerAction.MoveLeft && keyCode <= RunnerAction.MoveDown) {
       evt.preventDefault()
       evt.stopImmediatePropagation()
@@ -152,7 +176,7 @@ export const GameView = () => {
     GameModel.on(ModelEvents.LevelUp, updateLevel)
     GameModel.on(ModelEvents.UpdateScore, updateScore)
     GameModel.on(ModelEvents.UpdateRest, updateRest)
-    GameModel.on(ModelEvents.Pause, onPause)
+    GameModel.on(ModelEvents.Message, onMessage)
     GameModel.init()
     return () => {
       document.removeEventListener('keydown', onKeyDown)
@@ -162,7 +186,7 @@ export const GameView = () => {
       GameModel.off(ModelEvents.LevelUp, updateLevel)
       GameModel.off(ModelEvents.UpdateScore, updateScore)
       GameModel.off(ModelEvents.UpdateRest, updateRest)
-      GameModel.off(ModelEvents.Pause, onPause)
+      GameModel.off(ModelEvents.Message, onMessage)
     }
   }, [])
 
@@ -177,13 +201,10 @@ export const GameView = () => {
         flexDirection: 'column',
         alignItems: 'center',
       }}>
-      {isPaused && (
-        <PauseScreen
-          noRest={rest === 0}
-          onReplay={onReplay}
-          onLevelUp={onLevelUp}
-          onOver={() => GameModel.gameOver()}
-        />
+      {message && (
+        <MessageScreen title={message.title} message={message.message}>
+          {message.children}
+        </MessageScreen>
       )}
       <Box
         sx={{

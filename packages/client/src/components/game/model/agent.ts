@@ -5,7 +5,7 @@ import { RunnerAction, Tile, OBSTACLE, TileSize } from '../constants';
 import { getTileAt, worldToMap } from '../utils';
 
 const checkNode = ({ x, y }: PositionType, action: RunnerAction): Array<RunnerAction> => {
-  const res = [];
+  const res: Array<RunnerAction> = [];
   const center = getTileAt({ x, y });
   const bottom = getTileAt({ x, y: y + 1 });
   const top = getTileAt({ x, y: y - 1 });
@@ -15,10 +15,15 @@ const checkNode = ({ x, y }: PositionType, action: RunnerAction): Array<RunnerAc
   const rightB = getTileAt({ x: x + 1, y: y + 1 });
 
   if ([center, bottom].includes(Tile.Stair)) {
-    if (left === Tile.Rope || [Tile.Brick, Tile.Concrete].includes(leftB)) {
+    if (OBSTACLE.includes(left) && OBSTACLE.includes(right)) {
+      return res;
+    }
+    if (left === Tile.Rope ||
+      ([Tile.Brick, Tile.Concrete].includes(leftB) && !OBSTACLE.includes(left))) {
       res.push(RunnerAction.MoveLeft);
     }
-    if (right === Tile.Rope || [Tile.Brick, Tile.Concrete].includes(rightB)) {
+    if (right === Tile.Rope ||
+      ([Tile.Brick, Tile.Concrete].includes(rightB) && !OBSTACLE.includes(right))) {
       res.push(RunnerAction.MoveRight);
     }
     if (center === Tile.Stair) {

@@ -6,7 +6,7 @@ img.src = enemyImg;
 
 export const enemyCfg = {
   img,
-  fps: 30,
+  fps: 16,
   phases: {
     [AnimationPhase.Run]: { start: 0, length: 8 },
     [AnimationPhase.Climb]: { start: 8, length: 8 },

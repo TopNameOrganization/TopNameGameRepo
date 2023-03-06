@@ -1,14 +1,9 @@
 import App from './App'
-import { render, screen } from '@testing-library/react'
+import * as renderer from "react-test-renderer";
 
-const appContent = 'Вот тут будет жить ваше приложение :)'
-
-// @ts-ignore
-global.fetch = jest.fn(() =>
-  Promise.resolve({ json: () => Promise.resolve('hey') })
-)
-
-test.skip('Example test', async () => {
-  render(<App />)
-  expect(screen.getByText(appContent)).toBeDefined()
+test('should renders App correctly', async () => {
+  const tree = renderer
+      .create(<App />)
+      .toJSON();
+  expect(tree).toMatchSnapshot();
 })

@@ -7,7 +7,7 @@ export const fetchUser = createAsyncThunk<User, void, { rejectValue: string }>(
   async (_, thunkAPI) => {
     try {
       const response = await AuthAPI.read()
-      return response.data
+      return await response.data
     } catch (error) {
       return thunkAPI.rejectWithValue('Server Error!')
     }

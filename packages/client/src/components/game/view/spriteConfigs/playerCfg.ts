@@ -6,7 +6,7 @@ img.src = runnerImg;
 
 export const playerCfg = {
   img,
-  fps: 15,
+  fps: 16,
   phases: {
     [AnimationPhase.Run]: { start: 0, length: 4 },
     [AnimationPhase.Climb]: { start: 4, length: 4 },

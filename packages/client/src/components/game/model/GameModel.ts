@@ -4,7 +4,7 @@ import { RunnerAction, Tile, TileSize } from "../constants";
 import { worldToMap, getTileAt, mapToWorld } from '../utils'
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
-import { LevelMapType, LevelType, ModelEvents, PositionType } from "./types";
+import { LevelMapType, LevelType, ModelEvents, PositionType, MessageType } from "./types";
 import { checkCollision } from './checkCollision';
 import { agent } from './agent';
 
@@ -101,10 +101,21 @@ export class GameModel extends EventBus {
 
   public togglePause() {
     this.paused = !this.paused;
-    this.dispatch(ModelEvents.Pause, this.paused);
+    this.dispatch(ModelEvents.Message, {
+      type: this.paused ? MessageType.Pause : MessageType.Hide,
+      title: 'PAUSE',
+      message: 'select action',
+      noRest: this.rest === 0
+    });
     if (!this.paused) {
       this.time = new Date().getTime();
       this.update();
+    }
+  }
+
+  public resetPause() {
+    if (this.paused) {
+      this.togglePause();
     }
   }
 
@@ -116,7 +127,7 @@ export class GameModel extends EventBus {
       this.dispatch(ModelEvents.UpdateRest, this.rest);
       this.getLevel(this.levelNum);
       this.paused = false;
-      this.dispatch(ModelEvents.Pause, this.paused);
+      this.dispatch(ModelEvents.Message, { type: MessageType.Hide });
     }
   }
 
@@ -131,7 +142,7 @@ export class GameModel extends EventBus {
       this.dispatch(ModelEvents.LevelUp, this.levelNum);
 
       this.paused = false;
-      this.dispatch(ModelEvents.Pause, this.paused);
+      this.dispatch(ModelEvents.Message, { type: MessageType.Hide });
     }
   }
 
@@ -140,7 +151,9 @@ export class GameModel extends EventBus {
   }
 
   public dispatchUpdate(): void {
+    this.paused = true;
     this.dispatch(ModelEvents.UpdateWorld, { level: this.levelMap });
+    this.dispatch(ModelEvents.Message, { type: MessageType.Message, title: `LEVEL ${this.levelNum + 1}` })
     this.enemies.forEach((runner) => runner.setAction(RunnerAction.Stay));
     this.update();
   }
