@@ -22,7 +22,7 @@ export type LevelType = {
   level: LevelMapType,
   player: PositionType,
   bonuses: number,
-  enemy: PositionType,
+  enemies: Array<PositionType>,
 }
 
 // TODO: всё кроме Update - это неточно

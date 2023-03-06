@@ -49,7 +49,6 @@ export const GameView = () => {
       level?.map((item, y) => {
         item.map((tile, x) => {
           if (![Tile.Empty, Tile.Player, Tile.Enemy].includes(tile)) {
-            const src = tileSpr.getPhase(0, tile)
             ctx.drawImage(tileSpr.getPhase(0, tile), x * TileSize, y * TileSize)
           }
         })
@@ -65,20 +64,22 @@ export const GameView = () => {
   const drawFrame = (data: {
     dTime: number
     player: RunnerInfoType
-    enemy: RunnerInfoType
+    enemies: Array<RunnerInfoType>
   }) => {
     const ctx = actorsRef.current?.getContext('2d')
     if (ctx) {
       ctx.clearRect(0, 0, width, height)
-      const { player, enemy, dTime } = data
+      const { player, enemies, dTime } = data
       // вроде не особо на что влияет, но лучше проверить
       if (player) {
         const { x, y, phase, direction } = player
         ctx.drawImage(playerSpr.getPhase(dTime, phase, direction), x, y)
       }
-      if (enemy) {
-        const { x, y, phase, direction } = enemy
-        ctx.drawImage(enemySpr.getPhase(dTime, phase, direction), x, y)
+      if (enemies.length > 0) {
+        enemies.map(runner => {
+          const { x, y, phase, direction } = runner
+          ctx.drawImage(enemySpr.getPhase(dTime, phase, direction), x, y)
+        })
       }
     }
   }

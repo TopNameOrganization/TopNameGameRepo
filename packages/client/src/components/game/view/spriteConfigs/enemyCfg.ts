@@ -6,12 +6,12 @@ img.src = enemyImg;
 
 export const enemyCfg = {
   img,
-  fps: 15,
+  fps: 30,
   phases: {
-    [AnimationPhase.Run]: { start: 0, length: 4 },
-    [AnimationPhase.Climb]: { start: 4, length: 4 },
-    [AnimationPhase.Hang]: { start: 8, length: 4 },
-    [AnimationPhase.Fall]: { start: 12, length: 4 },
-    [AnimationPhase.Stay]: { start: 16, length: 1 },
+    [AnimationPhase.Run]: { start: 0, length: 8 },
+    [AnimationPhase.Climb]: { start: 8, length: 8 },
+    [AnimationPhase.Hang]: { start: 16, length: 8 },
+    [AnimationPhase.Fall]: { start: 24, length:8 },
+    [AnimationPhase.Stay]: { start: 28, length: 1 },
   },
 }

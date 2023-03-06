@@ -10,41 +10,34 @@ const checkNode = ({ x, y }: PositionType, action: RunnerAction): Array<RunnerAc
   const bottom = getTileAt({ x, y: y + 1 });
   const top = getTileAt({ x, y: y - 1 });
   const left = getTileAt({ x: x - 1, y });
+  const leftB = getTileAt({ x: x - 1, y: y + 1 });
   const right = getTileAt({ x: x + 1, y });
+  const rightB = getTileAt({ x: x + 1, y: y + 1 });
 
   if ([center, bottom].includes(Tile.Stair)) {
-    switch (action) {
-      case RunnerAction.MoveLeft:
-      case RunnerAction.MoveRight:
-        if (!OBSTACLE.includes(top)) {
-          if (center === Tile.Stair) {
-            res.push(RunnerAction.MoveUp);
-          }
-        }
-        if (!OBSTACLE.includes(bottom)) {
-          res.push(RunnerAction.MoveDown);
-        }
-        break;
-      case RunnerAction.MoveUp:
-      case RunnerAction.MoveDown:
-        if ([Tile.Brick, Tile.Concrete].includes(bottom)) {
-          if (!OBSTACLE.includes(right)) {
-            res.push(RunnerAction.MoveRight);
-          }
-          if (!OBSTACLE.includes(left)) {
-            res.push(RunnerAction.MoveLeft);
-          }
-        }
-        break;
-      default:
+    if (left === Tile.Rope || [Tile.Brick, Tile.Concrete].includes(leftB)) {
+      res.push(RunnerAction.MoveLeft);
+    }
+    if (right === Tile.Rope || [Tile.Brick, Tile.Concrete].includes(rightB)) {
+      res.push(RunnerAction.MoveRight);
+    }
+    if (center === Tile.Stair) {
+      if (!OBSTACLE.includes(top)) {
+        res.push(RunnerAction.MoveUp);
+      }
+      if (!OBSTACLE.includes(bottom)) {
+        res.push(RunnerAction.MoveDown);
+      }
+    } else {
+      res.push(RunnerAction.MoveDown);
     }
   }
 
-  return res;
+  const opp = RunnerAction.MoveLeft + ((action - RunnerAction.MoveLeft) + 2) % 4;
+  return res.filter((action) => action !== opp);
 }
 
 export const agent = (dTime: number, actor: RunnerType): CheckCollisionType => {
-  let turn = false;
   const { action, orientation } = actor;
   const { position, phase, isEnd } = checkCollision(dTime, actor);
 
@@ -58,10 +51,11 @@ export const agent = (dTime: number, actor: RunnerType): CheckCollisionType => {
   });
 
   if (currAtMap.x !== nextAtMap.x || currAtMap.y !== nextAtMap.y) {
-    const dirs = checkNode(currAtMap, action);
+    const dirs = checkNode(nextAtMap, action);
     if (dirs.length > 0) {
-      actor.setAction(dirs[Math.floor(Math.random() * dirs.length)]);
-      turn = true;
+      const n = Math.floor(Math.random() * dirs.length);
+      actor.setAction(dirs[n]);
+      return { position: { x: position.x, y: position.y }, phase, isEnd };
     }
   } else if (isEnd) {
     switch (action) {
@@ -85,5 +79,5 @@ export const agent = (dTime: number, actor: RunnerType): CheckCollisionType => {
     actor.setAction(orientation === 1 ? RunnerAction.MoveRight : RunnerAction.MoveLeft);
   }
 
-  return { position: turn ? { x: actor.x, y: actor.y } : position, phase, isEnd };
+  return { position, phase, isEnd };
 }

@@ -1,10 +1,10 @@
 import { EventBus } from "../utils/EventBus";
 import { GameAPI } from '../../../api/GameApi';
-import { RunnerAction, Tile, TileSize, AnimationPhase } from "../constants";
+import { RunnerAction, Tile, TileSize } from "../constants";
 import { worldToMap, getTileAt, mapToWorld } from '../utils'
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
-import { LevelMapType, LevelType, ModelEvents } from "./types";
+import { LevelMapType, LevelType, ModelEvents, PositionType } from "./types";
 import { checkCollision } from './checkCollision';
 import { agent } from './agent';
 
@@ -23,14 +23,13 @@ export class GameModel extends EventBus {
   private levelMap: LevelMapType;
   private player: RunnerType;
   private bonuses = 0;
-  private enemy: RunnerType;
+  private enemies: Array<RunnerType> = [];
 
   private _lastPressed: number; // TODO: подумать где и как это xранить более лучше
 
   constructor() {
     super();
     this.player = new Runner();
-    this.enemy = new Runner();
 
     // TODO: убрать это отсюда куда-нить
     GameAPI.read('levels150.set').then(({ data }) => {
@@ -43,7 +42,7 @@ export class GameModel extends EventBus {
       const data = new Int8Array(this.reader.result as ArrayBuffer);
       const level: LevelMapType = [];
       let player = { x: 0, y: 0 };
-      let enemy = { x: 0, y: 0 };
+      const enemies: Array<PositionType> = [];
       const bonuses = data.reduce((prev, curr, i) => {
         const x = i % 32;
         const y = Math.floor(i / 32);
@@ -55,19 +54,22 @@ export class GameModel extends EventBus {
           player = mapToWorld({ x, y });
         }
         if (curr === Tile.Enemy) {
-          enemy = mapToWorld({ x, y });
+          enemies.push(mapToWorld({ x, y }));
+          if (this.enemies.length < enemies.length) {
+            this.enemies.push(new Runner());
+          }
         }
         return curr === Tile.Bonus ? prev + 1 : prev;
       }, 0);
-      this.setLevel({ level, player, bonuses, enemy });
+      this.setLevel({ level, player, bonuses, enemies });
     });
     // ---
   }
 
-  public setLevel({ level, player, bonuses, enemy }: LevelType): void {
+  public setLevel({ level, player, bonuses, enemies }: LevelType): void {
     this.levelMap = level;
     this.player.update(player);
-    this.enemy.update(enemy);
+    enemies.forEach((runner, i) => this.enemies[i].update(runner));
     this.bonuses = bonuses;
     if (this.inited) {
       this.dispatchUpdate();
@@ -139,7 +141,7 @@ export class GameModel extends EventBus {
 
   public dispatchUpdate(): void {
     this.dispatch(ModelEvents.UpdateWorld, { level: this.levelMap });
-    this.enemy.setAction(RunnerAction.MoveLeft);
+    this.enemies.forEach((runner) => runner.setAction(RunnerAction.Stay));
     this.update();
   }
 
@@ -171,9 +173,23 @@ export class GameModel extends EventBus {
 
     const newPlayerState = checkCollision(dTime, this.player);
     this.player.update(newPlayerState.position);
+    const player = {
+      x: this.player.x,
+      y: this.player.y,
+      phase: newPlayerState.phase,
+      direction: this.player.orientation,
+    }
 
-    const newEnemyState = agent(dTime, this.enemy);
-    this.enemy.update(newEnemyState.position)
+    const enemies = this.enemies.map((runner) => {
+      const newState = agent(dTime, runner);
+      runner.update(newState.position);
+      return {
+        x: runner.x,
+        y: runner.y,
+        phase: newState.phase,
+        direction: runner.orientation,
+      }
+    })
 
     const playerAtMap = worldToMap({ x: this.player.x + TileSize / 2, y: this.player.y + TileSize / 2 });
     if (getTileAt(playerAtMap) === Tile.Bonus) {
@@ -192,20 +208,8 @@ export class GameModel extends EventBus {
     }
 
     this.time = currentTime;
-    const player = {
-      x: this.player.x,
-      y: this.player.y,
-      phase: newPlayerState.phase,
-      direction: this.player.orientation,
-    }
-    const enemy = {
-      x: this.enemy.x,
-      y: this.enemy.y,
-      phase: newEnemyState.phase,
-      direction: this.enemy.orientation,
-    }
 
-    this.dispatch(ModelEvents.Update, { dTime, player, enemy });
+    this.dispatch(ModelEvents.Update, { dTime, player, enemies });
     if (!this.paused) {
       requestAnimationFrame(this.update.bind(this));
     }
