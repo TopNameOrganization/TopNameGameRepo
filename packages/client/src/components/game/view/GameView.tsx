@@ -28,7 +28,6 @@ export const GameView = () => {
   const [score, setScore] = useState<number>(0)
   const [rest, setRest] = useState<number>(0)
   const [message, setMessage] = useState<MessageScreenProps | null>(null)
-  // const [enemySprites, setEnemySprites] = useState<Array<Sprite>>([]);
 
   const worldRef = useRef<HTMLCanvasElement>(null)
   const actorsRef = useRef<HTMLCanvasElement>(null)
