@@ -28,34 +28,46 @@ export const GameView = () => {
   const [score, setScore] = useState<number>(0)
   const [rest, setRest] = useState<number>(0)
   const [message, setMessage] = useState<MessageScreenProps | null>(null)
+  // const [enemySprites, setEnemySprites] = useState<Array<Sprite>>([]);
 
   const worldRef = useRef<HTMLCanvasElement>(null)
   const actorsRef = useRef<HTMLCanvasElement>(null)
 
   const tileSpr = new Sprite(tileCfg)
   const playerSpr = new Sprite(playerCfg)
-  const enemySpr = new Sprite(enemyCfg)
+  const enemySprites: Array<Sprite> = []
 
   const updateWorld = ({
     level,
     burn,
+    enemies,
   }: {
     level?: LevelMapType
     burn?: PositionType
+    enemies?: number
   }) => {
     const ctx = worldRef.current?.getContext('2d')
     if (ctx) {
       if (level) {
         ctx.fillStyle = '#000000'
         ctx.fillRect(0, 0, width, height)
-      }
-      level?.map((item, y) => {
-        item.map((tile, x) => {
-          if (![Tile.Empty, Tile.Player, Tile.Enemy].includes(tile)) {
-            ctx.drawImage(tileSpr.getPhase(0, tile), x * TileSize, y * TileSize)
-          }
+        level?.map((item, y) => {
+          item.map((tile, x) => {
+            if (![Tile.Empty, Tile.Player, Tile.Enemy].includes(tile)) {
+              ctx.drawImage(
+                tileSpr.getPhase(0, tile),
+                x * TileSize,
+                y * TileSize
+              )
+            }
+          })
         })
-      })
+      }
+      if (enemies && enemies > 0) {
+        while (enemySprites.length < enemies) {
+          enemySprites.push(new Sprite(enemyCfg))
+        }
+      }
       if (burn) {
         const { x, y } = burn
         ctx.fillStyle = 'black'
@@ -78,9 +90,9 @@ export const GameView = () => {
         ctx.drawImage(playerSpr.getPhase(dTime, phase, direction), x, y)
       }
       if (enemies.length > 0) {
-        enemies.map(runner => {
+        enemies.map((runner, i) => {
           const { x, y, phase, direction } = runner
-          ctx.drawImage(enemySpr.getPhase(dTime, phase, direction), x, y)
+          ctx.drawImage(enemySprites[i].getPhase(dTime, phase, direction), x, y)
         })
       }
     }

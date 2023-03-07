@@ -152,7 +152,7 @@ export class GameModel extends EventBus {
 
   public dispatchUpdate(): void {
     this.paused = true;
-    this.dispatch(ModelEvents.UpdateWorld, { level: this.levelMap });
+    this.dispatch(ModelEvents.UpdateWorld, { level: this.levelMap, enemies: this.enemies.length });
     this.dispatch(ModelEvents.Message, { type: MessageType.Message, title: `LEVEL ${this.levelNum + 1}` })
     this.enemies.forEach((runner) => runner.setAction(RunnerAction.Stay));
     this.update();
