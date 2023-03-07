@@ -4,7 +4,7 @@ import { checkCollision } from './checkCollision';
 import { RunnerAction, Tile, OBSTACLE, TileSize } from '../constants';
 import { getTileAt, worldToMap } from '../utils';
 
-const checkNode = ({ x, y }: PositionType, action: RunnerAction): Array<RunnerAction> => {
+export const checkNode = ({ x, y }: PositionType): Array<RunnerAction> => {
   const res: Array<RunnerAction> = [];
   const center = getTileAt({ x, y });
   const bottom = getTileAt({ x, y: y + 1 });
@@ -37,9 +37,12 @@ const checkNode = ({ x, y }: PositionType, action: RunnerAction): Array<RunnerAc
       res.push(RunnerAction.MoveDown);
     }
   }
-
-  const opp = RunnerAction.MoveLeft + ((action - RunnerAction.MoveLeft) + 2) % 4;
-  return res.filter((action) => action !== opp);
+  if (res.length === 2) {
+    if (Math.abs(res[1] - res[0]) === 2) {
+      return [];
+    }
+  }
+  return res;
 }
 
 export const agent = (dTime: number, actor: RunnerType): CheckCollisionType => {
@@ -56,7 +59,8 @@ export const agent = (dTime: number, actor: RunnerType): CheckCollisionType => {
   });
 
   if (currAtMap.x !== nextAtMap.x || currAtMap.y !== nextAtMap.y) {
-    const dirs = checkNode(nextAtMap, action);
+    const opp = RunnerAction.MoveLeft + ((action - RunnerAction.MoveLeft) + 2) % 4;
+    const dirs = checkNode(nextAtMap).filter((action) => action !== opp);
     if (dirs.length > 0) {
       const n = Math.floor(Math.random() * dirs.length);
       actor.setAction(dirs[n]);

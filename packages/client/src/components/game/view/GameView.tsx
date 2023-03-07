@@ -19,6 +19,7 @@ import { Sprite } from './sprite'
 import { tileCfg } from './spriteConfigs'
 import { playerCfg } from './spriteConfigs'
 import { enemyCfg } from './spriteConfigs'
+import { checkNode } from '../model/agent'
 
 const width = 32 * TileSize
 const height = 22 * TileSize
@@ -50,14 +51,30 @@ export const GameView = () => {
       if (level) {
         ctx.fillStyle = '#000000'
         ctx.fillRect(0, 0, width, height)
-        level?.map((item, y) => {
-          item.map((tile, x) => {
+        level?.forEach((item, y) => {
+          item.forEach((tile, x) => {
             if (![Tile.Empty, Tile.Player, Tile.Enemy].includes(tile)) {
               ctx.drawImage(
                 tileSpr.getPhase(0, tile),
                 x * TileSize,
                 y * TileSize
               )
+            }
+
+            const dirs = checkNode({ x, y })
+            if (dirs.length > 0) {
+              ctx.strokeStyle = 'lightgreen'
+              ctx.lineWidth = 2
+              ctx.strokeRect(x * TileSize, y * TileSize, TileSize, TileSize)
+
+              const mid = { x: (x + 0.5) * TileSize, y: (y + 0.5) * TileSize }
+              dirs.forEach(dir => {
+                const a = RunnerAction.MoveLeft - dir
+                const xx = mid.x - TileSize * 0.3 * Math.cos((a * Math.PI) / 2)
+                const yy = mid.y + TileSize * 0.3 * Math.sin((a * Math.PI) / 2)
+                ctx.fillStyle = 'green'
+                ctx.fillRect(xx - 3, yy - 3, 6, 6)
+              })
             }
           })
         })
