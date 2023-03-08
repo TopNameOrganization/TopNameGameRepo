@@ -18,11 +18,11 @@ export const checkNode = ({ x, y }: PositionType): Array<RunnerAction> => {
     if (OBSTACLE.includes(left) && OBSTACLE.includes(right)) {
       return res;
     }
-    if (left === Tile.Rope ||
+    if ([Tile.Rope, Tile.Stair].includes(left) ||
       ([Tile.Brick, Tile.Concrete].includes(leftB) && !OBSTACLE.includes(left))) {
       res.push(RunnerAction.MoveLeft);
     }
-    if (right === Tile.Rope ||
+    if ([Tile.Rope, Tile.Stair].includes(right) ||
       ([Tile.Brick, Tile.Concrete].includes(rightB) && !OBSTACLE.includes(right))) {
       res.push(RunnerAction.MoveRight);
     }

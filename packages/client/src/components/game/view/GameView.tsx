@@ -61,21 +61,21 @@ export const GameView = () => {
               )
             }
 
-            const dirs = checkNode({ x, y })
-            if (dirs.length > 0) {
-              ctx.strokeStyle = 'lightgreen'
-              ctx.lineWidth = 2
-              ctx.strokeRect(x * TileSize, y * TileSize, TileSize, TileSize)
+            // const dirs = checkNode({ x, y })
+            // if (dirs.length > 0) {
+            //   ctx.strokeStyle = 'lightgreen'
+            //   ctx.lineWidth = 2
+            //   ctx.strokeRect(x * TileSize, y * TileSize, TileSize, TileSize)
 
-              const mid = { x: (x + 0.5) * TileSize, y: (y + 0.5) * TileSize }
-              dirs.forEach(dir => {
-                const a = RunnerAction.MoveLeft - dir
-                const xx = mid.x - TileSize * 0.3 * Math.cos((a * Math.PI) / 2)
-                const yy = mid.y + TileSize * 0.3 * Math.sin((a * Math.PI) / 2)
-                ctx.fillStyle = 'green'
-                ctx.fillRect(xx - 3, yy - 3, 6, 6)
-              })
-            }
+            //   const mid = { x: (x + 0.5) * TileSize, y: (y + 0.5) * TileSize }
+            //   dirs.forEach(dir => {
+            //     const a = RunnerAction.MoveLeft - dir
+            //     const xx = mid.x - TileSize * 0.3 * Math.cos((a * Math.PI) / 2)
+            //     const yy = mid.y + TileSize * 0.3 * Math.sin((a * Math.PI) / 2)
+            //     ctx.fillStyle = 'green'
+            //     ctx.fillRect(xx - 3, yy - 3, 6, 6)
+            //   })
+            // }
           })
         })
       }
