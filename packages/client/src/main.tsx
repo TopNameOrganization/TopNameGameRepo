@@ -2,9 +2,17 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
+import { setupStore } from './store'
+import { ConnectedRouter } from "connected-react-router";
+import { Provider } from 'react-redux'
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+const { store, history } = setupStore()
+
+ReactDOM.hydrateRoot(
+  document.getElementById('root')!,
+  <Provider store={store}>
+    <ConnectedRouter history={history}>
+      <App />
+    </ConnectedRouter>
+  </Provider>
 )

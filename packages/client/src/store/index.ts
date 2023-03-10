@@ -12,8 +12,13 @@ export const setupStore = (url = '/') => {
   const history = isServer
         ? createMemoryHistory({ initialEntries: [url] })
         : createBrowserHistory();
-  return configureStore({
+  const store = configureStore({
     reducer: rootReducer(history),
     //preloadedState: initialState
-  })
+  });
+
+  return {
+    store,
+    history,
+  };
 }
