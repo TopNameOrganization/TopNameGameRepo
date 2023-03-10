@@ -1,11 +1,10 @@
 import { AnimationPhase } from '../../constants'
-import runnerImg from '../../../../assets/game/player.png';
-
-const img = new Image();
-img.src = runnerImg;
+import { getImage } from './get-image';
+// import runnerImg from '../../../../assets/game/player.png';
+const runnerImg = '';
 
 export const playerCfg = {
-  img,
+  img: getImage(runnerImg)!,
   fps: 15,
   phases: {
     [AnimationPhase.Run]: { start: 0, length: 4 },

@@ -1,7 +1,6 @@
-import { rootReducer, RootState } from './reducers'
+import { rootReducer } from './reducers'
 import { configureStore } from "@reduxjs/toolkit";
 import { createBrowserHistory, createMemoryHistory } from 'history';
-
 
 export const isServer = !(
   typeof window !== 'undefined' &&
@@ -9,7 +8,7 @@ export const isServer = !(
   window.document.createElement
 );
 
-export const setupStore = (url: string) => {
+export const setupStore = (url = '/') => {
   const history = isServer
         ? createMemoryHistory({ initialEntries: [url] })
         : createBrowserHistory();

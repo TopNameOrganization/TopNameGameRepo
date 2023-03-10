@@ -4,6 +4,7 @@ import { RunnerAction, Tile, TileSize, AnimationPhase } from "../constants";
 import Runner from './Runner';
 import { Runner as RunnerType } from "./Runner";
 import { LevelType, PositionType, ModelEvents, MessageType } from "./types";
+import { isBrowser } from "../../../constants/is-browser";
 
 const OBSTACLE: Tile[] = [Tile.Brick, Tile.Concrete, Tile.Out];
 
@@ -30,32 +31,33 @@ export class GameModel extends EventBus {
     this.player = new Runner();
 
     // TODO: убрать это отсюда куда-нить
-    GameAPI.read('levels150.set').then(({ data }) => {
-      this.levels = data;
-      this.getLevel(this.levelNum);
-    })
+    if (isBrowser) {
+      GameAPI.read('levels150.set').then(({ data }) => {
+        this.levels = data;
+        this.getLevel(this.levelNum);
+      });
 
-    this.reader = new FileReader();
-    this.reader.addEventListener('loadend', () => {
-      const data = new Int8Array(this.reader.result as ArrayBuffer);
-      const level: LevelType = [];
-      const player = { x: 0, y: 0 };
-      const bonuses = data.reduce((prev, curr, i) => {
-        const x = i % 32;
-        const y = Math.floor(i / 32);
-        if (!level[y]) {
-          level[y] = [];
-        }
-        level[y][x] = (curr === Tile.Enemy || curr === Tile.Player) ? Tile.Empty : curr;
-        if (curr === Tile.Player) {
-          player.x = x * TileSize;
-          player.y = y * TileSize;
-        }
-        return curr === Tile.Bonus ? prev + 1 : prev;
-      }, 0);
-      this.setLevel({ level, player, bonuses });
-    });
-    // ---
+      this.reader = new FileReader();
+      this.reader.addEventListener('loadend', () => {
+        const data = new Int8Array(this.reader.result as ArrayBuffer);
+        const level: LevelType = [];
+        const player = { x: 0, y: 0 };
+        const bonuses = data.reduce((prev, curr, i) => {
+          const x = i % 32;
+          const y = Math.floor(i / 32);
+          if (!level[y]) {
+            level[y] = [];
+          }
+          level[y][x] = (curr === Tile.Enemy || curr === Tile.Player) ? Tile.Empty : curr;
+          if (curr === Tile.Player) {
+            player.x = x * TileSize;
+            player.y = y * TileSize;
+          }
+          return curr === Tile.Bonus ? prev + 1 : prev;
+        }, 0);
+        this.setLevel({ level, player, bonuses });
+      });
+    }
   }
 
   public setLevel({ level, player, bonuses }: { level: LevelType, player: PositionType, bonuses: number }): void {

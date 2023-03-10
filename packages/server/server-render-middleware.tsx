@@ -1,12 +1,12 @@
-import React from 'react';
+// import React from 'react';
 import { renderToString } from 'react-dom/server';
 import type { Request, Response } from 'express';
 import { StaticRouter } from 'react-router-dom/server';
 //import type { StaticRouterContext } from 'react-router';
 import { Provider as ReduxProvider } from 'react-redux';
-import { setupStore } from '../client/src/store/index'; //TODO настроить TSconfig 
+import { setupStore } from '../client/src/store/index';
 //import { getInitialState } from './store/getInitialState';
-import App from "../client/src/App"; //TODO настроить TSconfig 
+import App from "../client/src/App";
 
 // В этой middleware мы формируем первичное состояние приложения на стороне сервера
 // Попробуйте её подебажить, чтобы лучше разобраться, как она работает
