@@ -1,7 +1,6 @@
 import { AnimationPhase } from '../../constants'
 import { getImage } from './get-image';
-// import runnerImg from '../../../../assets/game/player.png';
-const runnerImg = '';
+import runnerImg from '../../../../assets/game/player.png';
 
 export const playerCfg = {
   img: getImage(runnerImg)!,

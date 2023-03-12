@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import { createServer as createViteServer } from 'vite';
 import type { ViteDevServer } from 'vite';
+import { setupStore } from '../client/src/store';
 
 dotenv.config()
 
@@ -9,7 +10,7 @@ import express from 'express'
 import * as fs from 'fs'
 import * as path from 'path'
 
-const isDev = () => process.env.NODE_ENV === 'development'
+const isProduction = process.env.NODE_ENV === 'production';
 
 async function startServer() {
   const app = express()
@@ -17,29 +18,24 @@ async function startServer() {
   const port = Number(process.env.SERVER_PORT) || 3001
 
   let vite: ViteDevServer | undefined;
-  // const distPath = path.dirname(require.resolve('client/dist/index.html'))
-  const distPath = path.resolve(__dirname, '..', 'client', 'dist');
-  // const srcPath = path.dirname(require.resolve('client'))
-  const srcPath = path.resolve(__dirname, '..', 'client');
-  // const ssrClientPath = require.resolve('client/ssr-dist/client.cjs')
-  const ssrClientPath = path.resolve(__dirname, '..', 'client', 'ssr-dist', 'client.cjs');
+  const clientPath = path.resolve(__dirname, '..', 'client');
+  const distPath = path.resolve(clientPath, 'dist');
+  const ssrClientPath = path.resolve(clientPath, 'ssr-dist', 'client.cjs');
+  const ssrPath = path.resolve(clientPath, 'ssr.tsx');
+  const templateDevPath = path.resolve(clientPath, 'index.html');
+  const templateProdPath = path.resolve(distPath, 'index.html');
 
-  if (isDev()) {
+  if (!isProduction) {
     vite = await createViteServer({
       server: { middlewareMode: true },
-      root: srcPath,
+      root: clientPath,
       appType: 'custom'
     })
 
     app.use(vite.middlewares)
   }
 
-  app.get('/api', (_, res) => {
-    res.json('👋 Howdy from the server :)')
-  })
-
-
-  if (!isDev()) {
+  if (isProduction) {
     app.use('/assets', express.static(path.resolve(distPath, 'assets')))
   }
 
@@ -49,36 +45,32 @@ async function startServer() {
     try {
       let template: string;
 
-      if (!isDev()) {
-        template = fs.readFileSync(
-          path.resolve(distPath, 'index.html'),
-          'utf-8',
-        )
+      if (isProduction) {
+        template = await fs.promises.readFile(templateProdPath, 'utf-8')
       } else {
-        template = fs.readFileSync(
-          path.resolve(srcPath, 'index.html'),
-          'utf-8',
-        )
-
+        template = await fs.promises.readFile(templateDevPath, 'utf-8')
         template = await vite!.transformIndexHtml(url, template)
-
       }
 
       let render: (url: string) => Promise<string>;
 
-      if (!isDev()) {
+      if (isProduction) {
         render = (await import(ssrClientPath)).render;
       } else {
-        render = (await vite!.ssrLoadModule(path.resolve(srcPath, 'ssr.tsx'))).render;
+        render = (await vite!.ssrLoadModule(ssrPath)).render;
       }
 
-      const appHtml = await render(url)
+      const appHtml = await render(url);
 
-      const html = template.replace(`<!--ssr-outlet-->`, appHtml)
+      const store = setupStore();
+
+      const html = template
+        .replace(`<!--ssr-outlet-->`, appHtml)
+        .replace(`<!--initial-state-outlet-->`, `<script>window.__INITIAL_STATE__ = ${JSON.stringify(store.getState())}</script>`)
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
     } catch (e) {
-      if (isDev()) {
+      if (!isProduction) {
         vite!.ssrFixStacktrace(e as Error)
       }
       next(e)

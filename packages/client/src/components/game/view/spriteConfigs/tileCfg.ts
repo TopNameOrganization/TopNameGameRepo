@@ -1,7 +1,6 @@
 import { Tile } from '../../constants'
 import { getImage } from './get-image';
-// import tileImg from '../../../../assets/game/tiles.png'
-const tileImg = '';
+import tileImg from '../../../../assets/game/tiles.png'
 
 export const tileCfg = {
   img: getImage(tileImg)!,

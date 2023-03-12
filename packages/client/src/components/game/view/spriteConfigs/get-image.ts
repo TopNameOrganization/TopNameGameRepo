@@ -1,6 +1,6 @@
 import { isServer } from "../../../../constants/is-browser";
 
-export const getImage = (src: string) => {
+export const getImage = (src: string): HTMLImageElement | null => {
   if (isServer) {
     return null;
   }

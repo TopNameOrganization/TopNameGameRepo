@@ -2,8 +2,7 @@ import { AxiosInstance, AxiosAdapter, AxiosPromise, AxiosResponse } from "axios"
 import { isServer } from "../constants/is-browser";
 
 export const setAdapterForSSR = (instance: AxiosInstance): void => {
-  if (isServer) {
-    console.log('SET AXIOS SSR ADAPTER!!!!');
+    if (isServer) {
     const adapter: AxiosAdapter = (): AxiosPromise => {
       const res = {} as AxiosResponse;
       return Promise.resolve(res);
@@ -11,4 +10,4 @@ export const setAdapterForSSR = (instance: AxiosInstance): void => {
 
     instance.defaults.adapter = adapter;
   }
-} 
+}
