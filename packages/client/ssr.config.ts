@@ -11,10 +11,6 @@ export default defineConfig({
       name: 'Client',
       formats: ['cjs'],
     },
-    rollupOptions: {
-      output: {
-        dir: 'ssr-dist',
-      },
-    }
+    outDir: path.resolve(__dirname, '..', '..', 'dist', 'ssr')
   }
 })

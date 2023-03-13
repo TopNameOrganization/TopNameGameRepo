@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "rm -rf dist && tsc --p ./tsconfig.prod.json",
-    "preview": "node ./dist/index.js",
-    "dev": "cross-env NODE_ENV=development nodemon index.ts",
+    "build1": "rm -rf dist && tsc --project ./tsconfig.prod.json",
+    "build": "tsc --project ./prod-config/tsconfig.json --noEmit && vite build --config ./prod-config/vite.config.ts",
+    "preview": "node ./dist/server/src/index.js",
+    "start": "cross-env NODE_ENV=production node ./dist/server/src/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "jest ."
