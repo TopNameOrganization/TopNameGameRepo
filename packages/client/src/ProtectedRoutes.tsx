@@ -1,3 +1,4 @@
+import React from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { ROUTES } from './constants'
@@ -16,7 +17,9 @@ export const ProtectedRoutes = () => {
     // trying to go to when they were redirected. This allows us to send them
     // along to that page after they login, which is a nicer user experience
     // than dropping them off on the home page.
-    return <Navigate to={ROUTES.login} state={{ from: location }} replace />
+    return (
+      <Navigate to={ROUTES.login.path} state={{ from: location }} replace />
+    )
   }
 
   return <Outlet />

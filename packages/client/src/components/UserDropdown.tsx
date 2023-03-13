@@ -18,7 +18,9 @@ import { useAuth } from '../context/AuthContext'
 
 export const UserDropdown = () => {
   const auth = useAuth()
-  const { avatar, display_name } = useAppSelector(state => state.userReducer.user)
+  const { avatar, display_name } = useAppSelector(
+    state => state.userReducer.user
+  )
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   )
@@ -67,7 +69,7 @@ export const UserDropdown = () => {
           </ListItemIcon>
           <Typography
             textAlign="center"
-            to={ROUTES.profile}
+            to={ROUTES.profile.path}
             component={Link}
             sx={{ textDecoration: 'none' }}>
             Profile

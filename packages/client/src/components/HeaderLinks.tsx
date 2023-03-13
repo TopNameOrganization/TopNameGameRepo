@@ -5,7 +5,7 @@ import { useRouteMatch } from '../hooks/useRouteMatch'
 import { ROUTES } from '../constants'
 
 export const HeaderLinks = () => {
-  const routeMatch = useRouteMatch(Object.values(ROUTES))
+  const routeMatch = useRouteMatch(Object.values(ROUTES).map(el => el.path))
   const currentTab = routeMatch?.pattern?.path
 
   return (
@@ -14,11 +14,16 @@ export const HeaderLinks = () => {
       value={currentTab}
       textColor="inherit"
       centered>
-      <Tab label="Game" value={ROUTES.game} to={ROUTES.game} component={Link} />
+      <Tab
+        label="Game"
+        value={ROUTES.game.path}
+        to={ROUTES.game.path}
+        component={Link}
+      />
       <Tab
         label="Leader board"
-        value={ROUTES.leaderBoard}
-        to={ROUTES.leaderBoard}
+        value={ROUTES.leaderBoard.path}
+        to={ROUTES.leaderBoard.path}
         component={Link}
       />
     </Tabs>

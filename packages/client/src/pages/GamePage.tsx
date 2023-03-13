@@ -23,7 +23,7 @@ export const GamePage = () => {
       const { id, login: name } = user
       await LeaderBoardAPI.addLeader({ id, name, ...data })
     }
-    navigate(ROUTES.leaderBoard)
+    navigate(ROUTES.leaderBoard.path)
   }
   useEffect(() => {
     GameModel.on(ModelEvents.GameOver, onOver)

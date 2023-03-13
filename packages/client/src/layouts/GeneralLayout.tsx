@@ -26,7 +26,7 @@ export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
             variant="h6"
             color="inherit"
             component={Link}
-            to={ROUTES.root}
+            to={ROUTES.root.path}
             sx={{ textDecoration: 'none' }}>
             Lode runner
           </Typography>
@@ -37,12 +37,15 @@ export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
             </>
           ) : (
             <Box>
-              <Button component={Link} to={ROUTES.login} variant="contained">
+              <Button
+                component={Link}
+                to={ROUTES.login.path}
+                variant="contained">
                 Login
               </Button>
               <Button
                 component={Link}
-                to={ROUTES.signup}
+                to={ROUTES.signup.path}
                 variant="contained"
                 sx={{ ml: 1 }}>
                 Sign up

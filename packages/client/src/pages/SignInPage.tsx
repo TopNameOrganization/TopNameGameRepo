@@ -14,7 +14,7 @@ export function SignInPage() {
       <SignInForm />
       <Grid container justifyContent="flex-end">
         <Grid item>
-          <Link component={RouterLink} to={ROUTES.signup} variant="body2">
+          <Link component={RouterLink} to={ROUTES.signup.path} variant="body2">
             {"Don't have an account? Sign Up"}
           </Link>
         </Grid>
