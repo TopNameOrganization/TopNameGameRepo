@@ -11,6 +11,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 const isProduction = process.env.NODE_ENV === 'production';
+console.log('MTETTEE', __dirname, isProduction);
 
 async function startServer() {
   const app = express()
@@ -18,12 +19,13 @@ async function startServer() {
   const port = Number(process.env.SERVER_PORT) || 3001
 
   let vite: ViteDevServer | undefined;
-  const clientPath = path.resolve(__dirname, '..', '..', 'client');
-  const distPath = path.resolve(clientPath, 'dist');
-  const ssrClientPath = path.resolve(clientPath, 'dist-ssr', 'client.js');
+  const clientPath = isProduction
+    ? path.resolve(__dirname, '..', 'client')
+    : path.resolve(__dirname, '..', '..', 'client');
+  const ssrClientPath = path.resolve(__dirname, '..', 'ssr', 'client.js');
   const ssrPath = path.resolve(clientPath, 'ssr.tsx');
-  const templateDevPath = path.resolve(clientPath, 'index.html');
-  const templateProdPath = path.resolve(distPath, 'index.html');
+  const templateHtmlPath = path.resolve(clientPath, 'index.html');
+  const assetsPath = path.resolve(clientPath, 'assets');
 
   if (!isProduction) {
     vite = await createViteServer({
@@ -36,7 +38,7 @@ async function startServer() {
   }
 
   if (isProduction) {
-    app.use('/assets', express.static(path.resolve(distPath, 'assets')))
+    app.use('/assets', express.static(assetsPath))
   }
 
   app.use('*', async (req, res, next) => {
@@ -46,16 +48,18 @@ async function startServer() {
       let template: string;
 
       if (isProduction) {
-        template = await fs.promises.readFile(templateProdPath, 'utf-8')
+        template = await fs.promises.readFile(templateHtmlPath, 'utf-8')
       } else {
-        template = await fs.promises.readFile(templateDevPath, 'utf-8')
+        template = await fs.promises.readFile(templateHtmlPath, 'utf-8')
         template = await vite!.transformIndexHtml(url, template)
       }
 
       let render: (url: string) => Promise<string>;
 
       if (isProduction) {
-        render = (await import(ssrClientPath)).render;
+        const mod = await import(require.resolve('../ssr/client.js'));
+        console.log({ mod });
+        render = mod.render;
       } else {
         render = (await vite!.ssrLoadModule(ssrPath)).render;
       }
