@@ -4,6 +4,7 @@ import { useMutation, useQuery, UseMutateFunction } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { AuthAPI } from '../api/AuthApi'
 import { SigninData, SignupData, User } from '../api/types'
+import { ROUTES } from "../constants";
 
 interface AuthData<T> {
   data: T
@@ -82,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   } = useMutation(AuthAPI.read, {
     onSuccess: () => {
       refetch()
-      navigate('/game')
+      navigate(ROUTES.game)
     },
   })
 
