@@ -12,6 +12,8 @@ export enum Tile {
 }
 
 export const VELOCITY = 200;
+export const OBSTACLE: Tile[] = [Tile.Brick, Tile.Concrete, Tile.Out];
+export const FLOOR: Tile[] = [Tile.Stair, ...OBSTACLE];
 export enum Orientation {
   Left = 0,
   Right = 1,

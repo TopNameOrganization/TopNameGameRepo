@@ -1,12 +1,14 @@
-import { PositionType } from "./types";
+import { PositionType, PathStepType } from "./types";
 import { RunnerAction, VELOCITY, TileSize, Orientation, AnimationPhase, Tile } from "../constants";
+import { worldToMap } from "../utils";
 
 export class Runner {
   private _x: number;
   private _y: number;
-  private _action: RunnerAction = RunnerAction.Fall;
+  private _action: RunnerAction = RunnerAction.Stay;
   private _orientation: Orientation = Orientation.Right;
-
+  private _target: PositionType;
+  private _path: Array<PathStepType> = [];
   private readonly magic: number = 2;
 
   constructor({ x, y }: PositionType = { x: 0, y: 0 }) {
@@ -27,6 +29,28 @@ export class Runner {
       if (this._action === RunnerAction.MoveRight) {
         this._orientation = 1;
       }
+    }
+  }
+
+  public reset(pos: PositionType) {
+    this.update(pos);
+    this.setTarget(worldToMap(pos));
+  }
+
+  public setTarget(val: PositionType) {
+    this._target = val;
+  }
+
+  public setPath(path: Array<PathStepType>) {
+    this._path = path;
+  }
+
+  public targetFromPath() {
+    if (this._path.length > 0) {
+      const { x, y, action } = this._path[0];
+      this.setTarget({ x, y });
+      this.setAction(action);
+      this._path.shift();
     }
   }
 
@@ -113,6 +137,14 @@ export class Runner {
 
   get orientation(): number {
     return this._orientation;
+  }
+
+  get target(): PositionType {
+    return this._target;
+  }
+
+  get path(): Array<PathStepType> {
+    return this._path;
   }
 }
 

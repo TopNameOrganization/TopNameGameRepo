@@ -1,21 +1,41 @@
-import { Tile, AnimationPhase } from "../constants";
+import { Tile, AnimationPhase, RunnerAction } from "../constants";
 
 export type PositionType = {
   x: number,
   y: number,
 };
 
-export type SizeType = {
-  width: number,
-  height: number,
-};
+export type NodeType = PositionType & { actions: Array<RunnerAction> };
 
-export type PlayerInfoType = PositionType & {
+export type CheckCollisionType = {
+  position: PositionType,
+  phase: AnimationPhase,
+}
+
+export type RunnerInfoType = PositionType & {
   phase: AnimationPhase,
   direction: number,
 };
 
-export type LevelType = Tile[][];
+export type LevelMapType = Tile[][];
+
+export type GraphEdgeType = {
+  action: RunnerAction,
+  cost: number,
+  vertice: string
+}
+export type GraphVerticeType = PositionType & {
+  edges: Array<GraphEdgeType>
+}
+export type PathGraphType = Record<string, GraphVerticeType>;
+export type PathStepType = PositionType & { action: RunnerAction };
+
+export type LevelType = {
+  level: LevelMapType,
+  player: PositionType,
+  bonuses: number,
+  enemies: Array<PositionType>,
+}
 
 export enum ModelEvents {
   Update = 'update',
