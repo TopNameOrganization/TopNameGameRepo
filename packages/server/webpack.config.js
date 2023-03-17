@@ -31,6 +31,13 @@ module.exports = {
           configFile: path.resolve(__dirname, "tsconfig.prod.json")
         }
       }],
+    }, {
+      test: /\.(png|jpe?g|gif)$/i,
+      use: [
+        {
+          loader: 'file-loader',
+        },
+      ],
     }],
   },
   resolve: {
@@ -39,5 +46,6 @@ module.exports = {
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, '..', '..', 'dist', 'server'),
+    publicPath: '',
   },
 };

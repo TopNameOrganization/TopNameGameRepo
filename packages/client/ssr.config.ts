@@ -11,7 +11,6 @@ export default defineConfig({
       name: 'Client',
       formats: ['cjs'],
     },
-    outDir: path.resolve(__dirname, '..', '..', 'dist', 'ssr'),
-    emptyOutDir: true,
-  },
+    outDir: path.resolve(__dirname, '..', '..', 'dist', 'ssr')
+  }
 })

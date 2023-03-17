@@ -22,7 +22,6 @@ async function startServer() {
   const clientPath = isProduction
     ? path.resolve(__dirname, '..', 'client')
     : path.resolve(__dirname, '..', '..', 'client');
-  const ssrClientPath = path.resolve(__dirname, '..', 'ssr', 'client.js');
   const ssrPath = path.resolve(clientPath, 'ssr.tsx');
   const templateHtmlPath = path.resolve(clientPath, 'index.html');
   const assetsPath = path.resolve(clientPath, 'assets');
@@ -54,12 +53,10 @@ async function startServer() {
         template = await vite!.transformIndexHtml(url, template)
       }
 
-      let render: (url: string) => Promise<string>;
+      let render: (url: string) => string;
 
       if (isProduction) {
-        const mod = await import(require.resolve('../ssr/client.js'));
-        console.log({ mod });
-        render = mod.render;
+        render = (await import('../../client/ssr')).render;
       } else {
         render = (await vite!.ssrLoadModule(ssrPath)).render;
       }
