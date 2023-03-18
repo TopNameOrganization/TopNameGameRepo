@@ -1,7 +1,9 @@
-import { RootState } from "../store/reducers"
+import { RootState } from "./src/store/reducers"
 
 declare const __SERVER_PORT__: number
 declare const __INITIAL_STATE__: RootState;
+
+declare module '*.png';
 
 // Fixes TS2694
 declare global {

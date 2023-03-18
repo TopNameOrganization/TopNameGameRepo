@@ -2,7 +2,6 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import { createServer as createViteServer } from 'vite';
 import type { ViteDevServer } from 'vite';
-import { setupStore } from '../../client/src/store';
 
 dotenv.config()
 
@@ -11,7 +10,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 const isProduction = process.env.NODE_ENV === 'production';
-console.log('MTETTEE', __dirname, isProduction);
 
 async function startServer() {
   const app = express()
@@ -19,17 +17,25 @@ async function startServer() {
   const port = Number(process.env.SERVER_PORT) || 3001
 
   let vite: ViteDevServer | undefined;
-  const clientPath = isProduction
-    ? path.resolve(__dirname, '..', 'client')
-    : path.resolve(__dirname, '..', '..', 'client');
-  const ssrPath = path.resolve(clientPath, 'ssr.tsx');
-  const templateHtmlPath = path.resolve(clientPath, 'index.html');
-  const assetsPath = path.resolve(clientPath, 'assets');
+
+  // DEV paths
+  const clientDevPath = path.resolve(__dirname, '..', '..', 'client');
+  const ssrDevPath = path.resolve(clientDevPath, 'ssr.tsx');
+  const templateDevHtmlPath = path.resolve(clientDevPath, 'index.html');
+
+  // PROD paths
+  const clientPath = path.resolve(__dirname, '..', '..', '..', 'client');
+  const clientDistPath = path.resolve(clientPath, 'dist');
+  const templateProdHtmlPath = path.resolve(clientDistPath, 'index.html');
+  const ssrClientPath = path.resolve(clientPath, 'dist-ssr', 'ssr.js');
+  const assetsPath = path.resolve(clientDistPath, 'assets');
+  const gamePath = path.resolve(clientDistPath, 'game');
+  const imagesPath = path.resolve(clientDistPath, 'images');
 
   if (!isProduction) {
     vite = await createViteServer({
       server: { middlewareMode: true },
-      root: clientPath,
+      root: clientDevPath,
       appType: 'custom'
     })
 
@@ -38,6 +44,8 @@ async function startServer() {
 
   if (isProduction) {
     app.use('/assets', express.static(assetsPath))
+    app.use('/game', express.static(gamePath))
+    app.use('/images', express.static(imagesPath))
   }
 
   app.use('*', async (req, res, next) => {
@@ -47,27 +55,26 @@ async function startServer() {
       let template: string;
 
       if (isProduction) {
-        template = await fs.promises.readFile(templateHtmlPath, 'utf-8')
+        template = await fs.promises.readFile(templateProdHtmlPath, 'utf-8')
       } else {
-        template = await fs.promises.readFile(templateHtmlPath, 'utf-8')
+        template = await fs.promises.readFile(templateDevHtmlPath, 'utf-8')
         template = await vite!.transformIndexHtml(url, template)
       }
 
-      let render: (url: string) => string;
+      let render: (url: string) => { html: string; muiCss: string; state: object };
 
       if (isProduction) {
-        render = (await import('../../client/ssr')).render;
+        render = (await import(ssrClientPath)).render;
       } else {
-        render = (await vite!.ssrLoadModule(ssrPath)).render;
+        render = (await vite!.ssrLoadModule(ssrDevPath)).render;
       }
 
-      const appHtml = await render(url);
-
-      const store = setupStore();
+      const renderApp = await render(url);
 
       const html = template
-        .replace(`<!--ssr-outlet-->`, appHtml)
-        .replace(`<!--initial-state-outlet-->`, `<script>window.__INITIAL_STATE__ = ${JSON.stringify(store.getState())}</script>`)
+        .replace(`<!--ssr-outlet-->`, renderApp.html)
+        .replace(`<!--initial-state-outlet-->`, `<script>window.__INITIAL_STATE__ = ${JSON.stringify(renderApp.state)}</script>`)
+        .replace(`<!--mui-css-outlet-->`, renderApp.muiCss)
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
     } catch (e) {

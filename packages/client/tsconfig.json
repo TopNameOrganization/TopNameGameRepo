@@ -16,7 +16,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "strictPropertyInitialization": false,
+    "strictPropertyInitialization": false
   },
   "include": ["src", "ssr.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
