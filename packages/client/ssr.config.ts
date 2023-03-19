@@ -17,7 +17,7 @@ export default defineConfig({
         dir: 'dist-ssr',
       },
     },
-    minify: false,
+    minify: true,
     ssr: true
   },
 })
