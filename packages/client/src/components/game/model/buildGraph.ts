@@ -6,7 +6,7 @@ import { checkFall, mapToWorld } from "../utils";
 const RECURSION_DEPTH = 100000;
 export const verticeId = ({ x, y }: PositionType) => `${x}-${y}`
 
-const buildEdge = ({ x, y, action }: { x: number, y: number, action: RunnerAction }) => {
+export const buildEdge = ({ x, y, action }: { x: number, y: number, action: RunnerAction }) => {
   let dx = 0;
   let dy = 0;
   switch (action) {
@@ -60,7 +60,7 @@ export const buildGraph = (init: Array<PositionType> = []): PathGraphType => {
       x = cnt % 32;
       y = Math.floor(cnt / 32);
     }
-    nodes = [{ x, y, actions: checkNode({ x, y }) }]
+    nodes = [{ x, y, actions: checkNode({ x, y }) }];
   }
   let depth = 0;
   const res: PathGraphType = {};

@@ -9,6 +9,7 @@ export class Runner {
   private _orientation: Orientation = Orientation.Right;
   private _target: PositionType;
   private _path: Array<PathStepType> = [];
+
   private readonly magic: number = 2;
 
   constructor({ x, y }: PositionType = { x: 0, y: 0 }) {
@@ -145,6 +146,12 @@ export class Runner {
 
   get path(): Array<PathStepType> {
     return this._path;
+  }
+
+  get pathIsPassed(): boolean {
+    const { x, y } = this;
+    const atMap = worldToMap({ x, y });
+    return this._path.length === 0 && atMap.x === this._target.x && atMap.y === this._target.y;
   }
 }
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Box } from '@mui/material'
-import { TileSize, RunnerAction } from '../../constants'
+import { TileSize } from '../../constants'
 import GameModel from '../../model/GameModel'
 import { PathStepType } from '../../model/types'
 import { verticeId } from '../../model/buildGraph'
@@ -45,7 +45,7 @@ export const PathControl = ({
       {vertices.map(({ x, y, action }) => (
         <Box
           onClick={evt => {
-            evt.stopPropagation();
+            evt.stopPropagation()
             onVertice({ x, y, action })
           }}
           sx={{
