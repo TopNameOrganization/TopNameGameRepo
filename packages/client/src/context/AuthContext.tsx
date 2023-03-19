@@ -4,6 +4,7 @@ import { useMutation, useQuery, UseMutateFunction } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { AuthAPI } from '../api/AuthApi'
 import { SigninData, SignupData, User } from '../api/types'
+import { ROUTES } from "../constants";
 
 interface AuthData<T> {
   data: T
@@ -22,6 +23,7 @@ interface Context {
   signin: AuthAction<SigninData>
   signup: AuthAction<SignupData>
   logout: AuthAction<void>
+  signInWithYandex: AuthAction<void>
 }
 
 const AuthContext = createContext<Context>({} as Context)
@@ -74,6 +76,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     },
   })
 
+  const {
+    mutate: signInWithYandex,
+    isLoading: signInWithYandexIsLoading,
+    error: signInWithYandexError,
+  } = useMutation(AuthAPI.read, {
+    onSuccess: () => {
+      refetch()
+      navigate(ROUTES.game)
+    },
+  })
+
   const value = {
     user: {
       data: !userError ? data?.data : undefined,
@@ -87,6 +100,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     },
     signup: { action: signup, isLoading: signupIsLoading, error: signupError },
     logout: { action: logout, isLoading: logoutIsLoading, error: logoutError },
+    signInWithYandex: {
+      action: signInWithYandex,
+      isLoading: signInWithYandexIsLoading,
+      error: signInWithYandexError
+    },
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
