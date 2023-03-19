@@ -1,11 +1,9 @@
 import { Tile } from '../../constants'
-import tileImg from '../../../../assets/game/tiles.png';
-
-const img = new Image();
-img.src = tileImg;
+import { getImage } from './get-image';
+import tileImg from '../../../../assets/game/tiles.png'
 
 export const tileCfg = {
-  img,
+  img: getImage(tileImg)!,
   fps: 15,
   phases: {
     [Tile.Brick]: { start: 0, length: 1 },

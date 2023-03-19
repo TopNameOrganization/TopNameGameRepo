@@ -20,7 +20,6 @@ import { Sprite } from './sprite'
 import { tileCfg } from './spriteConfigs'
 import { playerCfg } from './spriteConfigs'
 import { enemyCfg } from './spriteConfigs'
-
 import { FPS } from './fps'
 
 const width = 32 * TileSize
