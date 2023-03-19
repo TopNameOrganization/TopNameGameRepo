@@ -10,7 +10,8 @@
     "test": "lerna run test",
     "lint": "lerna run lint",
     "format": "lerna run format",
-    "preview": "lerna run preview"
+    "preview": "lerna run preview",
+    "start": "cross-env NODE_ENV=production node dist/server/index.js"
   },
   "license": "MIT",
   "workspaces": [

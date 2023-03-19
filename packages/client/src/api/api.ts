@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
+import { setAdapterForSSR } from './api-ssr-adapter'
 
 const baseURL = 'https://ya-praktikum.tech/api/v2'
 
@@ -11,13 +12,16 @@ const getInstance = () => {
       baseURL,
       timeout: 1000,
       withCredentials: true,
-    })
+    });
+
     instance.interceptors.response.use(undefined, error => {
       if (error.response.status === '401') {
         window.location.href = '/#/login'
       }
       throw error
-    })
+    });
+
+    setAdapterForSSR(instance);
   }
 
   return instance
@@ -30,7 +34,9 @@ const getInstanceLocal = () => {
       timeout: 1000,
       withCredentials: true,
       responseType: 'blob',
-    })
+    });
+  
+    setAdapterForSSR(instanceLocal);
   }
 
   return instanceLocal
