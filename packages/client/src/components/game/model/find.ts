@@ -4,6 +4,7 @@ import { RunnerAction } from '../constants';
 export const find = (start: string, end: string, graph: PathGraphType): Array<PathStepType> => {
   const iTime = new Date().getTime();
   if (graph[start] && graph[end]) {
+    // TODO: сделать нормальный тип
     const visited: Record<string, any> = {};
     const unvisited = [];
     const { x, y } = graph[start];
@@ -22,6 +23,7 @@ export const find = (start: string, end: string, graph: PathGraphType): Array<Pa
             vertice = visited[vertice.parent];
           }
           path.reverse();
+          // пусть пока будет, для оценки шустрости поиска
           console.log(`FOUND IN ${new Date().getTime() - iTime}`);
           return path;
         }
