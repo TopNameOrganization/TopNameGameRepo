@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, createContext } from 'react'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 
 type Theme = 'light' | 'dark'
@@ -12,7 +12,7 @@ interface Context {
   setTheme: (theme: Theme) => void
 }
 
-export const ThemeContext = React.createContext<Context>({} as Context)
+export const ThemeContext = createContext<Context>({} as Context)
 
 export const CustomThemeProvider = ({ children }: Props) => {
   const currentTheme = (localStorage.getItem('appTheme') || 'dark') as Theme

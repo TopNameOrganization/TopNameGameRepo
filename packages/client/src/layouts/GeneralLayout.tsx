@@ -29,13 +29,13 @@ export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
             <>
               <HeaderLinks />
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <ThemeSwitcher />
+                <ThemeSwitch />
                 <UserDropdown />
               </Box>
             </>
           ) : (
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <ThemeSwitcher />
+              <ThemeSwitch />
               <Button
                 size="small"
                 component={Link}
@@ -54,7 +54,6 @@ export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
               </Button>
             </Box>
           )}
-          <ThemeSwitch></ThemeSwitch>
         </Toolbar>
       </AppBar>
       {children}
