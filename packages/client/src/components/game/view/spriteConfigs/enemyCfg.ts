@@ -1,11 +1,9 @@
 import { AnimationPhase } from '../../constants'
 import enemyImg from '../../../../assets/game/enemy.png';
-
-const img = new Image();
-img.src = enemyImg;
+import { getImage } from './get-image';
 
 export const enemyCfg = {
-  img,
+  img: getImage(enemyImg)!,
   fps: 30,
   phases: {
     [AnimationPhase.Run]: { start: 0, length: 8 },

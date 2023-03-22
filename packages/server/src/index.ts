@@ -27,7 +27,7 @@ async function startServer() {
   const clientPath = path.resolve(__dirname, '..', '..', '..', 'client');
   const clientDistPath = path.resolve(clientPath, 'dist');
   const templateProdHtmlPath = path.resolve(clientDistPath, 'index.html');
-  const ssrClientPath = path.resolve(clientPath, 'dist-ssr', 'ssr.js');
+  const ssrClientPath = path.resolve(clientPath, 'dist-ssr', 'ssr.cjs');
   const assetsPath = path.resolve(clientDistPath, 'assets');
   const gamePath = path.resolve(clientDistPath, 'game');
   const imagesPath = path.resolve(clientDistPath, 'images');
