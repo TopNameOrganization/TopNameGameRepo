@@ -6,7 +6,7 @@ import { checkFall, mapToWorld } from "../utils";
 const RECURSION_DEPTH = 100000;
 export const verticeId = ({ x, y }: PositionType) => `${x}-${y}`
 
-const buildEdge = ({ x, y, action }: { x: number, y: number, action: RunnerAction }) => {
+export const buildEdge = ({ x, y, action }: { x: number, y: number, action: RunnerAction }) => {
   let dx = 0;
   let dy = 0;
   switch (action) {
