@@ -37,7 +37,7 @@ export const GameView = () => {
   const [rest, setRest] = useState<number>(0)
   const [message, setMessage] = useState<MessageScreenProps | null>(null)
 
-  const [vertices, setVertices] = useState<Array<PathStepType>>([])
+  // const [vertices, setVertices] = useState<Array<PathStepType>>([])
 
   const worldRef = useRef<HTMLCanvasElement>(null)
   const actorsRef = useRef<HTMLCanvasElement>(null)
@@ -51,13 +51,13 @@ export const GameView = () => {
     burn,
     enemies,
     graph,
-    vertices,
+    // vertices,
   }: {
     level?: LevelMapType
     burn?: PositionType
     enemies?: number
     graph?: PathGraphType
-    vertices?: Array<PathStepType>
+    // vertices?: Array<PathStepType>
   }) => {
     const ctx = worldRef.current?.getContext('2d')
     if (ctx) {
@@ -103,9 +103,9 @@ export const GameView = () => {
         ctx.fillStyle = 'black'
         ctx.fillRect(x * TileSize, y * TileSize, TileSize, TileSize)
       }
-      if (vertices) {
-        setVertices(vertices)
-      }
+      // if (vertices) {
+      //   setVertices(vertices)
+      // }
     }
   }
 
@@ -272,7 +272,7 @@ export const GameView = () => {
           height={height}
           style={{ position: 'absolute' }}
         />
-        <PathControl vertices={vertices}></PathControl>
+        {/* <PathControl vertices={vertices}></PathControl> */}
       </Box>
       <Grid container spacing={10} sx={{ width }}>
         <Grid item xs={4}>
