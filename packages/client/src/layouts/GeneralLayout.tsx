@@ -13,6 +13,7 @@ import { ROUTES } from '../constants'
 import { UserDropdown } from '../components/UserDropdown'
 import { HeaderLinks } from '../components/HeaderLinks'
 import { useAuth } from '../context/AuthContext'
+import { ThemeSwitch } from '../components/ThemeSwitch'
 
 export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
   const auth = useAuth()
@@ -49,6 +50,7 @@ export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
               </Button>
             </Box>
           )}
+          <ThemeSwitch></ThemeSwitch>
         </Toolbar>
       </AppBar>
       {children}
