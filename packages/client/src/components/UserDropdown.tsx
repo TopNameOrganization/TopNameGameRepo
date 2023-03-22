@@ -15,10 +15,14 @@ import { Link } from 'react-router-dom'
 import { ROUTES, resourcesUrl } from '../constants'
 import { useAppSelector } from '../hooks/redux'
 import { useAuth } from '../context/AuthContext'
+import { useCustomTheme } from '../context/ThemeProvider'
 
 export const UserDropdown = () => {
   const auth = useAuth()
-  const { avatar, display_name } = useAppSelector(state => state.userReducer.user)
+  const { theme } = useCustomTheme()
+  const { avatar, display_name } = useAppSelector(
+    state => state.userReducer.user
+  )
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   )
@@ -69,7 +73,10 @@ export const UserDropdown = () => {
             textAlign="center"
             to={ROUTES.profile}
             component={Link}
-            sx={{ textDecoration: 'none' }}>
+            sx={{
+              textDecoration: 'none',
+              color: theme === 'light' ? '#000' : '#fff',
+            }}>
             Profile
           </Typography>
         </MenuItem>
