@@ -2,7 +2,9 @@ import { Runner as RunnerType } from './Runner';
 import { CheckCollisionType, PositionType, PathGraphType } from './types';
 import { RunnerAction, TileSize, FLOOR } from '../constants';
 import { worldToMap, getTileAt, mapToWorld } from '../utils';
-import { buildGraph } from './buildGraph';
+import { buildGraph, buildEdge, verticeId } from './buildGraph';
+import { getStartNode } from './checkNode';
+import { find } from './find';
 
 export class Agent {
   private graph: PathGraphType;
@@ -30,7 +32,6 @@ export class Agent {
     const { x, y } = actor.target;
     if (newPosAtMap.x === x && newPosAtMap.y === y &&
       (newForwardAtMap.x !== x || newForwardAtMap.y !== y)) {
-
       newPos = { ...mapToWorld(actor.target) };
       if (actor.action === RunnerAction.Fall) {
         actor.resetAction();
@@ -49,5 +50,26 @@ export class Agent {
       position: newPos,
       phase: actor.getAnimationPhase(tile, onFloor)
     };
+  }
+
+  public getNearestVertice({ x, y }: PositionType): string {
+    const atMap = worldToMap({ x, y });
+    const { actions } = getStartNode({ x, y });
+    let minCost = 1000;
+    let verticeId = '';
+    actions.forEach((action) => {
+      const { cost, vertice } = buildEdge({ x: atMap.x, y: atMap.y, action });
+      if (cost < minCost) {
+        minCost = cost;
+        verticeId = vertice;
+      }
+    });
+    return verticeId;
+  }
+
+  public findPath(actor: RunnerType, goal: string) {
+    const { x, y } = actor;
+    const path = find(verticeId(worldToMap({ x, y })), goal, this.graph);
+    actor.setPath(path);
   }
 }

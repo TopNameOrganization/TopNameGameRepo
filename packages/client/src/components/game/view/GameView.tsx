@@ -10,8 +10,6 @@ import {
   LevelMapType,
   MessageType,
   ModelMessageType,
-  PathStepType,
-  GraphVerticeType,
   PathGraphType,
 } from '../model'
 
@@ -22,10 +20,8 @@ import { Sprite } from './sprite'
 import { tileCfg } from './spriteConfigs'
 import { playerCfg } from './spriteConfigs'
 import { enemyCfg } from './spriteConfigs'
-import { checkNode } from '../model/checkNode'
 
 import { FPS } from './fps'
-import { PathControl } from './pathControl'
 
 const width = 32 * TileSize
 const height = 22 * TileSize
@@ -36,8 +32,6 @@ export const GameView = () => {
   const [score, setScore] = useState<number>(0)
   const [rest, setRest] = useState<number>(0)
   const [message, setMessage] = useState<MessageScreenProps | null>(null)
-
-  const [vertices, setVertices] = useState<Array<PathStepType>>([])
 
   const worldRef = useRef<HTMLCanvasElement>(null)
   const actorsRef = useRef<HTMLCanvasElement>(null)
@@ -51,13 +45,11 @@ export const GameView = () => {
     burn,
     enemies,
     graph,
-    vertices,
   }: {
     level?: LevelMapType
     burn?: PositionType
     enemies?: number
     graph?: PathGraphType
-    vertices?: Array<PathStepType>
   }) => {
     const ctx = worldRef.current?.getContext('2d')
     if (ctx) {
@@ -102,9 +94,6 @@ export const GameView = () => {
         const { x, y } = burn
         ctx.fillStyle = 'black'
         ctx.fillRect(x * TileSize, y * TileSize, TileSize, TileSize)
-      }
-      if (vertices) {
-        setVertices(vertices)
       }
     }
   }
@@ -272,7 +261,6 @@ export const GameView = () => {
           height={height}
           style={{ position: 'absolute' }}
         />
-        <PathControl vertices={vertices}></PathControl>
       </Box>
       <Grid container spacing={10} sx={{ width }}>
         <Grid item xs={4}>

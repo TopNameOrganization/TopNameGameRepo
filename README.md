@@ -10,7 +10,7 @@
 ### Как добавить зависимости?
 В этом проекте используется `monorepo` на основе [`lerna`](https://github.com/lerna/lerna)
 
-Чтобы добавить зависимость для клиента 
+Чтобы добавить зависимость для клиента
 ```yarn lerna add {your_dep} --scope client```
 
 Для сервера
@@ -71,6 +71,14 @@
 1. nginx, раздающий клиентскую статику (client)
 2. node, ваш сервер (server)
 3. postgres, вашу базу данных (postgres)
+
+Переменные окружения, значения которых нужно указать в `.env`:
+- `CLIENT_PORT` - Порт клиента
+- `SERVER_PORT` - Порт сервера
+- `POSTGRES_USER` - Пользователь БД
+- `POSTGRES_PASSWORD` - Пароль БД
+- `POSTGRES_DB` - Имя БД
+- `POSTGRES_PORT` - Порт БД
 
 Если вам понадобится только один сервис, просто уточните какой в команде
 `docker compose up {sevice_name}`, например `docker compose up server`

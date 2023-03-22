@@ -69,7 +69,6 @@ export class GameModel extends EventBus {
   }
 
   public setLevel({ level, player, bonuses, enemies }: LevelType): void {
-    console.log(enemies.length);
     this.time = new Date().getTime();
     this.levelMap = level;
     this.agent.updateGraph(enemies);
@@ -218,13 +217,17 @@ export class GameModel extends EventBus {
     const enemies = this.enemies.map((runner) => {
       const newState = this.agent.update(dTime, runner);
       runner.update(newState.position);
+      if (runner.pathIsPassed) {
+        const goal = this.agent.getNearestVertice({ x: this.player.x, y: this.player.y });
+        this.agent.findPath(runner, goal);
+      }
       return {
         x: runner.x,
         y: runner.y,
         phase: newState.phase,
         direction: runner.orientation,
       }
-    })
+    });
 
     const playerAtMap = worldToMap({ x: this.player.x + TileSize / 2, y: this.player.y + TileSize / 2 });
     if (getTileAt(playerAtMap) === Tile.Bonus) {
