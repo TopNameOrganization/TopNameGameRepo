@@ -1,18 +1,12 @@
 import * as React from 'react'
-import {
-  Box,
-  AppBar,
-  Toolbar,
-  Typography,
-  Paper,
-  Container,
-  Button,
-} from '@mui/material'
+import { Box, AppBar, Toolbar, Typography, Button } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { ROUTES } from '../constants'
 import { UserDropdown } from '../components/UserDropdown'
 import { HeaderLinks } from '../components/HeaderLinks'
 import { useAuth } from '../context/AuthContext'
+import { ThemeSwitcher } from '../components/ThemeSwitcher'
+import { Footer } from '../components/Footer'
 
 export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
   const auth = useAuth()
@@ -33,18 +27,28 @@ export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
           {auth.user.data ? (
             <>
               <HeaderLinks />
-              <UserDropdown />
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <ThemeSwitcher />
+                <UserDropdown />
+              </Box>
             </>
           ) : (
-            <Box>
-              <Button component={Link} to={ROUTES.login} variant="contained">
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <ThemeSwitcher />
+              <Button
+                size="small"
+                component={Link}
+                to={ROUTES.login}
+                variant="contained"
+                sx={{ fontWeight: 'bold' }}>
                 Login
               </Button>
               <Button
+                size="small"
                 component={Link}
                 to={ROUTES.signup}
                 variant="contained"
-                sx={{ ml: 1 }}>
+                sx={{ ml: 1, fontWeight: 'bold' }}>
                 Sign up
               </Button>
             </Box>
@@ -52,30 +56,7 @@ export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
         </Toolbar>
       </AppBar>
       {children}
-      <Paper
-        sx={{
-          marginTop: 'calc(10% + 60px)',
-          position: 'fixed',
-          bottom: 0,
-          width: '100%',
-        }}
-        component="footer"
-        square
-        variant="outlined">
-        <Container maxWidth="lg">
-          <Box
-            sx={{
-              flexGrow: 1,
-              justifyContent: 'center',
-              display: 'flex',
-              my: 1,
-            }}>
-            <Typography variant="caption" color="initial">
-              Copyright ©2023.
-            </Typography>
-          </Box>
-        </Container>
-      </Paper>
+      <Footer />
     </Box>
   )
 }
