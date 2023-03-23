@@ -5,6 +5,7 @@ import { QueryClientProvider, QueryClient } from 'react-query'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { DefaultStub } from './components/DefaultStub'
 import { serviceWorkersRegistration } from './serviceWorkersRegistration'
+import { CustomThemeProvider } from './context/ThemeProvider'
 
 const queryClient = new QueryClient()
 
@@ -14,13 +15,15 @@ function App() {
   }, [])
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ErrorBoundary msg={<DefaultStub />}>
-        <AuthProvider>
-          <Router />
-        </AuthProvider>
-      </ErrorBoundary>
-    </QueryClientProvider>
+    <CustomThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ErrorBoundary msg={<DefaultStub />}>
+          <AuthProvider>
+            <Router />
+          </AuthProvider>
+        </ErrorBoundary>
+      </QueryClientProvider>
+    </CustomThemeProvider>
   )
 }
 
