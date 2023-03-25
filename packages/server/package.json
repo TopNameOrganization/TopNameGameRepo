@@ -21,10 +21,7 @@
     "prettier": "^2.7.1",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.6.5",
-    "sequelize-typescript": "^2.1.0",
-    "ts-loader": "^9.4.2",
-    "webpack": "^5.76.1",
-    "webpack-node-externals": "^3.0.0"
+    "sequelize-typescript": "^2.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
