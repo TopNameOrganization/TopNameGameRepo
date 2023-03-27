@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react'
+import React, { useState, createContext, useEffect } from 'react'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 
 type Theme = 'light' | 'dark'
@@ -15,15 +15,20 @@ interface Context {
 export const ThemeContext = createContext<Context>({} as Context)
 
 export const CustomThemeProvider = ({ children }: Props) => {
-  const currentTheme = (localStorage.getItem('appTheme') || 'dark') as Theme
-
-  const [themeName, setThemeName] = useState<Theme>(currentTheme)
+  const [themeName, setThemeName] = useState<Theme>('light')
 
   const theme = createTheme({
     palette: {
-      mode: currentTheme,
+      mode: themeName,
     },
   })
+
+  useEffect(() => {
+    const currentTheme = localStorage.getItem('appTheme')
+    if (currentTheme) {
+      setThemeName(currentTheme as Theme)
+    }
+  }, [])
 
   const handleSetThemeName = (name: Theme) => {
     localStorage.setItem('appTheme', name)

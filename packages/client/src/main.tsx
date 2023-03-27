@@ -7,9 +7,9 @@ import { Provider } from 'react-redux'
 import { RootState } from './store/reducers'
 import { BrowserRouter } from 'react-router-dom'
 
-declare const __INITIAL_STATE__: RootState;
+declare const __INITIAL_STATE__: RootState
 
-const store = setupStore(__INITIAL_STATE__);
+const store = setupStore(__INITIAL_STATE__)
 
 ReactDOM.hydrateRoot(
   document.getElementById('root')!,
