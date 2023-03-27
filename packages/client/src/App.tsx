@@ -6,6 +6,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { DefaultStub } from './components/DefaultStub'
 import { serviceWorkersRegistration } from './serviceWorkersRegistration'
 import { CustomThemeProvider } from './context/ThemeProvider'
+import React from 'react'
 
 const queryClient = new QueryClient()
 
