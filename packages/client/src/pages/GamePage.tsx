@@ -27,7 +27,6 @@ export const GamePage = () => {
   }
   useEffect(() => {
     GameModel.on(ModelEvents.GameOver, onOver)
-    ForumAPI.addTopic({ title: 'test', nickName: 'nick' })
   }, [])
 
   return (
