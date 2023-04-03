@@ -6,4 +6,7 @@ export const ROUTES = {
   signup: '/signup',
   profile: '/profile',
   leaderBoard: '/leader-board',
+  forum: '/forum',
+  forumCreate: '/forum/create',
+  forumDetail: '/forum/:id',
 }

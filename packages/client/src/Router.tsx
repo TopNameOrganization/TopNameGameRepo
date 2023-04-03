@@ -16,6 +16,11 @@ export const Router = () => {
         <Route path={ROUTES.game} element={<Pages.GamePage />} />
         <Route path={ROUTES.profile} element={<Pages.ProfilePage />} />
         <Route path={ROUTES.leaderBoard} element={<Pages.LeaderBoardPage />} />
+        <Route path={ROUTES.forum} element={<Pages.ForumLayoutPage />} >
+          <Route index element={<Pages.ForumListPage />} />
+          <Route path={ROUTES.forumCreate} element={<Pages.ForumCreatePage />} />
+          <Route path={ROUTES.forumDetail} element={<Pages.ForumDetailPage />} />
+        </Route>
       </Route>
       <Route path="*" element={<Pages.NotFoundPage />} />
     </Routes>

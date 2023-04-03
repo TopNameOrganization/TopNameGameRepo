@@ -1,0 +1,25 @@
+.header {
+  display: flex;
+  align-items: center;
+}
+.img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.relativeTime {
+  font-size: 12px;
+}
+
+.reply {
+  display: flex;
+  align-items: flex-end;
+  cursor: pointer;
+  gap: 4px;
+  visibility: hidden;
+}
+
+.root:hover .reply {
+  visibility: visible;
+}
