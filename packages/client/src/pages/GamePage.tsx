@@ -10,8 +10,6 @@ import { ModelEvents } from '../components/game/model'
 import { GameView } from '../components/game/view/GameView'
 import { useAuth } from '../context/AuthContext'
 
-import { ForumAPI } from '../api/ForumAPI'
-
 export const GamePage = () => {
   const navigate = useNavigate()
   const {
@@ -27,7 +25,6 @@ export const GamePage = () => {
   }
   useEffect(() => {
     GameModel.on(ModelEvents.GameOver, onOver)
-    ForumAPI.addTopic({ title: 'test', nickName: 'nick' })
   }, [])
 
   return (
