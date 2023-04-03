@@ -52,3 +52,12 @@ export interface OAuthData {
 export interface serviceIdData {
   service_id: string
 }
+
+export interface ForumTopicData {
+  id?: number,
+  nickName: string,
+  title: string
+  avatarUrl?: string,
+  shortDescription?: string,
+  message?: string,
+}

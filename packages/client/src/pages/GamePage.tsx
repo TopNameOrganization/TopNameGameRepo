@@ -2,15 +2,15 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Container } from '@mui/material'
 
-import { LeaderData, User } from '../api/types'
 import { LeaderBoardAPI } from '../api/LeaderBoardApi'
 import { GeneralLayout } from '../layouts'
 import { ROUTES } from '../constants'
-import { useAppSelector } from '../hooks/redux'
 import GameModel from '../components/game/model/GameModel'
 import { ModelEvents } from '../components/game/model'
 import { GameView } from '../components/game/view/GameView'
 import { useAuth } from '../context/AuthContext'
+
+import { ForumAPI } from '../api/ForumAPI'
 
 export const GamePage = () => {
   const navigate = useNavigate()
@@ -27,6 +27,7 @@ export const GamePage = () => {
   }
   useEffect(() => {
     GameModel.on(ModelEvents.GameOver, onOver)
+    ForumAPI.addTopic({ title: 'test', nickName: 'nick' })
   }, [])
 
   return (
