@@ -9,6 +9,7 @@ export class Runner {
   private _orientation: Orientation = Orientation.Right;
   private _target: PositionType;
   private _path: Array<PathStepType> = [];
+  private _isTrapped = false;
 
   private readonly magic: number = 2;
 
@@ -57,6 +58,10 @@ export class Runner {
 
   public resetAction() {
     this._action = RunnerAction.Stay;
+  }
+
+  public setIsTrapped(val: boolean): void {
+    this._isTrapped = val;
   }
 
   public getNextPos(dTime: number): PositionType {
@@ -152,6 +157,10 @@ export class Runner {
     const { x, y } = this;
     const atMap = worldToMap({ x, y });
     return this._path.length === 0 && atMap.x === this._target.x && atMap.y === this._target.y;
+  }
+
+  get isTrapped(): boolean {
+    return this._isTrapped;
   }
 }
 
