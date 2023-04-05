@@ -1,7 +1,7 @@
 import { Runner as RunnerType } from './Runner';
 import { CheckCollisionType, PositionType, PathGraphType } from './types';
-import { RunnerAction, TileSize, FLOOR } from '../constants';
-import { worldToMap, getTileAt, mapToWorld } from '../utils';
+import { RunnerAction, TileSize, FLOOR, AnimationPhase } from '../constants';
+import { worldToMap, getTileAt, mapToWorld, checkTrap } from '../utils';
 import { buildGraph, buildEdge, verticeId } from './buildGraph';
 import { getStartNode } from './checkNode';
 import { find } from './find';
@@ -22,9 +22,27 @@ export class Agent {
   }
 
   public update(dTime: number, actor: RunnerType): CheckCollisionType {
+    if (actor.action === RunnerAction.Stay && actor.isTrapped) {
+      return {
+        position: { x: actor.x, y: actor.y },
+        phase: AnimationPhase.Stay,
+      }
+    }
+
     if (!actor.target) {
       actor.setTarget(worldToMap({ x: actor.x, y: actor.y }));
     }
+
+    if (!actor.isTrapped && checkTrap({ x: actor.x, y: actor.y })) {
+      const atMap = worldToMap({ x: actor.x + TileSize / 2, y: actor.y + TileSize / 2 });
+      actor.setPath([
+        { ...atMap, action: actor.action },
+        { x: atMap.x, y: atMap.y + 1, action: RunnerAction.Fall }
+      ]);
+      actor.targetFromPath();
+      actor.setIsTrapped(true);
+    }
+
     let newPos = actor.getNextPos(dTime);
     const newPosAtMap = worldToMap({ x: newPos.x + TileSize / 2, y: newPos.y + TileSize / 2 });
     const newForwardAtMap = worldToMap(actor.getCheckCollisionPoint(newPos));

@@ -213,7 +213,7 @@ export class GameModel extends EventBus {
       y++
       if (getTileAt({ x, y }) === Tile.Brick) {
         this.player.setAction(RunnerAction.Stay)
-        this.levelMap[y][x] = Tile.Empty
+        this.levelMap[y][x] = Tile.Trap
         this.dispatch(ModelEvents.UpdateWorld, { burn: { x, y } })
       }
     }
@@ -236,6 +236,10 @@ export class GameModel extends EventBus {
     }
 
     const enemies = this.enemies.map(runner => {
+      const atMap = worldToMap({ x: runner.x, y: runner.y });
+      if (runner.action === RunnerAction.Stay && runner.isTrapped && getTileAt(atMap) !== Tile.Trapped) {
+        this.levelMap[atMap.y][atMap.x] = Tile.Trapped;
+      }
       const newState = this.agent.update(dTime, runner)
       runner.update(newState.position)
       if (runner.pathIsPassed) {

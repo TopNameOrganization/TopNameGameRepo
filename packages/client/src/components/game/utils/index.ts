@@ -23,8 +23,15 @@ export const getTileAt = ({ x, y }: PositionType): Tile => {
 export const checkFall = ({ x, y }: PositionType): boolean => {
   const mid: PositionType = worldToMap({ x: x + .5 * TileSize, y: y + .5 * TileSize });
   const bottom: PositionType = worldToMap({ x: x + .5 * TileSize, y: y + TileSize });
+  return [Tile.Empty, Tile.Bonus, Tile.Trap].includes(getTileAt(mid))
+    && ([Tile.Empty, Tile.Rope, Tile.Bonus, Tile.Trap].includes(getTileAt(bottom)));
+}
+
+export const checkTrap = ({ x, y }: PositionType): boolean => {
+  const mid: PositionType = worldToMap({ x: x + .5 * TileSize, y: y + .5 * TileSize });
+  const bottom: PositionType = worldToMap({ x: x + .5 * TileSize, y: y + TileSize });
   return [Tile.Empty, Tile.Bonus].includes(getTileAt(mid))
-    && ([Tile.Empty, Tile.Rope, Tile.Bonus].includes(getTileAt(bottom)));
+    && (getTileAt(bottom) === Tile.Trap);
 }
 
 export { EventBus } from './EventBus';

@@ -8,12 +8,14 @@ export enum Tile {
   Bonus = 5,
   Enemy = 6,
   Player = 7,
+  Trap = 96,
+  Trapped = 99,
   Out = 100,
 }
 
 export const VELOCITY = 200;
 export const OBSTACLE: Tile[] = [Tile.Brick, Tile.Concrete, Tile.Out];
-export const FLOOR: Tile[] = [Tile.Stair, ...OBSTACLE];
+export const FLOOR: Tile[] = [Tile.Stair, Tile.Trapped, ...OBSTACLE];
 export enum Orientation {
   Left = 0,
   Right = 1,
