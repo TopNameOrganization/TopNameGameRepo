@@ -1,6 +1,6 @@
 import { EventBus } from '../utils/EventBus'
 import { GameAPI } from '../../../api/GameApi'
-import { RunnerAction, Tile, TileSize } from '../constants'
+import { RunnerAction, Tile, TileSize, TrapLifeTime } from '../constants'
 import { worldToMap, getTileAt, mapToWorld } from '../utils'
 import Runner from './Runner'
 import { Runner as RunnerType } from './Runner'
@@ -11,6 +11,7 @@ import {
   PositionType,
   MessageType,
   PathStepType,
+  TrapType,
 } from './types'
 import { checkCollision } from './checkCollision'
 import { Agent } from './Agent'
@@ -35,6 +36,7 @@ export class GameModel extends EventBus {
   private bonuses = 0
   private agent: Agent
   private enemies: Array<RunnerType> = []
+  private traps: Array<TrapType> = [];
 
   private _lastPressed: number // TODO: подумать где и как это xранить более лучше
 
@@ -68,7 +70,7 @@ export class GameModel extends EventBus {
           if (curr === Tile.Player) {
             player = mapToWorld({ x, y })
           }
-          if (curr === Tile.Enemy && this.enemies.length === 0) {
+          if (curr === Tile.Enemy /* && this.enemies.length === 0 */) {
             enemies.push(mapToWorld({ x, y }))
             this.enemies.push(new Runner())
           }
@@ -87,6 +89,7 @@ export class GameModel extends EventBus {
     this.player.update(player)
     enemies.forEach((runner, i) => this.enemies[i].reset(runner))
     this.bonuses = bonuses
+    this.traps = []
     if (this.inited) {
       this.dispatchUpdate()
     }
@@ -215,6 +218,7 @@ export class GameModel extends EventBus {
         this.player.setAction(RunnerAction.Stay)
         this.levelMap[y][x] = Tile.Trap
         this.dispatch(ModelEvents.UpdateWorld, { burn: { x, y } })
+        this.traps.push({ x, y, time: 0 })
       }
     }
   }
@@ -225,6 +229,17 @@ export class GameModel extends EventBus {
     if (this.time) {
       dTime = (currentTime - this.time) / 1000
     }
+
+    this.traps = this.traps
+      .map(({ x, y, time }) => ({ x, y, time: time + dTime }))
+      .filter(({ x, y, time }) => {
+        if (time > TrapLifeTime) {
+          this.levelMap[y][x] = Tile.Brick
+          this.dispatch(ModelEvents.UpdateWorld, { fixTrap: { x, y } })
+          return false;
+        }
+        return true;
+      })
 
     const newPlayerState = checkCollision(dTime, this.player)
     this.player.update(newPlayerState.position)
