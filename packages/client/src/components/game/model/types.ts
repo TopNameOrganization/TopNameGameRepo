@@ -18,6 +18,9 @@ export type RunnerInfoType = PositionType & {
 };
 
 export type LevelMapType = Tile[][];
+export type TrapType = PositionType & {
+  time: number,
+}
 
 export type GraphEdgeType = {
   action: RunnerAction,

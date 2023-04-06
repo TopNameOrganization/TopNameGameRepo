@@ -37,3 +37,5 @@ export enum AnimationPhase {
   Fall = 4,
   Freeze = 100,
 }
+
+export const TrapLifeTime = 5;

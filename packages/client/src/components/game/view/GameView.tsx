@@ -42,11 +42,13 @@ export const GameView = () => {
   const updateWorld = ({
     level,
     burn,
+    fixTrap,
     enemies,
     graph,
   }: {
     level?: LevelMapType
     burn?: PositionType
+    fixTrap?: PositionType
     enemies?: number
     graph?: PathGraphType
   }) => {
@@ -93,6 +95,14 @@ export const GameView = () => {
         const { x, y } = burn
         ctx.fillStyle = 'black'
         ctx.fillRect(x * TileSize, y * TileSize, TileSize, TileSize)
+      }
+      if (fixTrap) {
+        const { x, y } = fixTrap
+        ctx.drawImage(
+          tileSpr.getPhase(0, Tile.Brick),
+          x * TileSize,
+          y * TileSize
+        )
       }
     }
   }
