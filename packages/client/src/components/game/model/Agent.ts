@@ -22,11 +22,15 @@ export class Agent {
   }
 
   public update(dTime: number, actor: RunnerType): CheckCollisionType {
+    const atMap = worldToMap({ x: actor.x + TileSize / 2, y: actor.y + TileSize / 2 });
     if (actor.action === RunnerAction.Stay && actor.isTrapped) {
-      return {
-        position: { x: actor.x, y: actor.y },
-        phase: AnimationPhase.Stay,
+      if (actor.wait(dTime)) {
+        return {
+          position: { x: actor.x, y: actor.y },
+          phase: AnimationPhase.Stay,
+        }
       }
+      actor.escape();
     }
 
     if (!actor.target) {
@@ -34,13 +38,12 @@ export class Agent {
     }
 
     if (!actor.isTrapped && checkTrap({ x: actor.x, y: actor.y })) {
-      const atMap = worldToMap({ x: actor.x + TileSize / 2, y: actor.y + TileSize / 2 });
+      actor.setIsTrapped(true);
       actor.setPath([
         { ...atMap, action: actor.action },
         { x: atMap.x, y: atMap.y + 1, action: RunnerAction.Fall }
       ]);
       actor.targetFromPath();
-      actor.setIsTrapped(true);
     }
 
     let newPos = actor.getNextPos(dTime);

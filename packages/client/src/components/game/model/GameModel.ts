@@ -18,7 +18,6 @@ import { Agent } from './Agent'
 import { verticeId } from './buildGraph'
 import { isBrowser } from '../../../constants/is-browser'
 
-const OBSTACLE: Tile[] = [Tile.Brick, Tile.Concrete, Tile.Out]
 export class GameModel extends EventBus {
   private reader: FileReader
   private time: number
@@ -36,7 +35,8 @@ export class GameModel extends EventBus {
   private bonuses = 0
   private agent: Agent
   private enemies: Array<RunnerType> = []
-  private traps: Array<TrapType> = [];
+  private traps: Array<TrapType> = []
+  private respawn: Array<PositionType> = []
 
   private _lastPressed: number // TODO: подумать где и как это xранить более лучше
 
@@ -88,6 +88,7 @@ export class GameModel extends EventBus {
     this.agent.updateGraph(enemies)
     this.player.update(player)
     enemies.forEach((runner, i) => this.enemies[i].reset(runner))
+    this.respawn = [...enemies]
     this.bonuses = bonuses
     this.traps = []
     if (this.inited) {
@@ -251,9 +252,18 @@ export class GameModel extends EventBus {
     }
 
     const enemies = this.enemies.map(runner => {
-      const atMap = worldToMap({ x: runner.x, y: runner.y });
-      if (runner.action === RunnerAction.Stay && runner.isTrapped && getTileAt(atMap) !== Tile.Trapped) {
-        this.levelMap[atMap.y][atMap.x] = Tile.Trapped;
+      const atMap = worldToMap({ x: runner.x + TileSize / 2, y: runner.y + TileSize / 2 });
+      if (runner.action === RunnerAction.Stay && runner.isTrapped) {
+        const n = Math.floor(Math.random() * this.respawn.length)
+        switch (getTileAt(atMap)) {
+          case Tile.Trap:
+            this.levelMap[atMap.y][atMap.x] = Tile.Trapped
+            break
+          case Tile.Brick:
+            runner.reset(this.respawn[n])
+            break
+          default:
+        }
       }
       const newState = this.agent.update(dTime, runner)
       runner.update(newState.position)
