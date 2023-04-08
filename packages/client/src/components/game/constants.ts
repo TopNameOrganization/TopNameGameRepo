@@ -39,3 +39,4 @@ export enum AnimationPhase {
 }
 
 export const TrapLifeTime = 5;
+export const WaitTime = 4;

@@ -1,5 +1,5 @@
 import { PositionType, PathStepType } from "./types";
-import { RunnerAction, VELOCITY, TileSize, Orientation, AnimationPhase, Tile } from "../constants";
+import { RunnerAction, VELOCITY, TileSize, Orientation, AnimationPhase, Tile, WaitTime } from "../constants";
 import { worldToMap } from "../utils";
 
 export class Runner {
@@ -10,6 +10,8 @@ export class Runner {
   private _target: PositionType;
   private _path: Array<PathStepType> = [];
   private _isTrapped = false;
+  private waitTime = 0;
+  private escapePath: Array<PathStepType> = [];
 
   private readonly magic: number = 2;
 
@@ -37,6 +39,8 @@ export class Runner {
   public reset(pos: PositionType) {
     this.update(pos);
     this.setTarget(worldToMap(pos));
+    this._isTrapped = false;
+    this.waitTime = 0;
   }
 
   public setTarget(val: PositionType) {
@@ -56,12 +60,34 @@ export class Runner {
     }
   }
 
+  public wait(dTime: number): boolean {
+    this.waitTime += dTime;
+    if (this.waitTime >= WaitTime) {
+      this.waitTime = 0;
+      return false;
+    }
+    return true;
+  }
+
+  public escape() {
+    this._isTrapped = false;
+    this.setPath(this.escapePath);
+    this.targetFromPath();
+  }
+
   public resetAction() {
     this._action = RunnerAction.Stay;
   }
 
   public setIsTrapped(val: boolean): void {
     this._isTrapped = val;
+    if (this.isTrapped) {
+      const currentPosition = worldToMap({ x: this.x + TileSize / 2, y: this.y + TileSize / 2 });
+      this.escapePath = [
+        { ...currentPosition, action: RunnerAction.MoveUp },
+        { ...this.target, action: this.action },
+      ]
+    }
   }
 
   public getNextPos(dTime: number): PositionType {
