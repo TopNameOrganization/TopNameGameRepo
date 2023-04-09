@@ -8,7 +8,7 @@ type CommentDraftProps = {
   onChange: (emoji: Emoji) => unknown
 }
 
-const emojiListCodes = ['1F601', '1F602', '1F603', '1F604']
+const emojiListCodes = ['1F604', '1F60D', '1F621', '1F622', '1F624', '1F633']
 
 const emojiList: Emoji[] = emojiListCodes.map((code) => ({
   html: String.fromCodePoint(parseInt(code, 16)),
