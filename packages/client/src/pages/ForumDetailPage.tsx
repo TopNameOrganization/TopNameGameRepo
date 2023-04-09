@@ -8,9 +8,6 @@ import {
   CardActions,
   Box,
   Paper,
-  TextField,
-  InputAdornment,
-  Button,
 } from '@mui/material'
 import { blue } from '@mui/material/colors'
 import { Link } from 'react-router-dom'
@@ -26,10 +23,12 @@ import {
   IComment,
   ICommentDraft,
   ICommentFair,
+  OnRemove,
   OnReply,
   OnReplySubmit,
 } from '../components/forum/types'
 import { Comments } from '../components/forum/ForumComments'
+import { CommentDraft } from '../components/forum/ForumCommentDraft'
 
 const tempData = {
   id: 1,
@@ -42,6 +41,7 @@ const tempData = {
 
 const sampleComment = {
   author: {
+    id: 1234,
     name: 'John Lock',
     avatar:
       'https://leonardo.osnova.io/133d39cc-fe54-8af6-a298-7e3d9368cb8e/-/scale_crop/64x64/-/format/webp/',
@@ -56,14 +56,16 @@ const getId = () => '' + Date.now() + Math.random()
 
 const commentData: IComment[] = Array.from({ length: 3 }, (v, index) => ({
   ...sampleComment,
+  author: {
+    ...sampleComment.author,
+    id: index === 1 ? 643971 : 1234
+  },
   id: getId(),
   replies: Array.from({ length: 5 }, (v, k) => ({
     ...sampleComment,
     id: getId(),
   })),
 }))
-
-console.log('commentData', commentData)
 
 const insertDraft = (comments: IComment[], place: ICommentFair): IComment[] => {
   const result: IComment[] = []
@@ -138,6 +140,35 @@ const insertFair = (
   return result
 }
 
+const removeFair = (comments: IComment[], current: ICommentFair): IComment[] => {
+  const result: IComment[] = [];
+
+  comments.forEach((comment) => {
+    if (comment.type === CommentType.FAIR) {
+      const nextReplies = removeFair(comment.replies, current);
+
+      if (comment.id === current.id) {
+        result.push({
+          ...comment,
+          replies: nextReplies,
+          isRemoved: true,
+        });
+      } else {
+        result.push({
+          ...comment,
+          replies: nextReplies,
+        });
+      }
+    }
+
+    if (comment.type === CommentType.DRAFT) {
+      result.push(comment);
+    }
+  });
+
+  return result;
+};
+
 export const ForumDetailPage = () => {
   const [comments, setComments] = useState(commentData)
 
@@ -147,11 +178,32 @@ export const ForumDetailPage = () => {
     setComments(nextComments)
   }
 
+  const onRootSubmit: OnReplySubmit = ({ value }) => {
+    const createdComment: ICommentFair = {
+      ...sampleComment,
+      id: getId(),
+      text: value,
+    };
+
+    const nextComments = [
+      createdComment,
+      ...comments
+    ];
+
+    setComments(nextComments);
+  };
+
   const onReplySubmit: OnReplySubmit = ({ comment, value }) => {
     const nextComments = insertFair(comments, comment, value)
 
     setComments(nextComments)
   }
+
+  const onRemove: OnRemove = (comment) => {
+    const nextComments = removeFair(comments, comment);
+    
+    setComments(nextComments);
+  };
 
   return (
     <GeneralLayout>
@@ -196,24 +248,15 @@ export const ForumDetailPage = () => {
       <Box maxWidth="sm" sx={{ margin: '0 auto' }}>
         <Paper sx={{ padding: '6px' }}>
           <h4>2 комментария</h4>
-          <TextField
-            fullWidth
-            label="Write here your comment"
-            // multiline
-            // rows={4}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button variant="outlined" color="primary">
-                    Send
-                  </Button>
-                </InputAdornment>
-              ),
-            }}
+          <CommentDraft
+            onReplySubmit={onRootSubmit}
+            comment={null!}
+            label={'Write here your comment'}
           />
           <Comments
             comments={comments}
             onReply={onReply}
+            onRemove={onRemove}
             onReplySubmit={onReplySubmit}
             className={styles.commentsRoot}
           />

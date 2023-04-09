@@ -17,9 +17,24 @@
   align-items: flex-end;
   cursor: pointer;
   gap: 4px;
+  
+}
+
+.actions {
+  display: flex;
   visibility: hidden;
 }
 
-.root:hover .reply {
+.root:hover .actions {
   visibility: visible;
+}
+
+.remove {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.root.removed .text,
+.root.removed .header {
+  opacity: .6;
 }

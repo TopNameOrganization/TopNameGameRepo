@@ -76,9 +76,8 @@ export const ForumListPage = () => {
           <Box>
             <Grid container item direction={'column'} spacing={2}>
               {tempData.map(cardTopic => (
-                <Grid item>
+                <Grid item key={cardTopic.id}>
                   <ForumListCard
-                    key={cardTopic.id}
                     id={cardTopic.id}
                     nickName={cardTopic.nickName}
                     title={cardTopic.title}
