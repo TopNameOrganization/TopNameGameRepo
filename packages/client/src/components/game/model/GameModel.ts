@@ -1,6 +1,6 @@
 import { EventBus } from '../utils/EventBus'
 import { GameAPI } from '../../../api/GameApi'
-import { RunnerAction, Tile, TileSize, TrapLifeTime, DelayTime } from '../constants'
+import { RunnerAction, Tile, TileSize, TrapLifeTime, DelayTime, InitRest } from '../constants'
 import { worldToMap, getTileAt, mapToWorld } from '../utils'
 import Runner from './Runner'
 import { Runner as RunnerType } from './Runner'
@@ -27,7 +27,7 @@ export class GameModel extends EventBus {
 
   private levelNum = 0 // TODO: 24? 71!!1 108!!1 113!!1 123!!1 136!!1 141!!1 (33 65)!!1
   private score = 0
-  private rest = 5
+  private rest = InitRest
 
   private levels: Blob
   private levelMap: LevelMapType
@@ -114,8 +114,14 @@ export class GameModel extends EventBus {
   }
 
   public init() {
-    if (this.levelMap) {
-      this.dispatchUpdate()
+    if (this.rest < 0) {
+      this.levelNum = 0
+      this.rest = InitRest;
+      this.getLevel(this.levelNum)
+    } else {
+      if (this.levelMap) {
+        this.dispatchUpdate()
+      }
     }
     this.dispatch(ModelEvents.UpdateRest, this.rest)
     this.inited = true
@@ -187,10 +193,6 @@ export class GameModel extends EventBus {
     this.dispatch(ModelEvents.UpdateWorld, { vertices })
   }
 
-  public setEnemyPath(path: Array<PathStepType>) {
-    this.enemies[0].setPath(path)
-  }
-
   public dispatchUpdate(): void {
     this.paused = true
     this.dispatch(ModelEvents.UpdateWorld, {
@@ -235,12 +237,19 @@ export class GameModel extends EventBus {
     }
 
     if (this.endDelay === 0) {
+      const playerAtMap = worldToMap({
+        x: this.player.x + TileSize / 2,
+        y: this.player.y + TileSize / 2,
+      })
       this.traps = this.traps
         .map(({ x, y, time }) => ({ x, y, time: time + dTime }))
         .filter(({ x, y, time }) => {
           if (time > TrapLifeTime) {
             this.levelMap[y][x] = Tile.Brick
             this.dispatch(ModelEvents.UpdateWorld, { fixTrap: { x, y } })
+            if (x === playerAtMap.x && y === playerAtMap.y) {
+              this.replay()
+            }
             return false;
           }
           return true;
@@ -254,10 +263,6 @@ export class GameModel extends EventBus {
         phase: newPlayerState.phase,
         direction: this.player.orientation,
       }
-      const playerAtMap = worldToMap({
-        x: this.player.x + TileSize / 2,
-        y: this.player.y + TileSize / 2,
-      })
 
       const enemies = this.enemies.map(runner => {
         const atMap = worldToMap({ x: runner.x + TileSize / 2, y: runner.y + TileSize / 2 });

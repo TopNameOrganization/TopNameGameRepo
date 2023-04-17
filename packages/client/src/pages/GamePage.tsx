@@ -25,6 +25,9 @@ export const GamePage = () => {
   }
   useEffect(() => {
     GameModel.on(ModelEvents.GameOver, onOver)
+    return () => {
+      GameModel.off(ModelEvents.GameOver, onOver)
+    }
   }, [])
 
   return (

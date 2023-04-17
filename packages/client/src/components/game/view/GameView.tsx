@@ -226,6 +226,7 @@ export const GameView = () => {
     return () => {
       document.removeEventListener('keydown', onKeyDown)
       document.removeEventListener('keyup', onKeyUp)
+
       GameModel.off(ModelEvents.UpdateWorld, updateWorld)
       GameModel.off(ModelEvents.Update, drawFrame)
       GameModel.off(ModelEvents.LevelUp, updateLevel)
