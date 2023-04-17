@@ -101,6 +101,16 @@ export const checkSides = ({ x, y }: PositionType): Array<RunnerAction> => {
   if (!OBSTACLE.includes(getTileAt({ x: x + 1, y }))) {
     res.push(RunnerAction.MoveRight);
   }
+  if (getTileAt({ x, y }) === Tile.Stair) {
+    if (!OBSTACLE.includes(getTileAt({ x, y: y - 1 }))) {
+      res.push(RunnerAction.MoveUp);
+    }
+    if (!OBSTACLE.includes(getTileAt({ x, y: y + 1 }))) {
+      res.push(RunnerAction.MoveDown);
+    }
+  } else if (!OBSTACLE.includes(getTileAt({ x, y })) && getTileAt({ x, y: y + 1 }) === Tile.Stair) {
+    res.push(RunnerAction.MoveDown);
+  }
   return res;
 }
 
@@ -113,7 +123,7 @@ export const getStartNode = ({ x, y }: PositionType): NodeType => {
     return { ...atMap, actions: [RunnerAction.Fall] };
   }
   const bottom = getTileAt({ x: atMap.x, y: atMap.y + 1 });
-  if (FLOOR.includes(bottom)) {
+  if (FLOOR.includes(bottom) || getTileAt(atMap) === Tile.Rope) {
     return { ...atMap, actions: checkSides(atMap) }
   }
   return { ...atMap, actions: [] };// TODO: подумать прям ОЧ внимательно

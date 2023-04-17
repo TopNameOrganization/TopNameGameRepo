@@ -1,6 +1,6 @@
 import { EventBus } from '../utils/EventBus'
 import { GameAPI } from '../../../api/GameApi'
-import { RunnerAction, Tile, TileSize, TrapLifeTime } from '../constants'
+import { RunnerAction, Tile, TileSize, TrapLifeTime, DelayTime } from '../constants'
 import { worldToMap, getTileAt, mapToWorld } from '../utils'
 import Runner from './Runner'
 import { Runner as RunnerType } from './Runner'
@@ -37,6 +37,7 @@ export class GameModel extends EventBus {
   private enemies: Array<RunnerType> = []
   private traps: Array<TrapType> = []
   private respawn: Array<PositionType> = []
+  private endDelay = 0;
 
   private _lastPressed: number // TODO: подумать где и как это xранить более лучше
 
@@ -84,6 +85,7 @@ export class GameModel extends EventBus {
 
   public setLevel({ level, player, bonuses, enemies }: LevelType): void {
     this.time = new Date().getTime()
+    this.endDelay = 0;
     this.levelMap = level
     this.agent.updateGraph(enemies)
     this.player.update(player)
@@ -120,16 +122,18 @@ export class GameModel extends EventBus {
   }
 
   public togglePause() {
-    this.paused = !this.paused
-    this.dispatch(ModelEvents.Message, {
-      type: this.paused ? MessageType.Pause : MessageType.Hide,
-      title: 'PAUSE',
-      message: 'select action',
-      noRest: this.rest === 0,
-    })
-    if (!this.paused) {
-      this.time = new Date().getTime()
-      this.update()
+    if (this.endDelay === 0) {
+      this.paused = !this.paused
+      this.dispatch(ModelEvents.Message, {
+        type: this.paused ? MessageType.Pause : MessageType.Hide,
+        title: 'PAUSE',
+        message: 'select action',
+        noRest: this.rest === 0,
+      })
+      if (!this.paused) {
+        this.time = new Date().getTime()
+        this.update()
+      }
     }
   }
 
@@ -142,7 +146,7 @@ export class GameModel extends EventBus {
   public replay() {
     this.rest--
     if (this.rest < 0) {
-      console.log('OVER!!1')
+      this.gameOver()
     } else {
       this.dispatch(ModelEvents.UpdateRest, this.rest)
       this.getLevel(this.levelNum)
@@ -167,6 +171,7 @@ export class GameModel extends EventBus {
   }
 
   public gameOver() {
+    this.paused = true;
     this.dispatch(ModelEvents.GameOver, {
       score: this.score,
       level: this.levelNum + 1,
@@ -192,8 +197,6 @@ export class GameModel extends EventBus {
       level: this.levelMap,
       enemies: this.enemies.length,
     })
-    const { x, y } = this.enemies[0]
-    this.setVertices(verticeId(worldToMap({ x, y })))
     this.dispatch(ModelEvents.Message, {
       type: MessageType.Message,
       title: `LEVEL ${this.levelNum + 1}`,
@@ -231,79 +234,119 @@ export class GameModel extends EventBus {
       dTime = (currentTime - this.time) / 1000
     }
 
-    this.traps = this.traps
-      .map(({ x, y, time }) => ({ x, y, time: time + dTime }))
-      .filter(({ x, y, time }) => {
-        if (time > TrapLifeTime) {
-          this.levelMap[y][x] = Tile.Brick
-          this.dispatch(ModelEvents.UpdateWorld, { fixTrap: { x, y } })
-          return false;
-        }
-        return true;
+    if (this.endDelay === 0) {
+      this.traps = this.traps
+        .map(({ x, y, time }) => ({ x, y, time: time + dTime }))
+        .filter(({ x, y, time }) => {
+          if (time > TrapLifeTime) {
+            this.levelMap[y][x] = Tile.Brick
+            this.dispatch(ModelEvents.UpdateWorld, { fixTrap: { x, y } })
+            return false;
+          }
+          return true;
+        })
+
+      const newPlayerState = checkCollision(dTime, this.player)
+      this.player.update(newPlayerState.position)
+      const player = {
+        x: this.player.x,
+        y: this.player.y,
+        phase: newPlayerState.phase,
+        direction: this.player.orientation,
+      }
+      const playerAtMap = worldToMap({
+        x: this.player.x + TileSize / 2,
+        y: this.player.y + TileSize / 2,
       })
 
-    const newPlayerState = checkCollision(dTime, this.player)
-    this.player.update(newPlayerState.position)
-    const player = {
-      x: this.player.x,
-      y: this.player.y,
-      phase: newPlayerState.phase,
-      direction: this.player.orientation,
-    }
+      const enemies = this.enemies.map(runner => {
+        const atMap = worldToMap({ x: runner.x + TileSize / 2, y: runner.y + TileSize / 2 });
+        if (atMap.x === playerAtMap.x && atMap.y === playerAtMap.y) {
+          if (this.endDelay === 0) {
+            this.endDelay = dTime;
+          }
+        }
+        if (runner.action === RunnerAction.Stay && runner.isTrapped) {
+          const n = Math.floor(Math.random() * this.respawn.length)
+          switch (getTileAt(atMap)) {
+            case Tile.Trap:
+              this.levelMap[atMap.y][atMap.x] = Tile.Trapped
+              break
+            case Tile.Brick:
+              runner.reset(this.respawn[n])
+              break
+            default:
+          }
+        }
+        const newState = this.agent.update(dTime, runner)
+        runner.update(newState.position)
+        if (runner.pathIsPassed) {
+          const goal = this.agent.getNearestVertice({
+            x: this.player.x,
+            y: this.player.y,
+          })
+          this.agent.findPath(runner, goal)
+          if (!runner.isTrapped && runner.path.length === 0) {
+            const atMapId = verticeId({ x: atMap.x, y: atMap.y })
+            if (this.agent.getGraph()[atMapId]) {
+              const { x, y, edges } = this.agent.getGraph()[atMapId]
+              let action = RunnerAction.Stay;
+              const playerAtMap = worldToMap({ x: player.x, y: player.y })
+              if (x === playerAtMap.x) {
+                if (y < playerAtMap.y) {
+                  action = RunnerAction.MoveDown;
+                } else {
+                  action = RunnerAction.MoveUp;
+                }
+              } else if (y === playerAtMap.y) {
+                if (x < playerAtMap.x) {
+                  action = RunnerAction.MoveRight;
+                } else {
+                  action = RunnerAction.MoveLeft;
+                }
+              }
+              const edge = edges.filter(({ action: edgeAction }) => edgeAction === action)[0]
+              if (edge) {
+                const { vertice } = edge
+                const { x: targetX, y: targetY } = this.agent.getGraph()[vertice]
+                runner.setPath([{ x: targetX, y: targetY, action }])
+              }
+            }
+          }
+        }
+        return {
+          x: runner.x,
+          y: runner.y,
+          phase: newState.phase,
+          direction: runner.orientation,
+        }
+      })
 
-    const enemies = this.enemies.map(runner => {
-      const atMap = worldToMap({ x: runner.x + TileSize / 2, y: runner.y + TileSize / 2 });
-      if (runner.action === RunnerAction.Stay && runner.isTrapped) {
-        const n = Math.floor(Math.random() * this.respawn.length)
-        switch (getTileAt(atMap)) {
-          case Tile.Trap:
-            this.levelMap[atMap.y][atMap.x] = Tile.Trapped
-            break
-          case Tile.Brick:
-            runner.reset(this.respawn[n])
-            break
-          default:
+      if (getTileAt(playerAtMap) === Tile.Bonus) {
+        this.dispatch(ModelEvents.UpdateWorld, { burn: playerAtMap })
+        this.levelMap[playerAtMap.y][playerAtMap.x] = Tile.Empty
+        this.bonuses--
+        this.score += 100
+        this.dispatch(ModelEvents.UpdateScore, this.score)
+        if (this.bonuses === 0) {
+          this.levelNum++
+          this.getLevel(this.levelNum)
+
+          this.dispatch(ModelEvents.LevelUp, this.levelNum)
+          return
         }
       }
-      const newState = this.agent.update(dTime, runner)
-      runner.update(newState.position)
-      if (runner.pathIsPassed) {
-        const goal = this.agent.getNearestVertice({
-          x: this.player.x,
-          y: this.player.y,
-        })
-        this.agent.findPath(runner, goal)
-      }
-      return {
-        x: runner.x,
-        y: runner.y,
-        phase: newState.phase,
-        direction: runner.orientation,
-      }
-    })
 
-    const playerAtMap = worldToMap({
-      x: this.player.x + TileSize / 2,
-      y: this.player.y + TileSize / 2,
-    })
-    if (getTileAt(playerAtMap) === Tile.Bonus) {
-      this.dispatch(ModelEvents.UpdateWorld, { burn: playerAtMap })
-      this.levelMap[playerAtMap.y][playerAtMap.x] = Tile.Empty
-      this.bonuses--
-      this.score += 100
-      this.dispatch(ModelEvents.UpdateScore, this.score)
-      if (this.bonuses === 0) {
-        this.levelNum++
-        this.getLevel(this.levelNum)
+      this.time = currentTime
 
-        this.dispatch(ModelEvents.LevelUp, this.levelNum)
-        return
+      this.dispatch(ModelEvents.Update, { dTime, player, enemies })
+    } else {
+      this.endDelay += dTime
+      if (this.endDelay >= DelayTime) {
+        this.endDelay = 0;
+        this.replay()
       }
     }
-
-    this.time = currentTime
-
-    this.dispatch(ModelEvents.Update, { dTime, player, enemies })
     if (!this.paused) {
       requestAnimationFrame(this.update.bind(this))
     }

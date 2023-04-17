@@ -37,10 +37,11 @@ export class Runner {
   }
 
   public reset(pos: PositionType) {
+    this.waitTime = 0;
+    this._isTrapped = false;
+    this._path = [];
     this.update(pos);
     this.setTarget(worldToMap(pos));
-    this._isTrapped = false;
-    this.waitTime = 0;
   }
 
   public setTarget(val: PositionType) {
