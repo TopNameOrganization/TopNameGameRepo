@@ -23,8 +23,6 @@ export const find = (start: string, end: string, graph: PathGraphType): Array<Pa
             vertice = visited[vertice.parent];
           }
           path.reverse();
-          // пусть пока будет, для оценки шустрости поиска
-          console.log(`FOUND IN ${new Date().getTime() - iTime}`);
           return path;
         }
         edges.forEach(({ cost, action, vertice }) => {
