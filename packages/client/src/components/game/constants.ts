@@ -38,6 +38,7 @@ export enum AnimationPhase {
   Freeze = 100,
 }
 
+export const InitRest = 5;
 export const TrapLifeTime = 5;
 export const WaitTime = 4;
 export const DelayTime = 3;
