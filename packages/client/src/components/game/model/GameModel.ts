@@ -10,7 +10,6 @@ import {
   ModelEvents,
   PositionType,
   MessageType,
-  PathStepType,
   TrapType,
 } from './types'
 import { checkCollision } from './checkCollision'
