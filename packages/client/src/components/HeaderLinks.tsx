@@ -28,6 +28,12 @@ export const HeaderLinks = () => {
         to={ROUTES.leaderBoard}
         component={Link}
       />
+      <Tab
+        label="Forum"
+        value={ROUTES.forum}
+        to={ROUTES.forum}
+        component={Link}
+      />
     </Tabs>
   )
 }
