@@ -20,10 +20,7 @@ export const RootPage = () => {
             width: '100%',
             height: 'calc(100% - 87.51px)',
             objectFit: 'contain',
-            backgroundColor: 'black',
-            // position: 'absolute',
-            // top: 0,
-            // left: 0,
+            backgroundColor: 'black'
           }}
         />
         <Box onClick={() => navigate(ROUTES.game)}
