@@ -2,11 +2,14 @@ import { Box, Button, Typography } from '@mui/material'
 import { GeneralLayout } from '../layouts'
 import videoBg from '../assets/landingVideo/videoBg.mp4'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '../constants/routes'
 
 export const RootPage = () => {
+  const navigate = useNavigate()
   return (
     <GeneralLayout>
-      <div>
+      <>
         <video
           src={videoBg}
           autoPlay
@@ -15,17 +18,18 @@ export const RootPage = () => {
           preload="auto"
           style={{
             width: '100%',
-            // height: '90vh',
-            backgroundSize: 'contain',
+            height: 'calc(100% - 87.51px)',
+            objectFit: 'contain',
+            backgroundColor: 'black',
             // position: 'absolute',
             // top: 0,
             // left: 0,
           }}
         />
-        <Box
+        <Box onClick={() => navigate(ROUTES.game)}
           sx={{
             position: 'absolute',
-            top: '546px',
+            top: '50%',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -41,7 +45,7 @@ export const RootPage = () => {
                 backgroundColor: 'transparent',
               },
             }}>
-            <PlayArrowIcon
+            <PlayArrowIcon 
               sx={{
                 color: 'white',
                 height: '400px',
@@ -49,7 +53,7 @@ export const RootPage = () => {
               }}
             />
           </Button>
-          <Button
+          <Button 
             disableRipple={true}
             sx={{
               color: 'white',
@@ -64,7 +68,7 @@ export const RootPage = () => {
             </Typography>
           </Button>
         </Box>
-      </div>
+      </>
     </GeneralLayout>
   )
 }

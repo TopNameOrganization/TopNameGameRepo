@@ -11,7 +11,7 @@ import { Footer } from '../components/Footer'
 export const GeneralLayout = ({ children }: { children: React.ReactNode }) => {
   const auth = useAuth()
   return (
-    <Box sx={{ flexGrow: 1, minHeight: '100vh' }} component="main">
+    <Box sx={{ flexGrow: 1, height: '100vh' }} component="main">
       <AppBar position="static">
         <Toolbar
           variant="dense"
