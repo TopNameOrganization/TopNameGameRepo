@@ -1,8 +1,8 @@
 import axios, { AxiosInstance, CreateAxiosDefaults } from 'axios'
 import { setAdapterForSSR } from './api-ssr-adapter'
 
-const baseURLYandex = 'https://ya-praktikum.tech/api/v2'
-const baseURLServer = 'http://localhost:3001/api/forum'
+const baseURLYandex = '/api/v2'
+const baseURLServer = '/api/forum'
 const baseURLLocal = '';
 
 const instances: Record<string, AxiosInstance> = {};
