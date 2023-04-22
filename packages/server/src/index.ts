@@ -6,6 +6,7 @@ import type { ViteDevServer } from 'vite';
 import express from 'express'
 import * as fs from 'fs'
 import * as path from 'path'
+import { createProxyMiddleware } from 'http-proxy-middleware'
 
 import router from './router'
 import { dbConnect } from './db'
@@ -58,6 +59,17 @@ function startServer() {
       app.use('/game', express.static(gamePath))
       app.use('/images', express.static(imagesPath))
     }
+
+    app.use(
+      '/api/v2',
+      createProxyMiddleware({
+        changeOrigin: true,
+        cookieDomainRewrite: {
+          '*': '',
+        },
+        target: 'https://ya-praktikum.tech',
+      })
+    );
 
     app.use('*', async (req, res, next) => {
       const url = req.originalUrl;
