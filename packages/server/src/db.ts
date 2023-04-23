@@ -8,7 +8,7 @@ const { POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_PORT } =
   process.env
 
 const sequelizeOptions: SequelizeOptions = {
-  host: 'localhost',
+  host: process.env.NODE_ENV === 'production' ? process.env.POSTGRES_HOST : 'localhost',
   port: Number(POSTGRES_PORT),
   username: POSTGRES_USER,
   password: POSTGRES_PASSWORD,
@@ -16,6 +16,8 @@ const sequelizeOptions: SequelizeOptions = {
   dialect: 'postgres',
   models,
 };
+
+console.log('sequelizeOptions ', sequelizeOptions)
 
 export const sequelize = new Sequelize(sequelizeOptions);
 
