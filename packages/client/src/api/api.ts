@@ -2,10 +2,12 @@ import axios, { AxiosInstance, CreateAxiosDefaults } from 'axios'
 import { setAdapterForSSR } from './api-ssr-adapter'
 
 const baseURLYandex = '/api/v2'
-const baseURLServer = '/api/forum'
-const baseURLLocal = '';
+const baseURLTopic = '/api/forum'
+const baseURLTheme = '/api/theme'
+const baseURLMessage = '/api/message'
+const baseURLLocal = ''
 
-const instances: Record<string, AxiosInstance> = {};
+const instances: Record<string, AxiosInstance> = {}
 
 const getInstance = (baseURL: string) => {
   if (!instances[baseURL]) {
@@ -23,14 +25,16 @@ const getInstance = (baseURL: string) => {
         window.location.href = '/#/login'
       }
       throw error
-    });
+    })
 
-    setAdapterForSSR(instances[baseURL]);
+    setAdapterForSSR(instances[baseURL])
   }
 
   return instances[baseURL]
 }
 
 export const api = getInstance(baseURLYandex)
-export const apiServer = getInstance(baseURLServer)
+export const apiTopic = getInstance(baseURLTopic)
+export const apiMessage = getInstance(baseURLMessage)
+export const apiTheme = getInstance(baseURLTheme)
 export const apiFile = getInstance(baseURLLocal)

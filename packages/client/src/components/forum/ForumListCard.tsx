@@ -8,46 +8,61 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import { blue } from '@mui/material/colors'
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import CommentIcon from '@mui/icons-material/Comment'
 import { ROUTES } from '../../constants'
 import { Link } from 'react-router-dom'
+import { useAppActions } from '../../hooks/redux'
+import { useAuth } from '../../context/AuthContext'
 
 interface FormListCardProps {
   id: number
   nickName: string
-  avatarUrl?: string
   title: string
   shortDescription?: string
+  likes: number[]
 }
 
 const FormListCard = ({
   id,
   nickName,
-  avatarUrl = '',
   title,
   shortDescription = '',
+  likes,
 }: FormListCardProps) => {
-  const [expanded, setExpanded] = React.useState(false)
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded)
-  }
+  const { user } = useAuth()
+  const { likeForumTopicAction, getForumTopics, getForumTopic } =
+    useAppActions()
 
   const onFavorite = (event: React.SyntheticEvent) => {
     event.preventDefault()
+    if (user.data?.id) {
+      likeForumTopicAction({
+        data: { topicId: id, ownerId: user.data?.id },
+        onSuccess: () => {
+          getForumTopics()
+          getForumTopic({ id })
+        },
+      })
+    }
   }
 
-  const onComment = (event: React.SyntheticEvent) => {
-    event.preventDefault()
-  }
+  const avatarDummy = React.useMemo(() => {
+    const nickArr = nickName.split(' ')
+    const name =
+      nickArr.length === 2
+        ? `${nickArr[0][0]}${nickArr[1][0]}`
+        : `${nickArr[0][0]}${nickArr[0][1]}`
+    return name.toLocaleUpperCase()
+  }, [])
+
+  const color = user.data?.id && likes.includes(user.data?.id) ? 'red' : 'gray'
 
   return (
-    <Link to={ROUTES.forumDetail} style={{ textDecoration: 'none' }}>
+    <Link to={`${ROUTES.forum}/${id}`} style={{ textDecoration: 'none' }}>
       <Card>
         <CardHeader
           avatar={
             <Avatar sx={{ bgcolor: blue[500] }} aria-label="recipe">
-              LR
+              {avatarDummy}
             </Avatar>
           }
           title={title}
@@ -60,10 +75,7 @@ const FormListCard = ({
         </CardContent>
         <CardActions disableSpacing>
           <IconButton aria-label="add to favorites" onClick={onFavorite}>
-            <FavoriteIcon />
-          </IconButton>
-          <IconButton aria-label="comment" onClick={onComment}>
-            <CommentIcon />
+            <FavoriteIcon sx={{ color }} />
           </IconButton>
         </CardActions>
       </Card>

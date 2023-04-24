@@ -1,5 +1,6 @@
 import { styled, Switch } from '@mui/material'
 import { useCustomTheme } from '../context/ThemeProvider'
+import React from 'react'
 
 const MUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,

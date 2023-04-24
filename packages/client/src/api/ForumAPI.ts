@@ -1,20 +1,21 @@
 import { AxiosResponse } from 'axios'
-import { ForumTopicData } from './types';
-import { apiServer } from './api';
+import { ForumTopicData, LikeRequest } from './types'
+import { apiTopic } from './api'
 
 export class ForumAPI {
   static addTopic = (data: ForumTopicData) =>
-    apiServer.post<string, AxiosResponse<string>>('/', data)
-      .then((res) => res)
-      .catch((err) => console.log(err));
+    apiTopic.post<string, AxiosResponse<string>>('/', data).then(res => res)
 
   static getTopic = ({ id }: { id: number }) =>
-    apiServer.get<string, AxiosResponse<ForumTopicData>>(`/`, { params: { id } })
-      .then((res) => res)
-      .catch((err) => console.log(err));
+    apiTopic
+      .get<string, AxiosResponse<ForumTopicData>>(`/`, { params: { id } })
+      .then(res => res)
 
   static getTopicList = () =>
-    apiServer.get<string, AxiosResponse<ForumTopicData[]>>(`/all`)
-      .then((res) => res)
-      .catch((err) => console.log(err));
+    apiTopic
+      .get<string, AxiosResponse<ForumTopicData[]>>(`/all`)
+      .then(res => res)
+
+  static likeTopic = (data: LikeRequest) =>
+    apiTopic.post<string, AxiosResponse<string>>('/like', data).then(res => res)
 }

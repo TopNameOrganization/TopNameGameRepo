@@ -1,47 +1,60 @@
-import { Model, Table, Column, DataType, AutoIncrement, PrimaryKey } from 'sequelize-typescript';
-import { CreateRequest } from './types';
+import {
+  Model,
+  Table,
+  Column,
+  DataType,
+  AutoIncrement,
+  PrimaryKey,
+} from 'sequelize-typescript'
+import { CreateTopicRequest } from './types'
 
 @Table({
   timestamps: false,
   paranoid: true,
-  tableName: 'topic'
+  tableName: 'topic',
 })
-export class Topic extends Model<CreateRequest> {
+export class Topic extends Model<CreateTopicRequest> {
   @AutoIncrement
   @PrimaryKey
   @Column({
     type: DataType.INTEGER,
-    field: 'id'
+    field: 'id',
   })
-  override id: number;
+  override id: number
 
   @Column({
     type: DataType.STRING,
-    field: 'nickName'
+    field: 'nickName',
   })
-  nickName: string;
+  nickName: string
 
   @Column({
     type: DataType.STRING,
-    field: 'title'
+    field: 'title',
   })
-  title: string;
+  title: string
 
   @Column({
     type: DataType.STRING,
-    field: 'shortDescription'
+    field: 'shortDescription',
   })
-  shortDescription: string;
+  shortDescription: string
 
   @Column({
     type: DataType.STRING,
-    field: 'message'
+    field: 'message',
   })
-  message: string;
+  message: string
 
   @Column({
     type: DataType.STRING,
-    field: 'avatarUrl'
+    field: 'avatarUrl',
   })
-  avatarUrl: string;
+  avatarUrl: string
+
+  @Column({
+    type: DataType.ARRAY(DataType.INTEGER),
+    field: 'likes',
+  })
+  likes: number[]
 }

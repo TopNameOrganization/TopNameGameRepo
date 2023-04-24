@@ -1,7 +1,16 @@
+.root {
+  border-bottom: 1px solid gray;
+  padding-top: 16px;
+  padding-bottom: 4px;
+}
+
 .header {
   display: flex;
   align-items: center;
+  color: gray;
+  font-size: 14px;
 }
+
 .img {
   width: 40px;
   height: 40px;
@@ -17,7 +26,6 @@
   align-items: flex-end;
   cursor: pointer;
   gap: 4px;
-  
 }
 
 .actions {
@@ -36,5 +44,5 @@
 
 .root.removed .text,
 .root.removed .header {
-  opacity: .6;
+  opacity: 0.6;
 }

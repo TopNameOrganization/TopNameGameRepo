@@ -38,14 +38,14 @@ export interface UserPasswordData {
 }
 
 export interface LeaderData {
-  id: number | null,
-  name: string,
-  score: number,
-  level: number,
+  id: number | null
+  name: string
+  score: number
+  level: number
 }
 
 export interface OAuthData {
-  code: string,
+  code: string
   redirect_uri: string
 }
 
@@ -54,10 +54,30 @@ export interface serviceIdData {
 }
 
 export interface ForumTopicData {
-  id?: number,
-  nickName: string,
+  id?: number
+  nickName: string
   title: string
-  avatarUrl?: string,
-  shortDescription?: string,
-  message?: string,
+  avatarUrl?: string
+  shortDescription?: string
+  message?: string
+  likes: number[]
+}
+
+export interface ForumMessageData {
+  id?: number
+  topicId: number
+  ownerId: number
+  nickName: string
+  message: string
+}
+
+export interface ThemeData {
+  id?: number
+  theme: 'light' | 'dark'
+  userId: number
+}
+
+export type LikeRequest = {
+  topicId: number
+  ownerId: number
 }
