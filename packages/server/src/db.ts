@@ -17,8 +17,6 @@ const sequelizeOptions: SequelizeOptions = {
   models,
 };
 
-console.log('sequelizeOptions ', sequelizeOptions)
-
 export const sequelize = new Sequelize(sequelizeOptions);
 
 export async function dbConnect() {
