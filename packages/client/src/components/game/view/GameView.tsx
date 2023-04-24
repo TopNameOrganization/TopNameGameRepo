@@ -20,11 +20,9 @@ import { Sprite } from './sprite'
 import { tileCfg } from './spriteConfigs'
 import { playerCfg } from './spriteConfigs'
 import { enemyCfg } from './spriteConfigs'
-import { FPS } from './fps'
 
 const width = 32 * TileSize
 const height = 22 * TileSize
-const fps = new FPS()
 
 export const GameView = () => {
   const [level, setLevel] = useState<number>(1)
@@ -127,8 +125,6 @@ export const GameView = () => {
         })
       }
     }
-
-    fps.updateTime(data.dTime)
   }
 
   const updateLevel = (n: number) => {

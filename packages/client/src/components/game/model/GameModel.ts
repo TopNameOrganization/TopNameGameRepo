@@ -113,6 +113,7 @@ export class GameModel extends EventBus {
   }
 
   public init() {
+    this.time = 0;
     if (this.rest < 0) {
       this.levelNum = 0
       this.rest = InitRest;
@@ -181,15 +182,6 @@ export class GameModel extends EventBus {
       score: this.score,
       level: this.levelNum + 1,
     })
-  }
-
-  public setVertices(id: string) {
-    const { edges } = this.agent.getGraph()[id]
-    const vertices = edges.map(({ action, vertice }) => {
-      const { x, y } = this.agent.getGraph()[vertice]
-      return { x, y, action }
-    })
-    this.dispatch(ModelEvents.UpdateWorld, { vertices })
   }
 
   public dispatchUpdate(): void {

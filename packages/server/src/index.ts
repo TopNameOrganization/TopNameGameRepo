@@ -6,7 +6,7 @@ import type { ViteDevServer } from 'vite';
 import express from 'express'
 import * as fs from 'fs'
 import * as path from 'path'
-import { createProxyMiddleware } from 'http-proxy-middleware'
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware'
 
 import router from './router'
 import { dbConnect } from './db'
@@ -68,6 +68,7 @@ function startServer() {
           '*': '',
         },
         target: 'https://ya-praktikum.tech',
+        onProxyReq: fixRequestBody,
       })
     );
 
