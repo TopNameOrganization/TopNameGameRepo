@@ -80,6 +80,5 @@ export const buildGraph = (init: Array<PositionType> = []): PathGraphType => {
     };
     nodes.shift();
   }
-  console.log(`DEPTH ${depth} BUILT IN ${new Date().getTime() - iTime}`);
   return res;
 }
