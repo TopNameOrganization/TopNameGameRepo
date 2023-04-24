@@ -9,39 +9,33 @@ import {
 } from '@mui/material'
 import { GeneralLayout } from '../layouts'
 import SearchIcon from '@mui/icons-material/Search'
-import ForumListCard from '../components/forum/ForumListCard'
 import AddIcon from '@mui/icons-material/Add'
 import { ROUTES } from '../constants'
 import { Link } from 'react-router-dom'
-
-const tempData = [
-  {
-    id: 1,
-    nickName: 'Первый комментатор',
-    avatarUrl: '',
-    title: 'topic',
-    shortDescription:
-      'Допустим здесь будет выводиться какое-то количество текста из описания топика. При нажатии на эту карточку будет открыться страница, с полным описанием и деревом комментариев, надо не забыть сделать в формочке отдельно инпут для описания, отдельный для тайтла',
-  },
-  {
-    id: 2,
-    nickName: 'Самый добрый комментатор',
-    avatarUrl: '',
-    title: 'topic2',
-    shortDescription:
-      '1. Нужно сделать кликабельную карточку 2. Счетчики комментариев и лайков 3.Компонент для DetailPage 4.Хедер - закрепить, футер перекрывает 3 карточку 5. Поправить верстку для этой страницы (задать высоту карточке, чтобы ограничить shortDescription)',
-  },
-  // {
-  //   id: 3,
-  //   nickName: 'Olya',
-  //   avatarUrl: '',
-  //   title: 'topic3',
-  //   shortDescription:
-  //     'По менюшке с тремя точками наверное можно сделать открыть, оставить комментарий или вообще убрать ее',
-  // },
-]
+import { useAppActions, useAppSelector } from '../hooks/redux'
+import { useEffect, useMemo, useState } from 'react'
+import ForumListCard from '../components/forum/ForumListCard'
 
 export const ForumListPage = () => {
+  const { getForumTopics } = useAppActions()
+  const { topics: data } = useAppSelector(state => state.forumTopicReducer)
+
+  const [search, setSearch] = useState<string>('')
+
+  const handleSearchChange = (event: React.ChangeEvent<any>) => {
+    setSearch(event.target.value)
+  }
+
+  const filteredData = useMemo(() => {
+    return data.filter(
+      el => el.title.includes(search) || el.shortDescription?.includes(search)
+    )
+  }, [data, search])
+
+  useEffect(() => {
+    getForumTopics()
+  }, [])
+
   return (
     <GeneralLayout>
       <Container sx={{ margin: '0 auto' }} maxWidth="sm">
@@ -55,6 +49,8 @@ export const ForumListPage = () => {
             <TextField
               label="Search forum topics"
               fullWidth
+              value={search}
+              onChange={handleSearchChange}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -64,8 +60,8 @@ export const ForumListPage = () => {
               }}
             />
             <Button
-            component={Link}
-            to={ROUTES.forumCreate}
+              component={Link}
+              to={ROUTES.forumCreate}
               variant="outlined"
               color="primary"
               sx={{ minWidth: '200px', ml: 1 }}>
@@ -75,14 +71,14 @@ export const ForumListPage = () => {
           </Box>
           <Box>
             <Grid container item direction={'column'} spacing={2}>
-              {tempData.map(cardTopic => (
+              {filteredData.map(cardTopic => (
                 <Grid item key={cardTopic.id}>
                   <ForumListCard
-                    id={cardTopic.id}
+                    id={cardTopic.id!}
                     nickName={cardTopic.nickName}
                     title={cardTopic.title}
                     shortDescription={cardTopic.shortDescription}
-                    avatarUrl={cardTopic.avatarUrl}
+                    likes={cardTopic.likes}
                   />
                 </Grid>
               ))}

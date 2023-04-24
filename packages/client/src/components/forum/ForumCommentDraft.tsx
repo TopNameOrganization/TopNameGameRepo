@@ -1,30 +1,48 @@
 import { TextField, InputAdornment, Button } from '@mui/material'
 import { useState } from 'react'
-import { ICommentDraft, OnReplySubmit } from './types'
 import { ForumReplyEmoji, Emoji } from './ForumReplyEmoji'
+import { useAuth } from '../../context/AuthContext'
+import { useAppActions } from '../../hooks/redux'
 
 type CommentDraftProps = {
-  comment: ICommentDraft
-  onReplySubmit: OnReplySubmit
-  label?: string;
+  topicId: number
+  label?: string
 }
 
 export const CommentDraft = ({
-  comment,
-  onReplySubmit,
+  topicId,
   label,
 }: CommentDraftProps): JSX.Element => {
+  const { user } = useAuth()
+  const { createForumMessageAction, getForumMessages } = useAppActions()
   const [value, setValue] = useState('')
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value)
   }
 
+  const handleCreateMessage = () => {
+    if (user.data) {
+      createForumMessageAction({
+        data: {
+          topicId,
+          ownerId: user.data.id!,
+          nickName:
+            user.data.display_name! ||
+            `${user.data.first_name} ${user.data.second_name}`,
+          message: value,
+        },
+        onSuccess: () => {
+          setValue('')
+          getForumMessages({ topicId })
+        },
+      })
+    }
+  }
+
   const onChangeEmoji = (emoji: Emoji) => {
-    console.log('onChangeEmoji', emoji);
-    console.log({ emoji });
-    setValue(value + ' ' + emoji.html);
-  };
+    setValue(value + ' ' + emoji.html)
+  }
 
   return (
     <TextField
@@ -39,7 +57,8 @@ export const CommentDraft = ({
               sx={{ marginLeft: '6px' }}
               variant="outlined"
               color="primary"
-              onClick={() => onReplySubmit({ comment, value })}>
+              disabled={!value}
+              onClick={handleCreateMessage}>
               Send
             </Button>
           </InputAdornment>

@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
-import { forumTopicService } from '../services/forumTopic.service'
+import { forumMessageService } from '../services/forumMessage.service'
 
-export class ForumTopicAPI {
+export class ForumMessageAPI {
   public static createOrUpdate = async (
     request: Request,
     response: Response,
@@ -9,7 +9,7 @@ export class ForumTopicAPI {
   ) => {
     const { body } = request
     try {
-      await forumTopicService.createOrUpdate(body)
+      await forumMessageService.createOrUpdate(body)
       response.json('ok')
     } catch (e) {
       next(e)
@@ -22,7 +22,7 @@ export class ForumTopicAPI {
     next: NextFunction
   ) => {
     const { query } = request
-    const found = await forumTopicService.find(query)
+    const found = await forumMessageService.find(query)
     if (found) {
       response.json({ ...found.dataValues })
     } else {
@@ -31,22 +31,14 @@ export class ForumTopicAPI {
   }
 
   public static findAll = async (request: Request, response: Response) => {
-    console.log(request.body)
-    const res = await forumTopicService.findAll()
+    console.log(request)
+    const { query } = request
+    const res = await forumMessageService.findAll(query)
     response.json(res)
   }
 
-  public static like = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) => {
-    const { body } = request
-    try {
-      await forumTopicService.like(body)
-      response.json('ok')
-    } catch (e) {
-      next(e)
-    }
+  public static delete = async (request: Request) => {
+    const { query } = request
+    await forumMessageService.delete(query)
   }
 }

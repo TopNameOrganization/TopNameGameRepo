@@ -16,15 +16,15 @@ function App() {
   }, [])
 
   return (
-    <CustomThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <ErrorBoundary msg={<DefaultStub />}>
-          <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary msg={<DefaultStub />}>
+        <AuthProvider>
+          <CustomThemeProvider>
             <Router />
-          </AuthProvider>
-        </ErrorBoundary>
-      </QueryClientProvider>
-    </CustomThemeProvider>
+          </CustomThemeProvider>
+        </AuthProvider>
+      </ErrorBoundary>
+    </QueryClientProvider>
   )
 }
 

@@ -7,20 +7,16 @@ import { ROUTES } from '../constants'
 export const HeaderLinks = () => {
   const routeMatch = useRouteMatch(Object.values(ROUTES))
   const currentTab = routeMatch?.pattern?.path
-  const possibleTabs = [
-    ROUTES.game,
-    ROUTES.leaderBoard,
-  ];
+  const possibleTabs = [ROUTES.game, ROUTES.leaderBoard, ROUTES.forum]
 
-  const value = possibleTabs.includes(currentTab!) ? currentTab : false;
+  const value = possibleTabs.includes(currentTab!) ? currentTab : false
 
   return (
     <Tabs
       TabIndicatorProps={{ style: { background: '#fff' } }}
       value={value}
       textColor="inherit"
-      centered
-    >
+      centered>
       <Tab label="Game" value={ROUTES.game} to={ROUTES.game} component={Link} />
       <Tab
         label="Leader board"

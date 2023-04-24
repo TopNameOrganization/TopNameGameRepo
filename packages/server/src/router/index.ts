@@ -1,7 +1,11 @@
-import { Router } from 'express';
-import { topicRoutes } from './forumTopic';
+import { Router } from 'express'
+import { topicRoutes } from './forumTopic'
+import { messageRoutes } from './forumMessage'
+import { themeRoutes } from './theme'
 
-const router: Router = Router();
-topicRoutes(router);
+const router: Router = Router()
+topicRoutes(router)
+messageRoutes(router)
+themeRoutes(router)
 
-export default router;
+export default router

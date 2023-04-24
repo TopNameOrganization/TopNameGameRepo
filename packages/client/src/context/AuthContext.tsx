@@ -1,10 +1,10 @@
-import { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode } from 'react'
 import { AxiosResponse } from 'axios'
 import { useMutation, useQuery, UseMutateFunction } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { AuthAPI } from '../api/AuthApi'
 import { SigninData, SignupData, User } from '../api/types'
-import { ROUTES } from "../constants";
+import { ROUTES } from '../constants'
 
 interface AuthData<T> {
   data: T
@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signInWithYandex: {
       action: signInWithYandex,
       isLoading: signInWithYandexIsLoading,
-      error: signInWithYandexError
+      error: signInWithYandexError,
     },
   }
 
