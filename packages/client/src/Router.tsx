@@ -16,6 +16,7 @@ export const Router = () => {
         <Route path={ROUTES.game} element={<Pages.GamePage />} />
         <Route path={ROUTES.profile} element={<Pages.ProfilePage />} />
         <Route path={ROUTES.leaderBoard} element={<Pages.LeaderBoardPage />} />
+        <Route path={ROUTES.levelEditor} element={<Pages.LevelEditorPage />} />
         <Route path={ROUTES.forum} element={<Pages.ForumLayoutPage />} >
           <Route index element={<Pages.ForumListPage />} />
           <Route path={ROUTES.forumCreate} element={<Pages.ForumCreatePage />} />
