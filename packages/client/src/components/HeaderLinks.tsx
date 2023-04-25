@@ -25,6 +25,12 @@ export const HeaderLinks = () => {
         component={Link}
       />
       <Tab
+        label="Level editor"
+        value={ROUTES.levelEditor}
+        to={ROUTES.levelEditor}
+        component={Link}
+      />
+      <Tab
         label="Forum"
         value={ROUTES.forum}
         to={ROUTES.forum}

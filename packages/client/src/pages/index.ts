@@ -1,4 +1,5 @@
 export { LeaderBoardPage } from './LeaderBoardPage'
+export { LevelEditorPage } from './LevelEditorPage'
 export { NotFoundPage } from './NotFoundPage'
 export { ProfilePage } from './ProfilePage'
 export { RootPage } from './RootPage'

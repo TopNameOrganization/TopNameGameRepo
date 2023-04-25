@@ -52,32 +52,33 @@ export class GameModel extends EventBus {
         this.getLevel(this.levelNum)
       })
 
-      this.reader = new FileReader()
+      this.reader = new FileReader();
       this.reader.addEventListener('loadend', () => {
-        const data = new Int8Array(this.reader.result as ArrayBuffer)
-        const level: LevelMapType = []
-        let player = { x: 0, y: 0 }
-        const enemies: Array<PositionType> = []
-        this.enemies = []
+        const data = new Int8Array(this.reader.result as ArrayBuffer);
+        //
+        const level: LevelMapType = [];
+        let player = { x: 0, y: 0 };
+        const enemies: Array<PositionType> = [];
+        this.enemies = [];
         const bonuses = data.reduce((prev, curr, i) => {
-          const x = i % 32
-          const y = Math.floor(i / 32)
+          const x = i % 32;
+          const y = Math.floor(i / 32);
           if (!level[y]) {
-            level[y] = []
+            level[y] = [];
           }
-          level[y][x] =
-            curr === Tile.Enemy || curr === Tile.Player ? Tile.Empty : curr
+          level[y][x] = (curr === Tile.Enemy || curr === Tile.Player) ? Tile.Empty : curr;
           if (curr === Tile.Player) {
-            player = mapToWorld({ x, y })
+            player = mapToWorld({ x, y });
           }
-          if (curr === Tile.Enemy /* && this.enemies.length === 0 */) {
-            enemies.push(mapToWorld({ x, y }))
-            this.enemies.push(new Runner())
+          if (curr === Tile.Enemy && this.enemies.length === 0) {
+            enemies.push(mapToWorld({ x, y }));
+            this.enemies.push(new Runner());
           }
-          return curr === Tile.Bonus ? prev + 1 : prev
-        }, 0)
-        this.setLevel({ level, player, bonuses, enemies })
-      })
+          return curr === Tile.Bonus ? prev + 1 : prev;
+        }, 0);
+        //
+        this.setLevel({ level, player, bonuses, enemies });
+      });
       // ---
     }
   }
