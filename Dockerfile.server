@@ -12,8 +12,7 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN npm i -g npm
-RUN npm i -g lerna
+RUN npm i lerna
 
 RUN yarn lerna bootstrap
 RUN yarn build --scope=client
