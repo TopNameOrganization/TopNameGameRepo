@@ -37,6 +37,8 @@ export class GameModel extends EventBus {
   private traps: Array<TrapType> = []
   private respawn: Array<PositionType> = []
   private endDelay = 0;
+  private custom = false;
+  private _customLevel: Int8Array
 
   private _lastPressed: number // TODO: подумать где и как это xранить более лучше
 
@@ -55,32 +57,39 @@ export class GameModel extends EventBus {
       this.reader = new FileReader();
       this.reader.addEventListener('loadend', () => {
         const data = new Int8Array(this.reader.result as ArrayBuffer);
-        //
-        const level: LevelMapType = [];
-        let player = { x: 0, y: 0 };
-        const enemies: Array<PositionType> = [];
-        this.enemies = [];
-        const bonuses = data.reduce((prev, curr, i) => {
-          const x = i % 32;
-          const y = Math.floor(i / 32);
-          if (!level[y]) {
-            level[y] = [];
-          }
-          level[y][x] = (curr === Tile.Enemy || curr === Tile.Player) ? Tile.Empty : curr;
-          if (curr === Tile.Player) {
-            player = mapToWorld({ x, y });
-          }
-          if (curr === Tile.Enemy && this.enemies.length === 0) {
-            enemies.push(mapToWorld({ x, y }));
-            this.enemies.push(new Runner());
-          }
-          return curr === Tile.Bonus ? prev + 1 : prev;
-        }, 0);
-        //
-        this.setLevel({ level, player, bonuses, enemies });
+        this.parseLevel(data)
       });
       // ---
     }
+  }
+
+  public parseLevel(data: Int8Array, custom = false) {
+    this.custom = custom
+    if (this.custom) {
+      this._customLevel = data;
+    }
+    const level: LevelMapType = [];
+    let player = { x: 0, y: 0 };
+    const enemies: Array<PositionType> = [];
+    this.enemies = [];
+    const bonuses = data.reduce((prev, curr, i) => {
+      const x = i % 32;
+      const y = Math.floor(i / 32);
+      if (!level[y]) {
+        level[y] = [];
+      }
+      level[y][x] = (curr === Tile.Enemy || curr === Tile.Player) ? Tile.Empty : curr;
+      if (curr === Tile.Player) {
+        player = mapToWorld({ x, y });
+      }
+      if (curr === Tile.Enemy) {
+        enemies.push(mapToWorld({ x, y }));
+        this.enemies.push(new Runner());
+      }
+      return curr === Tile.Bonus ? prev + 1 : prev;
+    }, 0);
+
+    this.setLevel({ level, player, bonuses, enemies })
   }
 
   public setLevel({ level, player, bonuses, enemies }: LevelType): void {
@@ -151,14 +160,19 @@ export class GameModel extends EventBus {
   }
 
   public replay() {
-    this.rest--
-    if (this.rest < 0) {
-      this.gameOver()
+    if (this.custom) {
+      this.custom = false;
+      this.dispatch(ModelEvents.CustomOver)
     } else {
-      this.dispatch(ModelEvents.UpdateRest, this.rest)
-      this.getLevel(this.levelNum)
-      this.paused = false
-      this.dispatch(ModelEvents.Message, { type: MessageType.Hide })
+      this.rest--
+      if (this.rest < 0) {
+        this.gameOver()
+      } else {
+        this.dispatch(ModelEvents.UpdateRest, this.rest)
+        this.getLevel(this.levelNum)
+        this.paused = false
+        this.dispatch(ModelEvents.Message, { type: MessageType.Hide })
+      }
     }
   }
 
@@ -193,7 +207,7 @@ export class GameModel extends EventBus {
     })
     this.dispatch(ModelEvents.Message, {
       type: MessageType.Message,
-      title: `LEVEL ${this.levelNum + 1}`,
+      title: this.custom ? 'CUSTOM LEVEL' : `LEVEL ${this.levelNum + 1}`,
     })
     this.update()
   }
@@ -326,11 +340,17 @@ export class GameModel extends EventBus {
         this.score += 100
         this.dispatch(ModelEvents.UpdateScore, this.score)
         if (this.bonuses === 0) {
-          this.levelNum++
-          this.getLevel(this.levelNum)
+          if (this.custom) {
+            this.custom = false;
+            this.dispatch(ModelEvents.CustomOver)
+            return
+          } else {
+            this.levelNum++
+            this.getLevel(this.levelNum)
 
-          this.dispatch(ModelEvents.LevelUp, this.levelNum)
-          return
+            this.dispatch(ModelEvents.LevelUp, this.levelNum)
+            return
+          }
         }
       }
 
@@ -347,6 +367,10 @@ export class GameModel extends EventBus {
     if (!this.paused) {
       requestAnimationFrame(this.update.bind(this))
     }
+  }
+
+  public get customLevel(): Int8Array {
+    return this._customLevel
   }
 
   // ---

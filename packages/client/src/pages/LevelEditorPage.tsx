@@ -1,11 +1,20 @@
 import { useState, useRef, SyntheticEvent, useEffect } from 'react'
-import { Grid, ImageList, ImageListItem, Typography } from '@mui/material'
+import {
+  Grid,
+  ImageList,
+  ImageListItem,
+  Typography,
+  Button,
+} from '@mui/material'
 import { GeneralLayout } from '../layouts'
 import { Tile, TileSize } from '../components/game/constants'
 import { worldToMap, mapToWorld } from '../components/game/utils'
 import { Sprite } from '../components/game/view/sprite'
 import { tileEditorCfg } from '../components/game/view/spriteConfigs'
 import { PositionType } from '../components/game/model/types'
+import GameModel from '../components/game/model/GameModel'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '../constants'
 
 const width = 32 * TileSize
 const height = 22 * TileSize
@@ -55,6 +64,7 @@ const imagesData = [
 ]
 
 export const LevelEditorPage = () => {
+  const navigate = useNavigate()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const ctx = canvasRef.current?.getContext('2d')
   const tileSpr = new Sprite(tileEditorCfg)
@@ -68,7 +78,7 @@ export const LevelEditorPage = () => {
   const onCanvasClick = ({ nativeEvent }: SyntheticEvent) => {
     const { offsetX, offsetY } = nativeEvent as PointerEvent
     const { x, y } = worldToMap({ x: offsetX, y: offsetY })
-    const index = y * 22 + x
+    const index = y * 32 + x
     if (ACTORS.includes(itemType) && levelArray[index] !== Tile.Empty) {
       // do nothing
     } else {
@@ -93,13 +103,18 @@ export const LevelEditorPage = () => {
     }
   }
 
+  const onTryClick = () => {
+    GameModel.parseLevel(new Int8Array(levelArray), true)
+    navigate(ROUTES.game)
+  }
+
   useEffect(() => {
     return () => {
       if (playerPos && itemType === Tile.Player) {
         if (ctx) {
           const atWorld = mapToWorld(playerPos)
           ctx.clearRect(atWorld.x, atWorld.y, TileSize, TileSize)
-          const index = playerPos.y * 22 + playerPos.x
+          const index = playerPos.y * 32 + playerPos.x
           setLevelArray(
             levelArray.map((tile, i) => (i === index ? Tile.Empty : tile))
           )
@@ -108,6 +123,27 @@ export const LevelEditorPage = () => {
     }
   }, [playerPos])
 
+  useEffect(() => {
+    if (GameModel.customLevel?.length > 0) {
+      const arr: Array<Tile> = []
+      GameModel.customLevel.forEach((tile, i) => {
+        arr.push(tile)
+        const x = i % 32
+        const y = Math.floor(i / 32)
+        if (tile === Tile.Player) {
+          setPlayerPos({ x, y })
+        }
+        if (ctx) {
+          ctx.clearRect(x * TileSize, y * TileSize, TileSize, TileSize)
+          if (tile !== Tile.Empty) {
+            ctx.drawImage(tileSpr.getPhase(0, tile), x * TileSize, y * TileSize)
+          }
+        }
+      })
+      setLevelArray(arr)
+    }
+  }, [ctx])
+
   return (
     <GeneralLayout>
       <Grid container spacing={2} sx={{ padding: '20px' }}>
@@ -115,6 +151,7 @@ export const LevelEditorPage = () => {
           <Typography component="h6" variant="h6">
             Level preview
           </Typography>
+          <Button onClick={onTryClick}>TRY IT!</Button>
           <canvas
             ref={canvasRef}
             width={width}

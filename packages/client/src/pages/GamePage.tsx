@@ -23,10 +23,17 @@ export const GamePage = () => {
     }
     navigate(ROUTES.leaderBoard)
   }
+
+  const onCustomOver = () => {
+    navigate(ROUTES.levelEditor)
+  }
+
   useEffect(() => {
     GameModel.on(ModelEvents.GameOver, onOver)
+    GameModel.on(ModelEvents.CustomOver, onCustomOver)
     return () => {
       GameModel.off(ModelEvents.GameOver, onOver)
+      GameModel.off(ModelEvents.CustomOver, onCustomOver)
     }
   }, [])
 
