@@ -1,11 +1,5 @@
 import { useState, useRef, SyntheticEvent, useEffect } from 'react'
-import {
-  Grid,
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  Typography,
-} from '@mui/material'
+import { Grid, ImageList, ImageListItem, Typography } from '@mui/material'
 import { GeneralLayout } from '../layouts'
 import { Tile, TileSize } from '../components/game/constants'
 import { worldToMap, mapToWorld } from '../components/game/utils'
@@ -15,7 +9,6 @@ import { PositionType } from '../components/game/model/types'
 
 const width = 32 * TileSize
 const height = 22 * TileSize
-const tileSpr = new Sprite(tileEditorCfg)
 const ACTORS = [Tile.Player, Tile.Enemy]
 
 const imagesData = [
@@ -64,6 +57,7 @@ const imagesData = [
 export const LevelEditorPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const ctx = canvasRef.current?.getContext('2d')
+  const tileSpr = new Sprite(tileEditorCfg)
 
   const [itemType, setItemType] = useState<Tile>(Tile.Brick)
   const [levelArray, setLevelArray] = useState<Array<Tile>>(
