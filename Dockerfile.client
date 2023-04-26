@@ -9,11 +9,13 @@ FROM base as builder
 
 COPY package.json yarn.lock
 RUN yarn install --frozen-lockfile
-RUN npm i -g lerna@5.4.3 -y
 
 COPY . .
 
+RUN npm i -g npm@9.6.5
 RUN npm i -g lerna@5.4.3 -y
+RUN npm audit fix --force
+
 RUN yarn lerna bootstrap
 RUN rm -rf /app/packages/client/dist/ && yarn build --scope=client
 
