@@ -13,8 +13,7 @@ RUN npm i -g lerna@5.4.3 -y
 
 COPY . .
 
-RUN npm i -g lerna@5.4.3
-RUN yarn global add lerna
+RUN npm i -g lerna@5.4.3 -y
 RUN yarn lerna bootstrap
 RUN rm -rf /app/packages/client/dist/ && yarn build --scope=client
 
