@@ -22,7 +22,7 @@ function startServer() {
       .use(
         cors({
           credentials: true,
-          origin: `http://localhost:${process.env.CLIENT_PORT}`,
+          origin: `http://130.193.39.171:${process.env.CLIENT_PORT}`,
         })
       )
       .use(express.json())
