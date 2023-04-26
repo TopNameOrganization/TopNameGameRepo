@@ -10,4 +10,3 @@ lerna-debug.log
 .yarn
 .yarnrc.yml
 coverage
-.env
