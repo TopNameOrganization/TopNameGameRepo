@@ -1,11 +1,9 @@
 import { Tile } from '../../constants'
+import { getImage } from './get-image';
 import tileImg from '../../../../assets/game/editor/tiles.png'
 
-const img = new Image();
-img.src = tileImg;
-
 export const tileEditorCfg = {
-  img,
+  img: getImage(tileImg)!,
   fps: 15,
   phases: {
     [Tile.Brick]: { start: 0, length: 1 },

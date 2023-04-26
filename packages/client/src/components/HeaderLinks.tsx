@@ -7,7 +7,12 @@ import { ROUTES } from '../constants'
 export const HeaderLinks = () => {
   const routeMatch = useRouteMatch(Object.values(ROUTES))
   const currentTab = routeMatch?.pattern?.path
-  const possibleTabs = [ROUTES.game, ROUTES.leaderBoard, ROUTES.forum]
+  const possibleTabs = [
+    ROUTES.game,
+    ROUTES.leaderBoard,
+    ROUTES.forum,
+    ROUTES.levelEditor,
+  ]
 
   const value = possibleTabs.includes(currentTab!) ? currentTab : false
 
