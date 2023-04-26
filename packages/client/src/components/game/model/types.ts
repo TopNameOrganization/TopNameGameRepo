@@ -49,6 +49,7 @@ export enum ModelEvents {
   UpdateScore = 'updateScore',
   UpdateRest = 'updateRest',
   GameOver = 'over',
+  CustomOver = 'customOver',
 };
 
 export enum MessageType {
