@@ -5,6 +5,7 @@ import {
   ImageListItem,
   Typography,
   Button,
+  Box,
 } from '@mui/material'
 import { GeneralLayout } from '../layouts'
 import { Tile, TileSize } from '../components/game/constants'
@@ -148,10 +149,14 @@ export const LevelEditorPage = () => {
     <GeneralLayout>
       <Grid container spacing={2} sx={{ padding: '20px' }}>
         <Grid item xs={10}>
-          <Typography component="h6" variant="h6">
-            Level preview
-          </Typography>
-          <Button onClick={onTryClick}>TRY IT!</Button>
+          <Box sx={{ display: 'flex' }}>
+            <Typography component="h6" variant="h6">
+              Level preview
+            </Typography>
+            <Button onClick={onTryClick} sx={{ ml: 4 }}>
+              TRY IT!
+            </Button>
+          </Box>
           <canvas
             ref={canvasRef}
             width={width}
