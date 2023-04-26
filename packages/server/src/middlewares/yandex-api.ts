@@ -1,9 +1,11 @@
-import axios from 'axios';
+import axios from 'axios'
 
 export class YandexAPI {
   API_ROOT = 'https://ya-praktikum.tech/api/v2/'
 
-  constructor(private cookieHeader: string) {}
+  constructor(private cookieHeader: string) {
+    this.cookieHeader = cookieHeader
+  }
 
   async authUser() {
     const { data } = await axios.get(`${this.API_ROOT}/auth/user`, {
@@ -11,6 +13,6 @@ export class YandexAPI {
         cookie: this.cookieHeader,
       },
     })
-    return data;
+    return data
   }
 }
